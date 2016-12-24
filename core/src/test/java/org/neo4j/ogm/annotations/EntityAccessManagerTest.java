@@ -47,8 +47,6 @@ import org.neo4j.ogm.entity.io.EntityAccessManager;
 import org.neo4j.ogm.entity.io.EntityAccess;
 import org.neo4j.ogm.entity.io.FieldReader;
 import org.neo4j.ogm.entity.io.FieldWriter;
-import org.neo4j.ogm.entity.io.MethodReader;
-import org.neo4j.ogm.entity.io.MethodWriter;
 import org.neo4j.ogm.entity.io.PropertyReader;
 import org.neo4j.ogm.entity.io.RelationalReader;
 import org.neo4j.ogm.entity.io.RelationalWriter;
@@ -179,7 +177,6 @@ public class EntityAccessManagerTest {
 
         RelationalWriter objectAccess = EntityAccessManager.getRelationalWriter(classInfo, "HAS_ACTIVITY", Relationship.OUTGOING, new Comment());
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the setter", objectAccess instanceof MethodWriter);
         Member member = new Member();
         objectAccess.write(member, parameter);
         assertEquals(member.getActivityList(), parameter);
@@ -216,7 +213,6 @@ public class EntityAccessManagerTest {
 
         RelationalWriter objectAccess = EntityAccessManager.getRelationalWriter(classInfo, "LOCATION", Relationship.OUTGOING, satelliteLocation);
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the setter", objectAccess instanceof MethodWriter);
         Satellite satellite = new Satellite();
         objectAccess.write(satellite, satelliteLocation);
         assertEquals(satellite.getLocation(), satelliteLocation);
@@ -329,7 +325,6 @@ public class EntityAccessManagerTest {
 
         RelationalReader reader = EntityAccessManager.getRelationalReader(classInfo, "HAS_ACTIVITY", Relationship.OUTGOING);
         assertNotNull("The resultant object reader shouldn't be null", reader);
-        assertTrue("The access mechanism should be via the getter", reader instanceof MethodReader);
         assertSame(member.getActivityList(), reader.read(member));
         assertEquals("HAS_ACTIVITY", reader.relationshipType());
     }
@@ -365,7 +360,6 @@ public class EntityAccessManagerTest {
 
         RelationalReader reader = EntityAccessManager.getRelationalReader(classInfo, "LOCATION", Relationship.OUTGOING);
         assertNotNull("The resultant object accessor shouldn't be null", reader);
-        assertTrue("The access mechanism should be via the getter", reader instanceof MethodReader);
         assertSame(satellite.getLocation(), reader.read(satellite));
         assertEquals("LOCATION", reader.relationshipType());
     }
@@ -414,7 +408,6 @@ public class EntityAccessManagerTest {
         assertEquals("An unexpected number of accessors was returned", 7, relationalAccessors.size());
 
         Map<String, Class<? extends RelationalReader>> expectedRelationalReaders = new HashMap<>();
-        expectedRelationalReaders.put("COMMENT", MethodReader.class);
         expectedRelationalReaders.put("FAVOURITE_TOPIC", FieldReader.class);
         expectedRelationalReaders.put("CONTAINS", FieldReader.class);
         expectedRelationalReaders.put("POST_WITHOUT_ACCESSOR_METHODS", FieldReader.class);

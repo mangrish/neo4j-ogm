@@ -23,7 +23,6 @@ import java.util.List;
 import org.junit.Test;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.entity.io.EntityAccessManager;
-import org.neo4j.ogm.entity.io.MethodWriter;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
@@ -43,7 +42,6 @@ public class RelationshipWriterPlainSetterTest {
 
         RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "LIST", Relationship.OUTGOING, new T());
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the method", objectAccess instanceof MethodWriter);
         assertEquals("LIST", objectAccess.relationshipName());
         assertEquals(List.class, objectAccess.type());
 
@@ -56,7 +54,6 @@ public class RelationshipWriterPlainSetterTest {
 
         RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "SCALAR", Relationship.OUTGOING, new T());
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the method", objectAccess instanceof MethodWriter);
         assertEquals("SCALAR", objectAccess.relationshipName());
         assertEquals(T.class, objectAccess.type());
 
@@ -70,7 +67,6 @@ public class RelationshipWriterPlainSetterTest {
 
         RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "ARRAY", Relationship.OUTGOING, new T());
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the method", objectAccess instanceof MethodWriter);
         assertEquals("ARRAY", objectAccess.relationshipName());
         assertEquals(T[].class, objectAccess.type());
 

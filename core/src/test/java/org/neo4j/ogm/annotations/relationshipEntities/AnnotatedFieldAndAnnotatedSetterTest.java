@@ -26,7 +26,6 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 import org.neo4j.ogm.entity.io.EntityAccessManager;
-import org.neo4j.ogm.entity.io.MethodWriter;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
@@ -47,7 +46,6 @@ public class AnnotatedFieldAndAnnotatedSetterTest {
 
         RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "REL_ENTITY_TYPE", Relationship.INCOMING, new RelEntity());
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the method", objectAccess instanceof MethodWriter);
         End end = new End();
         objectAccess.write(end, parameter);
         assertEquals(end.getRelEntities(), parameter);
