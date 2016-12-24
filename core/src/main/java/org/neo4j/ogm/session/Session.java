@@ -13,7 +13,20 @@
 
 package org.neo4j.ogm.session;
 
-import org.neo4j.ogm.session.event.Observer;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Map;
+
+import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.cypher.Filter;
+import org.neo4j.ogm.cypher.Filters;
+import org.neo4j.ogm.cypher.query.Pagination;
+import org.neo4j.ogm.cypher.query.SortOrder;
+import org.neo4j.ogm.model.QueryStatistics;
+import org.neo4j.ogm.model.Result;
+import org.neo4j.ogm.session.event.Event;
+import org.neo4j.ogm.session.event.EventListener;
+import org.neo4j.ogm.transaction.Transaction;
 
 /**
  * A {@link Session} serves as the main point of integration for the Neo4j OGM.  All the publicly-available capabilities of the
@@ -24,17 +37,243 @@ import org.neo4j.ogm.session.event.Observer;
  * @author Luanne Misquitta
  * @author Mark Angrish
  */
-public interface Session extends
-        Observer,
-        Capability.LoadOne,
-        Capability.LoadByIds,
-        Capability.LoadByInstances,
-        Capability.LoadByType,
-        Capability.Save,
-        Capability.Delete,
-        Capability.Transactions,
-        Capability.ExecuteQueries,
-        Capability.GraphId {
+public interface Session {
+
+	EventListener register(EventListener eventListener);
+
+	boolean dispose(EventListener eventListener);
+
+	void notifyListeners(Event event);
+
+	boolean eventsEnabled();
+
+	<T, ID extends Serializable> T load(Class<T> type, ID id);
+
+	<T, ID extends Serializable> T load(Class<T> type, ID id, int depth);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, int depth);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, SortOrder sortOrder);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, SortOrder sortOrder, int depth);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, Pagination paging);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, Pagination paging, int depth);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, SortOrder sortOrder, Pagination pagination);
+
+	<T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, SortOrder sortOrder, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Collection<T> objects);
+
+	<T> Collection<T> loadAll(Collection<T> objects, int depth);
+
+	<T> Collection<T> loadAll(Collection<T> objects, SortOrder sortOrder);
+
+	<T> Collection<T> loadAll(Collection<T> objects, SortOrder sortOrder, int depth);
+
+	<T> Collection<T> loadAll(Collection<T> objects, Pagination pagination);
+
+	<T> Collection<T> loadAll(Collection<T> objects, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Collection<T> objects, SortOrder sortOrder, Pagination pagination);
+
+	<T> Collection<T> loadAll(Collection<T> objects, SortOrder sortOrder, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type);
+
+	<T> Collection<T> loadAll(Class<T> type, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, SortOrder sortOrder);
+
+	<T> Collection<T> loadAll(Class<T> type, SortOrder sortOrder, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Pagination paging);
+
+	<T> Collection<T> loadAll(Class<T> type, Pagination paging, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, SortOrder sortOrder, Pagination pagination);
+
+	<T> Collection<T> loadAll(Class<T> type, SortOrder sortOrder, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, SortOrder sortOrder);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, SortOrder sortOrder, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, Pagination pagination);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, SortOrder sortOrder, Pagination pagination);
+
+	<T> Collection<T> loadAll(Class<T> type, Filter filter, SortOrder sortOrder, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, SortOrder sortOrder);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, SortOrder sortOrder, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, Pagination pagination);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, Pagination pagination, int depth);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, SortOrder sortOrder, Pagination pagination);
+
+	<T> Collection<T> loadAll(Class<T> type, Filters filters, SortOrder sortOrder, Pagination pagination, int depth);
+
+	<T> void save(T object);
+
+	<T> void save(T object, int depth);
+
+	<T> void delete(T object);
+
+	<T> void deleteAll(Class<T> type);
+
+	<T> Object delete(Class<T> type, Iterable<Filter> filters, boolean listResults);
+
+	void purgeDatabase();
+
+	void clear();
+
+	/**
+	 * Resolve the graph id for a possible entity
+	 * @param possibleEntity the possible entity
+	 * @return the value of the {@link GraphId} or null if either the object is not an entity or the id is null.
+	 */
+	Long resolveGraphIdFor(Object possibleEntity);
+
+	boolean detachNodeEntity(Long id);
+
+	boolean detachRelationshipEntity(Long id);
+
+	/**
+	 * Given a cypher statement this method will return a domain object that is hydrated to the
+	 * default level or a scalar (depending on the parametrized type).
+	 *
+	 * @param objectType The type that should be returned from the query.
+	 * @param cypher The parametrizable cypher to execute.
+	 * @param parameters Any scalar parameters to attach to the cypher.
+	 *
+	 * @param <T> A domain object or scalar.
+	 *
+	 * @return An instance of the objectType that matches the given cypher and parameters. Null if no object
+	 * is matched
+	 *
+	 * @throws java.lang.RuntimeException If more than one object is found.
+	 */
+	<T> T queryForObject(Class<T> objectType, String cypher,  Map<String, ?> parameters);
+
+	/**
+	 * Given a cypher statement this method will return a collection of domain objects that is hydrated to
+	 * the default level or a collection of scalars (depending on the parametrized type).
+	 *
+	 * @param objectType The type that should be returned from the query.
+	 * @param cypher The parametrizable cypher to execute.
+	 * @param parameters Any parameters to attach to the cypher.
+	 *
+	 * @param <T> A domain object or scalar.
+	 *
+	 * @return A collection of domain objects or scalars as prescribed by the parametrized type.
+	 */
+	<T> Iterable<T> query(Class<T> objectType, String cypher, Map<String, ?> parameters);
+
+	/**
+	 * Given a cypher statement this method will return a Result object containing a collection of Map's which represent Neo4j
+	 * objects as properties, along with query statistics if applicable.
+	 *
+	 * Each element of the query result is a map which you can access by the name of the returned field
+	 *
+	 * TODO: Are we going to use the neo4jOperations conversion method to cast the value object to its proper class?
+	 *
+	 * @param cypher  The parametrisable cypher to execute.
+	 * @param parameters Any parameters to attach to the cypher.
+	 *
+	 * @return A {@link Result} containing an {@link Iterable} map representing query results and {@link QueryStatistics} if applicable.
+	 */
+	Result query(String cypher, Map<String, ?> parameters);
+
+	/**
+	 * Given a cypher statement this method will return a Result object containing a collection of Map's which represent Neo4j
+	 * objects as properties, along with query statistics if applicable.
+	 *
+	 * Each element of the query result is a map which you can access by the name of the returned field
+	 *
+	 * TODO: Are we going to use the neo4jOperations conversion method to cast the value object to its proper class?
+	 *
+	 * @param cypher  The parametrisable cypher to execute.
+	 * @param parameters Any parameters to attach to the cypher.
+	 * @param readOnly true if the query is readOnly, false otherwise
+	 *
+	 * @return A {@link Result} of {@link Iterable}s with each entry representing a neo4j object's properties.
+	 */
+	Result query(String cypher, Map<String, ?> parameters, boolean readOnly);
+
+	/**
+	 * Counts all the <em>node</em> entities of the specified type.
+	 *
+	 * @param entity The {@link Class} denoting the type of entity to count
+	 * @return The number of entities in the database of the given type
+	 */
+	long countEntitiesOfType(Class<?> entity);
+
+	/**
+	 * Counts all the <em>node</em> entities of the specified type which match the filters supplied
+	 *
+	 * @param clazz The {@link Class} denoting the type of entity to count
+	 * @param filters a collection of {@link Filter} objects used as additional parameters to the query
+	 * @return The number of entities in the database of the given type matched by the given filters
+	 */
+	long count(Class<?> clazz, Iterable<Filter> filters);
+
+	/**
+	 * Get the existing transaction if available
+	 *
+	 * @return an active Transaction, or null if none exists
+	 */
+	Transaction getTransaction();
+
+	/**
+	 * Begin a new READ_WRITE transaction. If an existing transaction already exists, users must
+	 * decide whether to commit or rollback. Only one transaction can be bound to a thread
+	 * at any time, so active transactions that have not been closed but are no longer bound
+	 * to the thread must be handled by client code.
+	 *
+	 * @return a new active Transaction
+	 */
+	Transaction beginTransaction();
+
+	/**
+	 * Begin a new transaction, passing in the required type (READ_ONLY, READ_WRITE).
+	 * If an existing transaction already exists, users must
+	 * decide whether to commit or rollback. Only one transaction can be bound to a thread
+	 * at any time, so active transactions that have not been closed but are no longer bound
+	 * to the thread must be handled by client code.
+	 *
+	 * @param type the {@link Transaction.Type} required for this transaction
+	 * @return a new active Transaction
+	 */
+	Transaction beginTransaction(Transaction.Type type);
+	/**
+	 * Applies the given {@link GraphCallback} in the scope of this {@link Session}, giving fine-grained control over
+	 * behaviour.
+	 *
+	 * @param <T> The type of object returned from applying this callback
+	 * @param graphCallback The {@link GraphCallback} to execute
+	 * @return The result of calling the given {@link GraphCallback}
+	 * @throws NullPointerException if invoked with <code>null</code>
+	 */
+	@Deprecated
+	<T> T doInTransaction(GraphCallback<T> graphCallback);
 
 	/**
 	 * Retrieves the last bookmark used in this session when used in a Neo4j Causal Cluster.
