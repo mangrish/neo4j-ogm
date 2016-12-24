@@ -510,11 +510,11 @@ public class GraphEntityMapper implements ResponseMapper<GraphModel> {
         for (ClassInfo classInfo : metadata.classInfoByLabelOrType(edge.getType())) {
 
 			// both source and target must be declared as START and END nodes respectively
-			if (!nodeTypeMatches(classInfo, source, StartNode.CLASS)) {
+			if (!nodeTypeMatches(classInfo, source, StartNode.class.getCanonicalName())) {
 				continue;
 			}
 
-			if (!nodeTypeMatches(classInfo, target, EndNode.CLASS)) {
+			if (!nodeTypeMatches(classInfo, target, EndNode.class.getCanonicalName())) {
 				continue;
 			}
 

@@ -123,7 +123,7 @@ public class EntityAccessManager {
     private static <T> T determinePropertyAccessor(ClassInfo classInfo, String propertyName, MethodInfo accessorMethodInfo,
                                             AccessorFactory<T> factory) {
         if (accessorMethodInfo != null) {
-            if (!accessorMethodInfo.hasAnnotation(Property.CLASS)) {
+            if (!accessorMethodInfo.hasAnnotation(Property.class.getCanonicalName())) {
                 // if there's an annotated field then we should prefer that over the non-annotated method
                 FieldInfo fieldInfo = classInfo.propertyField(propertyName);
                 if (fieldInfo != null && !fieldInfo.getAnnotations().isEmpty()) {
@@ -335,7 +335,7 @@ public class EntityAccessManager {
         for (FieldInfo fieldInfo : classInfo.propertyFields()) {
             MethodInfo getterInfo = classInfo.propertyGetter(fieldInfo.property());
             if (getterInfo != null) { //if we have a getter
-                if (getterInfo.hasAnnotation(Property.CLASS) || fieldInfo.getAnnotations().isEmpty()) { //and the getter is annotated with @Property OR the field is not annotated
+                if (getterInfo.hasAnnotation(Property.class.getCanonicalName()) || fieldInfo.getAnnotations().isEmpty()) { //and the getter is annotated with @Property OR the field is not annotated
                     readers.add(new MethodReader(classInfo, getterInfo)); //use the getter
                     continue;
                 }
@@ -355,7 +355,7 @@ public class EntityAccessManager {
         for (FieldInfo fieldInfo : classInfo.relationshipFields()) {
             MethodInfo getterInfo = classInfo.methodsInfo().get(inferGetterName(fieldInfo));
             if (getterInfo != null) {
-                if (getterInfo.hasAnnotation(Relationship.CLASS) || !fieldInfo.hasAnnotation(Relationship.CLASS)) {
+                if (getterInfo.hasAnnotation(Relationship.class.getCanonicalName()) || !fieldInfo.hasAnnotation(Relationship.class.getCanonicalName())) {
                     readers.add(new MethodReader(classInfo, getterInfo));
                     continue;
                 }
@@ -481,7 +481,7 @@ public class EntityAccessManager {
 
     public static RelationalReader getEndNodeReader(ClassInfo relationshipEntityClassInfo) {
         for (FieldInfo fieldInfo : relationshipEntityClassInfo.relationshipFields()) {
-            if (fieldInfo.getAnnotations().get(EndNode.CLASS) != null) {
+            if (fieldInfo.getAnnotations().get(EndNode.class.getCanonicalName()) != null) {
                 return new FieldReader(relationshipEntityClassInfo, fieldInfo);
             }
         }
@@ -491,7 +491,7 @@ public class EntityAccessManager {
 
     public static RelationalReader getStartNodeReader(ClassInfo relationshipEntityClassInfo) {
         for (FieldInfo fieldInfo : relationshipEntityClassInfo.relationshipFields()) {
-            if (fieldInfo.getAnnotations().get(StartNode.CLASS) != null) {
+            if (fieldInfo.getAnnotations().get(StartNode.class.getCanonicalName()) != null) {
                 return new FieldReader(relationshipEntityClassInfo, fieldInfo);
             }
         }
@@ -549,9 +549,9 @@ public class EntityAccessManager {
         if (methodInfos.size() == 1) {
             MethodInfo candidateMethodInfo = methodInfos.iterator().next();
             //If the method is annotated, then the relationship type must match
-            if (candidateMethodInfo.hasAnnotation(Relationship.CLASS)) {
-                AnnotationInfo relationshipAnnotation = candidateMethodInfo.getAnnotations().get(Relationship.CLASS);
-                if(!relationshipType.equals(relationshipAnnotation.get(Relationship.TYPE, null))) {
+            if (candidateMethodInfo.hasAnnotation(Relationship.class.getCanonicalName())) {
+                AnnotationInfo relationshipAnnotation = candidateMethodInfo.getAnnotations().get(Relationship.class.getCanonicalName());
+                if(!relationshipType.equals(relationshipAnnotation.get("type", null))) {
                     return null;
                 }
             }
@@ -584,9 +584,9 @@ public class EntityAccessManager {
         }
         if (methodInfos.size() == 1) {
             MethodInfo candidateMethodInfo = methodInfos.iterator().next();
-            if (candidateMethodInfo.hasAnnotation(Relationship.CLASS)) {
-                AnnotationInfo relationshipAnnotation = candidateMethodInfo.getAnnotations().get(Relationship.CLASS);
-                if(!relationshipType.equals(relationshipAnnotation.get(Relationship.TYPE, null))) {
+            if (candidateMethodInfo.hasAnnotation(Relationship.class.getCanonicalName())) {
+                AnnotationInfo relationshipAnnotation = candidateMethodInfo.getAnnotations().get(Relationship.class.getCanonicalName());
+                if(!relationshipType.equals(relationshipAnnotation.get("type", null))) {
                     return null;
                 }
             }
@@ -618,9 +618,9 @@ public class EntityAccessManager {
         }
         if (fieldInfos.size() == 1) {
             FieldInfo candidateFieldInfo = fieldInfos.iterator().next();
-            if (candidateFieldInfo.hasAnnotation(Relationship.CLASS)) {
-                AnnotationInfo relationshipAnnotation = candidateFieldInfo.getAnnotations().get(Relationship.CLASS);
-                if(!relationshipType.equals(relationshipAnnotation.get(Relationship.TYPE, null))) {
+            if (candidateFieldInfo.hasAnnotation(Relationship.class.getCanonicalName())) {
+                AnnotationInfo relationshipAnnotation = candidateFieldInfo.getAnnotations().get(Relationship.class.getCanonicalName());
+                if(!relationshipType.equals(relationshipAnnotation.get("type", null))) {
                     return null;
                 }
             }

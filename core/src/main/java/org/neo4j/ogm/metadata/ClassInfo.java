@@ -218,14 +218,14 @@ public class ClassInfo {
             try {
                 lock.lock();
                 if (neo4jName == null) {
-                    AnnotationInfo annotationInfo = annotationsInfo.get(NodeEntity.CLASS);
+                    AnnotationInfo annotationInfo = annotationsInfo.get(NodeEntity.class.getCanonicalName());
                     if (annotationInfo != null) {
-                        neo4jName = annotationInfo.get(NodeEntity.LABEL, simpleName());
+                        neo4jName = annotationInfo.get("label", simpleName());
                         return neo4jName;
                     }
-                    annotationInfo = annotationsInfo.get(RelationshipEntity.CLASS);
+                    annotationInfo = annotationsInfo.get(RelationshipEntity.class.getCanonicalName());
                     if (annotationInfo != null) {
-                        neo4jName = annotationInfo.get(RelationshipEntity.TYPE, simpleName().toUpperCase());
+                        neo4jName = annotationInfo.get("type", simpleName().toUpperCase());
                         return neo4jName;
                     }
                     neo4jName = simpleName();
@@ -238,7 +238,7 @@ public class ClassInfo {
     }
 
     private Collection<String> collectLabels(Collection<String> labelNames) {
-        if (!isAbstract || annotationsInfo.get(NodeEntity.CLASS) != null) {
+        if (!isAbstract || annotationsInfo.get(NodeEntity.class.getCanonicalName()) != null) {
             labelNames.add(neo4jName());
         }
         if (directSuperclass != null && !"java.lang.Object".equals(directSuperclass.className)) {
@@ -322,7 +322,7 @@ public class ClassInfo {
             lock.lock();
             if (identityField == null) {
                 for (FieldInfo fieldInfo : fieldsInfo().fields()) {
-                    AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(GraphId.CLASS);
+                    AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(GraphId.class.getCanonicalName());
                     if (annotationInfo != null) {
                         if (fieldInfo.getTypeDescriptor().equals("Ljava/lang/Long;")) {
                             identityField = fieldInfo;
@@ -381,7 +381,7 @@ public class ClassInfo {
 
     public boolean isRelationshipEntity() {
         for (AnnotationInfo info : annotations()) {
-            if (info.getName().equals(RelationshipEntity.CLASS)) {
+            if (info.getName().equals(RelationshipEntity.class.getCanonicalName())) {
                 return true;
             }
         }
@@ -403,7 +403,7 @@ public class ClassInfo {
                     fieldInfos = new HashSet<>();
                     for (FieldInfo fieldInfo : fieldsInfo().fields()) {
                         if (fieldInfo != identityField && !fieldInfo.isLabelField()) {
-                            AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(Property.CLASS);
+                            AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(Property.class.getCanonicalName());
                             if (annotationInfo == null) {
                                 if (fieldInfo.persistableAsProperty()) {
                                     fieldInfos.add(fieldInfo);
@@ -475,7 +475,7 @@ public class ClassInfo {
         Set<FieldInfo> fieldInfos = new HashSet<>();
         for (FieldInfo fieldInfo : fieldsInfo().fields()) {
             if (fieldInfo != identityField) {
-                AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(Relationship.CLASS);
+                AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(Relationship.class.getCanonicalName());
                 if (annotationInfo == null) {
                     if (!fieldInfo.persistableAsProperty()) {
                         fieldInfos.add(fieldInfo);
@@ -569,7 +569,7 @@ public class ClassInfo {
      */
     public MethodInfo identityGetter() {
         for (MethodInfo methodInfo : methodsInfo().getters()) {
-            AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(GraphId.CLASS);
+            AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(GraphId.class.getCanonicalName());
             if (annotationInfo != null) {
                 if (methodInfo.getTypeDescriptor().equals("()Ljava/lang/Long;")) {
                     return methodInfo;
@@ -593,7 +593,7 @@ public class ClassInfo {
      */
     public MethodInfo identitySetter() {
         for (MethodInfo methodInfo : methodsInfo().setters()) {
-            AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(GraphId.CLASS);
+            AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(GraphId.class.getCanonicalName());
             if (annotationInfo != null) {
                 if (methodInfo.getTypeDescriptor().equals("(Ljava/lang/Long;)V")) {
                     return methodInfo;
@@ -620,7 +620,7 @@ public class ClassInfo {
         Set<MethodInfo> propertyGetters = new HashSet<>();
         for (MethodInfo methodInfo : methodsInfo().getters()) {
             if (!methodInfo.isEquallyNamed(identityGetter)) {
-                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Property.CLASS);
+                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Property.class.getCanonicalName());
                 if (annotationInfo == null) {
                     if (methodInfo.isSimpleGetter()) {
                         propertyGetters.add(methodInfo);
@@ -644,7 +644,7 @@ public class ClassInfo {
         Set<MethodInfo> propertySetters = new HashSet<>();
         for (MethodInfo methodInfo : methodsInfo().setters()) {
             if (!methodInfo.isEquallyNamed(identitySetter)) {
-                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Property.CLASS);
+                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Property.class.getCanonicalName());
                 if (annotationInfo == null) {
                     if (methodInfo.isSimpleSetter()) {
                         propertySetters.add(methodInfo);
@@ -672,7 +672,7 @@ public class ClassInfo {
         Set<MethodInfo> relationshipGetters = new HashSet<>();
         for (MethodInfo methodInfo : methodsInfo().getters()) {
             if (identityGetter == null || !methodInfo.getName().equals(identityGetter.getName())) {
-                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Relationship.CLASS);
+                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Relationship.class.getCanonicalName());
                 if (annotationInfo == null) {
                     if (!methodInfo.isSimpleGetter()) {
                         relationshipGetters.add(methodInfo);
@@ -696,7 +696,7 @@ public class ClassInfo {
         Set<MethodInfo> relationshipSetters = new HashSet<>();
         for (MethodInfo methodInfo : methodsInfo().setters()) {
             if (identitySetter == null || !methodInfo.getName().equals(identitySetter.getName())) {
-                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Relationship.CLASS);
+                AnnotationInfo annotationInfo = methodInfo.getAnnotations().get(Relationship.class.getCanonicalName());
                 if (annotationInfo == null) {
                     if (!methodInfo.isSimpleSetter()) {
                         relationshipSetters.add(methodInfo);
@@ -1149,7 +1149,7 @@ public class ClassInfo {
     }
 
     public boolean isTransient() {
-        return annotationsInfo.get(Transient.CLASS) != null;
+        return annotationsInfo.get(Transient.class.getCanonicalName()) != null;
     }
 
     public boolean isAbstract() {

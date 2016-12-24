@@ -22,17 +22,16 @@ import org.neo4j.ogm.annotation.Relationship;
  */
 public class UserV18 {
 
+    @Relationship(direction = "OUTGOING")
     private UserV18 knows;
 
     public UserV18() {
     }
 
-    @Relationship(direction = "OUTGOING")
     public UserV18 getKnows() {
         return knows;
     }
 
-    @Relationship(direction = "OUTGOING")
     public void setKnows(UserV18 friend) {
         this.knows = friend;
     }

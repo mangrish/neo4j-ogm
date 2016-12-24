@@ -80,21 +80,23 @@ public class RelationshipWriterAnnotatedSetterTest {
 
         Long id;
 
+        @Relationship(type = "LIST", direction = Relationship.OUTGOING)
         List<T> list;
+
+        @Relationship(type = "ARRAY", direction = Relationship.OUTGOING)
         T[] array;
+
+        @Relationship(type = "SCALAR", direction = Relationship.OUTGOING)
         T scalar;
 
-        @Relationship(type = "LIST", direction = Relationship.OUTGOING)
         public void setList(List<T> list) {
             this.list = list;
         }
 
-        @Relationship(type = "ARRAY", direction = Relationship.OUTGOING)
         public void setArray(T[] array) {
             this.array = array;
         }
 
-        @Relationship(type = "SCALAR", direction = Relationship.OUTGOING)
         public void setScalar(T scalar) {
             this.scalar = scalar;
         }

@@ -62,7 +62,7 @@ public class MethodsInfo {
                     dataInputStream.skipBytes(attributeLength);
                 }
             }
-            if (!methodName.equals("<init>") && !methodName.equals("<clinit>") && objectAnnotations.get(Transient.CLASS) == null) {
+            if (!methodName.equals("<init>") && !methodName.equals("<clinit>") && objectAnnotations.get(Transient.class.getCanonicalName()) == null) {
                 addMethod(new MethodInfo(methodName, descriptor, typeParameterDescriptor, objectAnnotations));
             }
         }

@@ -28,12 +28,9 @@ import java.lang.annotation.*;
  * @author Vince Bickers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.FIELD)
 @Inherited
 public @interface Property {
-
-    String CLASS = "org.neo4j.ogm.annotation.Property";
-    String NAME = "name";
 
     String name() default "";
 }

@@ -59,12 +59,10 @@ public class Artist {
         this.name = name;
     }
 
-    @Relationship(type = "GUEST_ALBUM")
     public Set<Album> getGuestAlbums() {
         return guestAlbums;
     }
 
-    @Relationship(type = "GUEST_ALBUM")
     public void setGuestAlbums(Set<Album> guestAlbums) {
         this.guestAlbums = guestAlbums;
         for (Album album : guestAlbums) {

@@ -13,6 +13,7 @@
 
 package org.neo4j.ogm.annotation;
 
+
 import java.lang.annotation.*;
 
 /**
@@ -25,12 +26,9 @@ import java.lang.annotation.*;
  * @author Vince Bickers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.FIELD)
 @Inherited
 public @interface GraphId {
-
-    String CLASS = "org.neo4j.ogm.annotation.GraphId";
-    String NAME = "name";
 
     String name() default "";
 

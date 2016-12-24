@@ -502,6 +502,7 @@ public class EntityAccessManagerTest {
         String propertyMethodsIgnored;
         @Property(name = "differentAnnotationOnGetter")
         String propertyWithDifferentAnnotatedGetter;
+        @Property(name = "testAnnoProp")
         boolean fullyAnnotatedPropertyAccessorWasCalled;
         int propertyWithoutAccessorMethods;
         @Relationship(type = "CONTAINS")
@@ -515,6 +516,7 @@ public class EntityAccessManagerTest {
         Topic favouriteTopic;
         boolean topicAccessorWasCalled;
         Post postWithoutAccessorMethods;
+        @Relationship(type = "COMMENT")
         Comment readOnlyComment;
         // interestingly, if I extend DomainObject then the inherited ID field isn't found within a nested class
         @SuppressWarnings("unused")
@@ -546,13 +548,11 @@ public class EntityAccessManagerTest {
             this.nonAnnotatedTestProperty = value;
         }
 
-        @Property(name = "testAnnoProp")
         public String getFullyAnnotatedProperty() {
             this.fullyAnnotatedPropertyAccessorWasCalled = true;
             return fullyAnnotatedProperty;
         }
 
-        @Property(name = "testAnnoProp")
         public void setFullyAnnotatedProperty(String fullyAnnotatedProperty) {
             this.fullyAnnotatedPropertyAccessorWasCalled = true;
             this.fullyAnnotatedProperty = fullyAnnotatedProperty;
@@ -584,7 +584,6 @@ public class EntityAccessManagerTest {
             this.favouriteTopic = favouriteTopic;
         }
 
-        @Relationship(type = "COMMENT")
         public Comment getReadOnlyComment() {
             return this.readOnlyComment;
         }

@@ -109,7 +109,6 @@ public class TransientObjectsTest {
 
         public TransientSingleClass transientSingleClassField;
 
-        @Transient
         public String getTransientObject() {
             return transientObject;
         }

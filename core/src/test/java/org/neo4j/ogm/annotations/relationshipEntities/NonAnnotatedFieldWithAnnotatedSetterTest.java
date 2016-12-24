@@ -95,6 +95,8 @@ public class NonAnnotatedFieldWithAnnotatedSetterTest {
     public static class End {
         Long id;
         String name;
+
+        @Relationship(type = "REL_ENTITY_TYPE", direction = "INCOMING")
         Set<RelEntity> relEntities = new HashSet<>();
 
         public End() {
@@ -104,7 +106,6 @@ public class NonAnnotatedFieldWithAnnotatedSetterTest {
             return relEntities;
         }
 
-        @Relationship(type = "REL_ENTITY_TYPE", direction = "INCOMING")
         public void setRelEntities(Set<RelEntity> relEntities) {
             this.relEntities = relEntities;
         }

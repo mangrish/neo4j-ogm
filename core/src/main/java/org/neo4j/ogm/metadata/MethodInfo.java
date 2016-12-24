@@ -157,9 +157,9 @@ public class MethodInfo {
     public String property() {
         if (isSimpleSetter() || isSimpleGetter()) {
             if (annotations != null) {
-                AnnotationInfo propertyAnnotation = annotations.get(Property.CLASS);
+                AnnotationInfo propertyAnnotation = annotations.get(Property.class.getCanonicalName());
                 if (propertyAnnotation != null) {
-                    return propertyAnnotation.get(Property.NAME, getName());
+                    return propertyAnnotation.get("name", getName());
                 }
             }
             if (name.startsWith("get") || name.startsWith("set")) {
@@ -175,9 +175,9 @@ public class MethodInfo {
     public String relationship() {
         if (!isSimpleSetter() && !isSimpleGetter()) {
             if (annotations != null) {
-                AnnotationInfo relationshipAnnotation = annotations.get(Relationship.CLASS);
+                AnnotationInfo relationshipAnnotation = annotations.get(Relationship.class.getCanonicalName());
                 if (relationshipAnnotation != null) {
-                    return relationshipAnnotation.get(Relationship.TYPE, RelationshipUtils.inferRelationshipType(getName()));
+                    return relationshipAnnotation.get("type", RelationshipUtils.inferRelationshipType(getName()));
                 }
             }
             return RelationshipUtils.inferRelationshipType(getName());
@@ -188,9 +188,9 @@ public class MethodInfo {
     public String relationshipTypeAnnotation() {
         if (!isSimpleSetter() && !isSimpleGetter()) {
             if (annotations != null) {
-                AnnotationInfo relationshipAnnotation = annotations.get(Relationship.CLASS);
+                AnnotationInfo relationshipAnnotation = annotations.get(Relationship.class.getCanonicalName());
                 if (relationshipAnnotation != null) {
-                    return relationshipAnnotation.get(Relationship.TYPE, null);
+                    return relationshipAnnotation.get("type", null);
                 }
             }
         }
@@ -267,11 +267,11 @@ public class MethodInfo {
 
     public String relationshipDirection(String defaultDirection) {
         if (relationship() != null) {
-            AnnotationInfo annotationInfo = getAnnotations().get(Relationship.CLASS);
+            AnnotationInfo annotationInfo = getAnnotations().get(Relationship.class.getCanonicalName());
             if (annotationInfo == null) {
                 return defaultDirection;
             }
-            return annotationInfo.get(Relationship.DIRECTION, defaultDirection);
+            return annotationInfo.get("direction", defaultDirection);
         }
         throw new RuntimeException("relationship direction call invalid");
     }

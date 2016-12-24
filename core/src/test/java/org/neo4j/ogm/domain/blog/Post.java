@@ -13,6 +13,7 @@
 
 package org.neo4j.ogm.domain.blog;
 
+import org.neo4j.ogm.annotation.PostLoad;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
 
@@ -23,7 +24,10 @@ public class Post {
 
     private Long id;
     private String title;
+
+    @Relationship(type = "NEXT", direction = Relationship.OUTGOING)
     private Post next;
+
     @Transient
     private Post previous;
 
@@ -54,9 +58,13 @@ public class Post {
         return next;
     }
 
-    @Relationship(type = "NEXT", direction = Relationship.OUTGOING)
-    public void setNext(Post next) {
+    public void setNext(Post post) {
         this.next = next;
+        updatePrevious();
+    }
+
+    @PostLoad
+    public void updatePrevious() {
         if (next != null) {
             next.previous = this;
         }

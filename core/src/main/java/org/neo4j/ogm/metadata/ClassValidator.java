@@ -42,7 +42,7 @@ public class ClassValidator {
 
     private void validateFields() throws MappingException {
         for (FieldInfo fieldInfo : classInfo.fieldsInfo().fields()) {
-            if (fieldInfo.hasAnnotation(Property.CLASS) && fieldInfo.hasCompositeConverter()) {
+            if (fieldInfo.hasAnnotation(Property.class.getCanonicalName()) && fieldInfo.hasCompositeConverter()) {
                 throw new MappingException(String.format("'%s' has both @Convert and @Property annotations applied to the field '%s'",
                         classInfo.name(), fieldInfo.getName()));
             }
@@ -51,7 +51,7 @@ public class ClassValidator {
 
     private void validateMethods() {
         for (MethodInfo methodInfo : classInfo.propertyGettersAndSetters()) {
-            if (methodInfo.hasAnnotation(Labels.CLASS)) {
+            if (methodInfo.hasAnnotation(Labels.class.getCanonicalName())) {
                 throw new MappingException(String.format("'%s' has the @Labels annotation applied to method '%s'. " +
                                 "The @Labels annotation can only be applied to a field.",
                         classInfo.name(), methodInfo.getName()));

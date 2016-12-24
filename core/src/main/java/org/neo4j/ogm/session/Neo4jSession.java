@@ -589,9 +589,9 @@ public class Neo4jSession implements Session {
         ClassInfo classInfo = metaData().classInfo(entityType.getName());
         FieldInfo fieldInfo = classInfo.propertyFieldByName(propertyName);
         if (fieldInfo != null && fieldInfo.getAnnotations() != null) {
-            AnnotationInfo annotation = fieldInfo.getAnnotations().get(Property.CLASS);
+            AnnotationInfo annotation = fieldInfo.getAnnotations().get(Property.class.getCanonicalName());
             if (annotation != null) {
-                return annotation.get(Property.NAME, propertyName);
+                return annotation.get("name", propertyName);
             }
         }
         //session.metaData().classInfo(entityType.getName()).propertyFieldByName(propertyName).property();
@@ -606,15 +606,15 @@ public class Neo4jSession implements Session {
         parameter.setRelationshipType(defaultRelationshipType);
         parameter.setRelationshipDirection(Relationship.UNDIRECTED);
         if (fieldInfo.getAnnotations() != null) {
-            AnnotationInfo annotation = fieldInfo.getAnnotations().get(Relationship.CLASS);
+            AnnotationInfo annotation = fieldInfo.getAnnotations().get(Relationship.class.getCanonicalName());
             if (annotation != null) {
-                parameter.setRelationshipType(annotation.get(Relationship.TYPE, defaultRelationshipType));
-                parameter.setRelationshipDirection(annotation.get(Relationship.DIRECTION, Relationship.UNDIRECTED));
+                parameter.setRelationshipType(annotation.get("type", defaultRelationshipType));
+                parameter.setRelationshipDirection(annotation.get("direction", Relationship.UNDIRECTED));
             }
-            if (fieldInfo.getAnnotations().get(StartNode.CLASS) != null) {
+            if (fieldInfo.getAnnotations().get(StartNode.class.getCanonicalName()) != null) {
                 parameter.setRelationshipDirection(Relationship.OUTGOING);
             }
-            if (fieldInfo.getAnnotations().get(EndNode.CLASS) != null) {
+            if (fieldInfo.getAnnotations().get(EndNode.class.getCanonicalName()) != null) {
                 parameter.setRelationshipDirection(Relationship.INCOMING);
             }
         }

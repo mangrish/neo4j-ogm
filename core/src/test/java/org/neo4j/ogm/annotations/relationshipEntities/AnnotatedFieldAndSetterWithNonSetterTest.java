@@ -104,7 +104,6 @@ public class AnnotatedFieldAndSetterWithNonSetterTest {
             return relEntities;
         }
 
-        @Relationship(type = "REL_ENTITY_TYPE", direction = "INCOMING")
         public void setRelEntities(Set<RelEntity> relEntities) {
             this.relEntities = relEntities;
         }

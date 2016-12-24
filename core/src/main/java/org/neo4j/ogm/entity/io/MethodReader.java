@@ -71,9 +71,9 @@ public class MethodReader implements RelationalReader, PropertyReader {
     public String relationshipDirection() {
         ObjectAnnotations annotations = methodInfo.getAnnotations();
         if (annotations != null) {
-            AnnotationInfo relationshipAnnotation = annotations.get(Relationship.CLASS);
+            AnnotationInfo relationshipAnnotation = annotations.get(Relationship.class.getCanonicalName());
             if (relationshipAnnotation != null) {
-                return relationshipAnnotation.get(Relationship.DIRECTION, Relationship.UNDIRECTED);
+                return relationshipAnnotation.get("direction", Relationship.UNDIRECTED);
             }
         }
         return Relationship.UNDIRECTED;

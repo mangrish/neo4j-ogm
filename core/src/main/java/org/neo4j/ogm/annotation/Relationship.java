@@ -19,13 +19,9 @@ import java.lang.annotation.*;
  * @author Vince Bickers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.FIELD)
 @Inherited
 public @interface Relationship {
-
-    String CLASS = "org.neo4j.ogm.annotation.Relationship";
-    String TYPE = "type";
-    String DIRECTION = "direction";
 
     String INCOMING = "INCOMING";
     String OUTGOING = "OUTGOING";

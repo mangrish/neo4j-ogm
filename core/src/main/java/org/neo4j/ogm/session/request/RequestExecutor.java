@@ -351,7 +351,7 @@ public class RequestExecutor {
 
 	private static void registerEntity(MappingContext mappingContext, ClassInfo classInfo, Long identity, Object entity) {
 		// ensure the newly created domain object is added into the mapping context
-		if (classInfo.annotationsInfo().get(RelationshipEntity.CLASS) == null) {
+		if (classInfo.annotationsInfo().get(RelationshipEntity.class.getCanonicalName()) == null) {
 			mappingContext.replaceNodeEntity(entity, identity);      // force the node entity object to be overwritten
 		} else {
 			mappingContext.replaceRelationshipEntity(entity, identity); // force the relationship entity to be overwritten

@@ -29,9 +29,8 @@ import java.lang.annotation.Target;
  * @author Jasper Blues
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
+@Target(ElementType.FIELD)
 public @interface Labels {
 
-    String CLASS = "org.neo4j.ogm.annotation.Labels";
     String[] defaultValue() default {};
 }

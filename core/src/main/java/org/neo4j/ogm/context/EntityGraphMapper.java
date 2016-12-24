@@ -111,8 +111,8 @@ public class EntityGraphMapper implements EntityMapper {
             // create or update the relationship if its not already been visited in the current compile context
             if (!compiler.context().visitedRelationshipEntity(EntityUtils.identity(entity, metaData))) {
 
-                AnnotationInfo annotationInfo = reInfo.annotationsInfo().get(RelationshipEntity.CLASS);
-                String relationshipType = annotationInfo.get(RelationshipEntity.TYPE, null);
+                AnnotationInfo annotationInfo = reInfo.annotationsInfo().get(RelationshipEntity.class.getCanonicalName());
+                String relationshipType = annotationInfo.get("type", null);
                 DirectedRelationship directedRelationship = new DirectedRelationship(relationshipType, Relationship.OUTGOING);
 
                 RelationshipBuilder relationshipBuilder = getRelationshipBuilder(compiler, entity, directedRelationship, false);
@@ -624,9 +624,9 @@ public class EntityGraphMapper implements EntityMapper {
         Long reIdentity = EntityUtils.identity(relationshipEntity, metaData);
         context.visitRelationshipEntity(reIdentity);
 
-        AnnotationInfo annotation = relEntityClassInfo.annotationsInfo().get(RelationshipEntity.CLASS);
+        AnnotationInfo annotation = relEntityClassInfo.annotationsInfo().get(RelationshipEntity.class.getCanonicalName());
         if (relationshipBuilder.type() == null) {
-            relationshipBuilder.setType(annotation.get(RelationshipEntity.TYPE, relEntityClassInfo.name()));
+            relationshipBuilder.setType(annotation.get("type", relEntityClassInfo.name()));
         }
 
         // if the RE is new, register it in the context so that we can set its ID correctly when it is created,
@@ -863,7 +863,7 @@ public class EntityGraphMapper implements EntityMapper {
      */
     private boolean isRelationshipEntity(Object potentialRelationshipEntity) {
         ClassInfo classInfo = metaData.classInfo(potentialRelationshipEntity);
-        return classInfo != null && null != classInfo.annotationsInfo().get(RelationshipEntity.CLASS);
+        return classInfo != null && null != classInfo.annotationsInfo().get(RelationshipEntity.class.getCanonicalName());
     }
 
     /**

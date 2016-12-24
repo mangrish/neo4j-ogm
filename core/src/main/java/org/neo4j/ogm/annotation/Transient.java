@@ -26,9 +26,8 @@ import java.lang.annotation.*;
  * @author Mark Angrish
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Inherited
 public @interface Transient {
-    String CLASS = "org.neo4j.ogm.annotation.Transient";
 }
 
