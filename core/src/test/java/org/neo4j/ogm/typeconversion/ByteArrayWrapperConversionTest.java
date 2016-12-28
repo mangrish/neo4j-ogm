@@ -32,36 +32,6 @@ public class ByteArrayWrapperConversionTest {
     @Test
     public void testConvertersLoaded() {
         assertTrue(photoInfo.propertyField("image").hasPropertyConverter());
-        assertTrue(photoInfo.propertyGetter("image").hasPropertyConverter());
-        assertTrue(photoInfo.propertySetter("image").hasPropertyConverter());
-    }
-
-    @Test
-    public void setImageAndCheck() {
-
-        PhotoWrapper photo = new PhotoWrapper();
-        AttributeConverter converter = photoInfo.propertyGetter("image").getPropertyConverter();
-
-        photo.setImage(new Byte[]{1, 2, 3, 4});
-
-        assertEquals("AQIDBA==", converter.toGraphProperty(photo.getImage()));
-    }
-
-    @Test
-    public void getImageAndCheck() {
-
-        PhotoWrapper photo = new PhotoWrapper();
-        AttributeConverter converter = photoInfo.propertyGetter("image").getPropertyConverter();
-
-        photo.setImage((Byte[]) converter.toEntityAttribute("AQIDBA=="));
-
-        Byte[] image = photo.getImage();
-        assertEquals(4, image.length);
-        assertEquals(Byte.decode("1"), image[0]);
-        assertEquals(Byte.decode("2"), image[1]);
-        assertEquals(Byte.decode("3"), image[2]);
-        assertEquals(Byte.decode("4"), image[3]);
-
     }
 
 }

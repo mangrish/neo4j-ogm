@@ -13,56 +13,36 @@
 
 package org.neo4j.ogm.metadata;
 
-import org.neo4j.ogm.annotation.Labels;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.exception.MappingException;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 public class ClassValidator {
 
-    private ClassInfo classInfo;
+	private ClassInfo classInfo;
 
 
-    public ClassValidator(ClassInfo classInfo) {
-        this.classInfo = classInfo;
-    }
+	public ClassValidator(ClassInfo classInfo) {
+		this.classInfo = classInfo;
+	}
 
-    public void validate() throws MappingException {
-        validateRelationshipEntity();
-        validateFields();
-        validateMethods();
-    }
+	public void validate() throws MappingException {
+		validateRelationshipEntity();
+		validateFields();
+	}
 
-    private void validateRelationshipEntity() throws MappingException {
-        if (classInfo.isRelationshipEntity() && classInfo.labelFieldOrNull() != null) {
-            throw new MappingException(String.format("'%s' is a relationship entity. The @Labels annotation can't be applied to " +
-                    "relationship entities.", classInfo.name()));
-        }
-    }
+	private void validateRelationshipEntity() throws MappingException {
+		if (classInfo.isRelationshipEntity() && classInfo.labelFieldOrNull() != null) {
+			throw new MappingException(String.format("'%s' is a relationship entity. The @Labels annotation can't be applied to " +
+					"relationship entities.", classInfo.name()));
+		}
+	}
 
-    private void validateFields() throws MappingException {
-        for (FieldInfo fieldInfo : classInfo.fieldsInfo().fields()) {
-            if (fieldInfo.hasAnnotation(Property.class.getCanonicalName()) && fieldInfo.hasCompositeConverter()) {
-                throw new MappingException(String.format("'%s' has both @Convert and @Property annotations applied to the field '%s'",
-                        classInfo.name(), fieldInfo.getName()));
-            }
-        }
-    }
-
-    private void validateMethods() {
-        for (MethodInfo methodInfo : classInfo.propertyGettersAndSetters()) {
-            if (methodInfo.hasAnnotation(Labels.class.getCanonicalName())) {
-                throw new MappingException(String.format("'%s' has the @Labels annotation applied to method '%s'. " +
-                                "The @Labels annotation can only be applied to a field.",
-                        classInfo.name(), methodInfo.getName()));
-            }
-            //TODO: Support and remove this restriction
-            if (methodInfo.hasAnnotation(Convert.CLASS)) {
-                throw new MappingException(String.format("'%s' has the @Convert annotation applied to method '%s'. " +
-                                "The @Convert annotation can only be applied to a field.",
-                        classInfo.name(), methodInfo.getName()));
-            }
-        }
-    }
-
+	private void validateFields() throws MappingException {
+		for (FieldInfo fieldInfo : classInfo.fieldsInfo().fields()) {
+			if (fieldInfo.hasAnnotation(Property.class.getCanonicalName()) && fieldInfo.hasCompositeConverter()) {
+				throw new MappingException(String.format("'%s' has both @Convert and @Property annotations applied to the field '%s'",
+						classInfo.name(), fieldInfo.getName()));
+			}
+		}
+	}
 }

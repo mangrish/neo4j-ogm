@@ -33,38 +33,7 @@ public class ByteArrayConversionTest {
     public void testConvertersLoaded() {
 
         assertTrue(photoInfo.propertyField("image").hasPropertyConverter());
-        assertTrue(photoInfo.propertyGetter("image").hasPropertyConverter());
-        assertTrue(photoInfo.propertySetter("image").hasPropertyConverter());
 
     }
-
-    @Test
-    public void setImageAndCheck() {
-
-        Photo photo = new Photo();
-        AttributeConverter converter = photoInfo.propertyGetter("image").getPropertyConverter();
-
-        photo.setImage(new byte[]{1, 2, 3, 4});
-
-        assertEquals("AQIDBA==", converter.toGraphProperty(photo.getImage()));
-    }
-
-    @Test
-    public void getImageAndCheck() {
-
-        Photo photo = new Photo();
-        AttributeConverter converter = photoInfo.propertyGetter("image").getPropertyConverter();
-
-        photo.setImage((byte[]) converter.toEntityAttribute("AQIDBA=="));
-
-        byte[] image = photo.getImage();
-        assertEquals(4, image.length);
-        assertEquals(1, image[0]);
-        assertEquals(2, image[1]);
-        assertEquals(3, image[2]);
-        assertEquals(4, image[3]);
-
-    }
-
 
 }

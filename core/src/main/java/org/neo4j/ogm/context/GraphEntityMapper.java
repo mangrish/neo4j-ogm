@@ -563,18 +563,6 @@ public class GraphEntityMapper implements ResponseMapper<GraphModel> {
 	private boolean declaresRelationshipTo(Class to, Class by, String relationshipName, String relationshipDirection) {
 		while (by != Object.class) {
 			ClassInfo classInfo = metadata.classInfo(by.getName());
-			MethodInfo methodInfo = classInfo.relationshipSetter(relationshipName, relationshipDirection, true);
-			if (methodInfo != null) {
-				if (methodInfo.isTypeOf(to)) {
-					return true;
-				}
-				if (methodInfo.isParameterisedTypeOf(to)) {
-					return true;
-				}
-				if (methodInfo.isArrayOf(to)) {
-					return true;
-				}
-			}
 			for (FieldInfo fieldInfo : classInfo.candidateRelationshipFields(relationshipName, relationshipDirection, true)) {
 				if (fieldInfo.isTypeOf(to)) {
 					return true;

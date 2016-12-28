@@ -70,18 +70,6 @@ public class EntityAccessManagerTest {
         );
     }
 
-    @Test
-    public void shouldPreferAnnotatedMethodToAnnotatedFieldWhenFindingPropertyToSet() {
-        ClassInfo classInfo = this.domainInfo.getClass(DummyDomainObject.class.getName());
-
-        EntityAccess objectAccess = EntityAccessManager.getPropertyWriter(classInfo, "testAnnoProp");
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-
-        DummyDomainObject domainObject = new DummyDomainObject();
-        objectAccess.write(domainObject, "Arbitrary Value");
-        assertEquals("Arbitrary Value", domainObject.fullyAnnotatedProperty);
-        assertTrue("The accessor method wasn't used to set the value", domainObject.fullyAnnotatedPropertyAccessorWasCalled);
-    }
 
     @Test
     public void shouldPreferAnnotatedFieldToPlainMethodWhenFindingPropertyToSet() {
@@ -110,20 +98,6 @@ public class EntityAccessManagerTest {
         assertEquals(String.class, objectAccess.type());
         objectAccess.write(domainObject, "TEST");
         assertEquals("TEST", domainObject.propertyMethodsIgnored);
-    }
-
-
-    @Test
-    public void shouldReturnAccessorMethodInPreferenceToFieldIfNoAnnotationsArePresent() {
-        ClassInfo classInfo = this.domainInfo.getClass(DummyDomainObject.class.getName());
-
-        EntityAccess objectAccess = EntityAccessManager.getPropertyWriter(classInfo, "nonAnnotatedTestProperty");
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-
-        DummyDomainObject domainObject = new DummyDomainObject();
-        objectAccess.write(domainObject, 8.14);
-        assertEquals(8.14, domainObject.nonAnnotatedTestProperty, 0.0);
-        assertTrue("The setter method wasn't called to write the value", domainObject.nonAnnotatedTestPropertyAccessorWasCalled);
     }
 
     @Test
@@ -234,20 +208,6 @@ public class EntityAccessManagerTest {
     }
 
     @Test
-    public void shouldDefaultToFindingSetterThatMatchesTheParameterTypeIfRelationshipTypeCannotBeMatched() {
-        // 5th, try to find a single setter that takes the parameter
-        ClassInfo classInfo = this.domainInfo.getClass(DummyDomainObject.class.getName());
-        Topic favouriteTopic = new Topic();
-
-        RelationalWriter objectAccess = EntityAccessManager.getRelationalWriter(classInfo, "DOES_NOT_MATCH", Relationship.OUTGOING, favouriteTopic);
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        DummyDomainObject domainObject = new DummyDomainObject();
-        objectAccess.write(domainObject, favouriteTopic);
-        assertEquals(domainObject.favouriteTopic, favouriteTopic);
-        assertTrue("The access should be via the setter method", domainObject.topicAccessorWasCalled);
-    }
-
-    @Test
     public void shouldDefaultToFieldThatMatchesTheParameterTypeIfRelationshipTypeCannotBeMatchedAndNoSetterExists() {
         // 6th, try to find a field that shares the same type as the parameter
         ClassInfo classInfo = this.domainInfo.getClass(DummyDomainObject.class.getName());
@@ -258,19 +218,6 @@ public class EntityAccessManagerTest {
         DummyDomainObject domainObject = new DummyDomainObject();
         objectAccess.write(domainObject, forumPost);
         assertEquals(domainObject.postWithoutAccessorMethods, forumPost);
-    }
-
-    @Test
-    public void shouldPreferAnnotatedMethodToAnnotatedFieldWhenReadingFromAnObject() {
-        ClassInfo classInfo = this.domainInfo.getClass(DummyDomainObject.class.getName());
-
-        DummyDomainObject domainObject = new DummyDomainObject();
-        domainObject.fullyAnnotatedProperty = "test text";
-
-        PropertyReader objectAccess = EntityAccessManager.getPropertyReader(classInfo, "testAnnoProp");
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertEquals(domainObject.fullyAnnotatedProperty, objectAccess.readProperty(domainObject));
-        assertTrue("The accessor method wasn't used to get the value", domainObject.fullyAnnotatedPropertyAccessorWasCalled);
     }
 
     @Test

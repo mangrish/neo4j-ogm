@@ -217,170 +217,11 @@ public class ClassInfoTest {
         assertEquals("posts", fieldInfo.getName());
     }
 
-
-    /**
-     * The default identity getter can be found if it exists.
-     */
-    @Test
-    public void testIdentityGetter() {
-        ClassInfo classInfo = metaData.classInfo("Member"); // can also use 'User' here
-        MethodInfo methodInfo = classInfo.identityGetter();
-
-        assertEquals("getId", methodInfo.getName());
-    }
-
-    /**
-     * The default identity setter can be found if it exists.
-     */
-    @Test
-    public void testIdentitySetter() {
-        ClassInfo classInfo = metaData.classInfo("Member"); // can also use 'User' here
-        MethodInfo methodInfo = classInfo.identitySetter();
-
-        assertEquals("setId", methodInfo.getName());
-    }
-
-    /**
-     * A non-default identity getter can be found if it is annotated.
-     */
-    @Test
-    public void testAnnotatedIdentityGetter() {
-        ClassInfo classInfo = metaData.classInfo("Activity");
-        MethodInfo methodInfo = classInfo.identityGetter();
-        assertEquals("getActivityId", methodInfo.getName());
-    }
-
-    /**
-     * A non-default identity setter can be found if it is annotated.
-     */
-    @Test
-    public void testAnnotatedIdentitySetter() {
-        ClassInfo classInfo = metaData.classInfo("Activity");
-        MethodInfo methodInfo = classInfo.identitySetter();
-        assertEquals("setActivityId", methodInfo.getName());
-    }
-
-    @Test
-    public void testRelationshipGetters() {
-        ClassInfo classInfo = metaData.classInfo("User");
-        Collection<MethodInfo> relationshipGetters = classInfo.relationshipGetters();
-        int count = 4;
-        assertEquals(count, relationshipGetters.size());
-        for (MethodInfo relationshipGetter : relationshipGetters) {
-            if (relationshipGetter.getName().equals("getActivityList")) count--;
-            if (relationshipGetter.getName().equals("getFollowees")) count--;
-            if (relationshipGetter.getName().equals("getMemberShip")) count--;
-            if (relationshipGetter.getName().equals("getFollowers")) count--;
-        }
-        assertEquals(0, count);
-    }
-
-    /**
-     * Can find methods for setting objects which are nodes in the graph as opposed to node properties.
-     */
-    @Test
-    public void testRelationshipSetters() {
-        ClassInfo classInfo = metaData.classInfo("User");
-        Collection<MethodInfo> relationshipSetters = classInfo.relationshipSetters();
-        int count = 4;
-        assertEquals(count, relationshipSetters.size());
-        for (MethodInfo relationshipSetter : relationshipSetters) {
-            if (relationshipSetter.getName().equals("setActivityList")) count--;
-            if (relationshipSetter.getName().equals("setFollowees")) count--;
-            if (relationshipSetter.getName().equals("setMemberShip")) count--;
-            if (relationshipSetter.getName().equals("setFollowers")) count--;
-        }
-    }
-
-    /**
-     * Can find methods for getting objects which can be represented as node properties in the graph
-     */
-    @Test
-    public void testPropertyGetters() {
-        ClassInfo classInfo = metaData.classInfo("User");
-        Collection<MethodInfo> propertyGetters = classInfo.propertyGetters();
-        int count = 5;
-        assertEquals(count, propertyGetters.size());
-        for (MethodInfo propertyGetter : propertyGetters) {
-            if (propertyGetter.getName().equals("getRenewalDate")) count--;
-            if (propertyGetter.getName().equals("getUserName")) count--;
-            if (propertyGetter.getName().equals("getPassword")) count--;
-            if (propertyGetter.getName().equals("getMembershipNumber")) count--;
-            if (propertyGetter.getName().equals("getNicknames")) count--;
-        }
-        assertEquals(0, count);
-    }
-
-    /**
-     * Can find methods for setting objects which can be represented as node properties in the graph.
-     */
-    @Test
-    public void testPropertySetters() {
-        ClassInfo classInfo = metaData.classInfo("User");
-        Collection<MethodInfo> propertySetters = classInfo.propertySetters();
-        int count = 5;
-        assertEquals(count, propertySetters.size());
-        for (MethodInfo propertySetter : propertySetters) {
-            if (propertySetter.getName().equals("setRenewalDate")) count--;
-            if (propertySetter.getName().equals("setUserName")) count--;
-            if (propertySetter.getName().equals("setPassword")) count--;
-            if (propertySetter.getName().equals("setMembershipNumber")) count--;
-            if (propertySetter.getName().equals("setNicknames")) count--;
-        }
-        assertEquals(0, count);
-    }
-
-    @Test
-    public void testNamedPropertyGetter() {
-        ClassInfo classInfo = metaData.classInfo("Comment");
-        MethodInfo methodInfo = classInfo.propertyGetter("remark");
-        assertEquals("getComment", methodInfo.getName());
-    }
-
-    @Test
-    public void testNamedPropertySetter() {
-        ClassInfo classInfo = metaData.classInfo("Comment");
-        MethodInfo methodInfo = classInfo.propertySetter("remark");
-        assertEquals("setComment", methodInfo.getName());
-    }
-
-    @Test
-    public void testNamedRelationshipGetter() {
-        ClassInfo classInfo = metaData.classInfo("Member");
-        MethodInfo methodInfo = classInfo.relationshipGetter("HAS_ACTIVITY");
-        assertEquals("getActivityList", methodInfo.getName());
-    }
-
-    @Test
-    public void testNamedRelationshipSetter() {
-        ClassInfo classInfo = metaData.classInfo("Member");
-        MethodInfo methodInfo = classInfo.relationshipSetter("HAS_ACTIVITY");
-        assertEquals("setActivityList", methodInfo.getName());
-    }
-
     @Test
     public void testClassInfoIsFoundForFQN() {
         String fqn = "org.neo4j.ogm.domain.forum.Topic";
         ClassInfo classInfo = metaData.classInfo(fqn);
         assertEquals(fqn, classInfo.name());
-    }
-
-    @Test
-    public void testFindDateSetter() {
-        ClassInfo classInfo = metaData.classInfo("Member");
-        List<MethodInfo> methodInfos = classInfo.findSetters(Date.class);
-        MethodInfo methodInfo = methodInfos.iterator().next();
-        assertEquals("setRenewalDate", methodInfo.getName());
-        assertTrue(methodInfo.hasPropertyConverter());
-    }
-
-    @Test
-    public void testFindDateGetter() {
-        ClassInfo classInfo = metaData.classInfo("Member");
-        List<MethodInfo> methodInfos = classInfo.findGetters(Date.class);
-        MethodInfo methodInfo = methodInfos.iterator().next();
-        assertEquals("getRenewalDate", methodInfo.getName());
-        assertTrue(methodInfo.hasPropertyConverter());
     }
 
     @Test
@@ -405,31 +246,6 @@ public class ClassInfoTest {
             if (fieldInfo.getName().equals("nicknames")) count--;
         }
         assertEquals(0, count);
-    }
-
-    @Test
-    public void testFindMultipleIterableMethodsWithSameParameterisedType() {
-        ClassInfo classInfo = metaData.classInfo("User");
-        List<MethodInfo> methodInfos = classInfo.findIterableSetters(Member.class);
-        int count = 2;
-        assertEquals(count, methodInfos.size());
-        for (MethodInfo methodInfo : methodInfos) {
-            if (methodInfo.getName().equals("setFollowees")) count--;
-            if (methodInfo.getName().equals("setFollowers")) count--;
-        }
-        assertEquals(count, 0);
-    }
-
-    @Test
-    public void testFindIterableMethodWithUniqueParameterisedType() {
-        ClassInfo classInfo = metaData.classInfo("User");
-        List<MethodInfo> methodInfos = classInfo.findIterableSetters(Activity.class);
-        int count = 1;
-        assertEquals(count, methodInfos.size());
-        for (MethodInfo methodInfo : methodInfos) {
-            if (methodInfo.getName().equals("setActivityList")) count--;
-        }
-        assertEquals(count, 0);
     }
 
     @Test
@@ -505,37 +321,6 @@ public class ClassInfoTest {
         assertTrue(fieldInfo.isScalar());
     }
 
-
-    /**
-     * @see DATAGRAPH-600
-     */
-    @Test
-    public void testArraySetterInfo() {
-        ClassInfo classInfo = metaData.classInfo("Member");
-        MethodInfo methodInfo = classInfo.propertySetter("nicknames");
-        assertFalse(methodInfo.isScalar());
-    }
-
-    /**
-     * @see DATAGRAPH-600
-     */
-    @Test
-    public void testCollectionSetterInfo() {
-        ClassInfo classInfo = metaData.classInfo("Member");
-        MethodInfo methodInfo = classInfo.relationshipSetter("followers");
-        assertFalse(methodInfo.isScalar());
-    }
-
-    /**
-     * @see DATAGRAPH-600
-     */
-    @Test
-    public void testScalarSetterInfo() {
-        ClassInfo classInfo = metaData.classInfo("Comment");
-        MethodInfo methodInfo = classInfo.propertySetter("remark");
-        assertTrue(methodInfo.isScalar());
-    }
-
     /**
      * @see DATAGRAPH-615
      */
@@ -585,17 +370,4 @@ public class ClassInfoTest {
         assertNull(classInfo.getTypeParameterDescriptorForRelationship("HAS", Relationship.OUTGOING));
 
     }
-
-    @Test
-    public void shouldExcludeStaticInitialisersFromPersistenceMethods() {
-
-        ClassInfo classInfo = metaData.classInfo("SecurityRole");
-        Collection<MethodInfo> methodInfos = classInfo.methodsInfo().methods();
-
-        for (MethodInfo methodInfo : methodInfos) {
-            assertFalse(methodInfo.getName().equals("<clinit>"));
-        }
-
-    }
-
 }
