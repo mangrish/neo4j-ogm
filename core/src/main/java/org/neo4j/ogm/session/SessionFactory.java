@@ -64,20 +64,6 @@ public class SessionFactory {
 
     /**
      * Constructs a new {@link SessionFactory} by initialising the object-graph mapping meta-data from the given list of domain
-     * object classes.
-     * <p>
-     * This will only load the classes explicitly listed. No other classes will be loaded.
-     * </p>
-     * Indexes will also be checked or built if configured.
-     *
-     * @param classes The classes to load as domain objects
-     */
-    public SessionFactory(Class... classes) {
-        this(null, new MetaData(classes));
-    }
-
-    /**
-     * Constructs a new {@link SessionFactory} by initialising the object-graph mapping meta-data from the given list of domain
      * object packages, and also sets the configuration to be used.
      * <p>
      * The package names passed to this constructor should not contain wildcards or trailing full stops, for example,
@@ -91,21 +77,6 @@ public class SessionFactory {
      */
     public SessionFactory(Configuration configuration, String... packages) {
         this(configuration, new MetaData(packages));
-    }
-
-    /**
-     * Constructs a new {@link SessionFactory} by initialising the object-graph mapping meta-data from the given list of domain
-     * object classes, and also sets the configuration to be used.
-     * <p>
-     * This will only load the classes explicitly listed. No other classes will be loaded.
-     * </p>
-     * Indexes will also be checked or built if configured.
-     *
-     * @param configuration The configuration to use
-     * @param classes The classes to load as domain objects
-     */
-    public SessionFactory(Configuration configuration, Class... classes) {
-        this(configuration, new MetaData(classes));
     }
 
     /**
