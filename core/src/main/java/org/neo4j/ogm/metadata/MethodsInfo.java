@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.neo4j.ogm.annotation.Transient;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyAnnotationInfo;
 
 /**
  * @author Vince Bickers
@@ -49,7 +50,7 @@ public class MethodsInfo {
                 if ("RuntimeVisibleAnnotations".equals(attributeName)) {
                     int annotationCount = dataInputStream.readUnsignedShort();
                     for (int m = 0; m < annotationCount; m++) {
-                        AnnotationInfo info = new AnnotationInfo(dataInputStream, constantPool);
+                        AnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
                         // todo: maybe register just the annotations we're interested in.
                         objectAnnotations.put(info.getName(), info);
                     }

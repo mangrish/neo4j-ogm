@@ -43,7 +43,7 @@ public class LegacyClassInfo implements ClassInfo {
 	private boolean hydrated;
 	private FieldsInfo fieldsInfo = new FieldsInfo();
 	private MethodsInfo methodsInfo = new MethodsInfo();
-	private AnnotationsInfo annotationsInfo = new AnnotationsInfo();
+	private AnnotationsInfo annotationsInfo = new LegacyAnnotationsInfo();
 	private InterfacesInfo interfacesInfo = new InterfacesInfo();
 	private ClassInfo directSuperclass;
 	private Map<Class, List<FieldInfo>> iterableFieldsForType = new HashMap<>();
@@ -87,7 +87,7 @@ public class LegacyClassInfo implements ClassInfo {
 		interfacesInfo = new InterfacesInfo(dataInputStream, constantPool);
 		fieldsInfo = new FieldsInfo(dataInputStream, constantPool);
 		methodsInfo = new MethodsInfo(dataInputStream, constantPool);
-		annotationsInfo = new AnnotationsInfo(dataInputStream, constantPool);
+		annotationsInfo = new LegacyAnnotationsInfo(dataInputStream, constantPool);
 		new ClassValidator(this).validate();
 		primaryIndexField = primaryIndexField();
 	}
