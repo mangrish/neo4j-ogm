@@ -26,7 +26,7 @@ public class InterfacesInfo {
 
     private final Map<String, InterfaceInfo> interfaceMap = new HashMap<>();
 
-    InterfacesInfo() {}
+    public InterfacesInfo() {}
 
     public InterfacesInfo(DataInputStream dataInputStream, ConstantPool constantPool) throws IOException {
         int interfaceCount = dataInputStream.readUnsignedShort();

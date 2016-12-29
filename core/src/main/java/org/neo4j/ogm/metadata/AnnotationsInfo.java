@@ -26,7 +26,7 @@ public class AnnotationsInfo {
 
     private final Map<String, AnnotationInfo> classAnnotations = new HashMap<>();
 
-    AnnotationsInfo() {}
+    public AnnotationsInfo() {}
 
     public AnnotationsInfo(DataInputStream dataInputStream, ConstantPool constantPool) throws IOException {
         int attributesCount = dataInputStream.readUnsignedShort();

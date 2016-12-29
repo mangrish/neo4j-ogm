@@ -30,7 +30,7 @@ public class FieldsInfo {
 
     private final Map<String, FieldInfo> fields = new HashMap<>();
 
-    FieldsInfo() {
+    public FieldsInfo() {
     }
 
     public FieldsInfo(DataInputStream dataInputStream, ConstantPool constantPool) throws IOException {

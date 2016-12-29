@@ -31,7 +31,7 @@ public class MethodsInfo {
     private final Map<String, MethodInfo> getters = new HashMap<>();
     private final Map<String, MethodInfo> setters = new HashMap<>();
 
-    MethodsInfo() {}
+    public MethodsInfo() {}
 
     public MethodsInfo(DataInputStream dataInputStream, ConstantPool constantPool) throws IOException {
         // get the method information for this class

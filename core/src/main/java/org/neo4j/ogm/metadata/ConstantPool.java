@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * @author Vince Bickers
  */
-class ConstantPool {
+public class ConstantPool {
 
     private final Object[] pool;
 
