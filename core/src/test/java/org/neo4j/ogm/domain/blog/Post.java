@@ -58,9 +58,8 @@ public class Post {
         return next;
     }
 
-    public void setNext(Post post) {
+    public void setNext(Post next) {
         this.next = next;
-        updatePrevious();
     }
 
     @PostLoad
@@ -72,10 +71,6 @@ public class Post {
 
     public Post getPrevious() {
         return previous;
-    }
-
-    public void setPrevious(Post previous) {
-        this.previous = previous;
     }
 
     public String toString() {
