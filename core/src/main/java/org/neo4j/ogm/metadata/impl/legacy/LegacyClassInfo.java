@@ -41,10 +41,10 @@ public class LegacyClassInfo implements ClassInfo {
 	private boolean isAbstract;
 	private boolean isEnum;
 	private boolean hydrated;
-	private FieldsInfo fieldsInfo = new FieldsInfo();
+	private FieldsInfo fieldsInfo = new LegacyFieldsInfo();
 	private MethodsInfo methodsInfo = new MethodsInfo();
 	private AnnotationsInfo annotationsInfo = new LegacyAnnotationsInfo();
-	private InterfacesInfo interfacesInfo = new InterfacesInfo();
+	private InterfacesInfo interfacesInfo = new LegacyInterfacesInfo();
 	private ClassInfo directSuperclass;
 	private Map<Class, List<FieldInfo>> iterableFieldsForType = new HashMap<>();
 	private Map<FieldInfo, Field> fieldInfoFields = new ConcurrentHashMap<>();
@@ -84,8 +84,8 @@ public class LegacyClassInfo implements ClassInfo {
 		if (sce != null) {
 			directSuperclassName = sce.replace('/', '.');
 		}
-		interfacesInfo = new InterfacesInfo(dataInputStream, constantPool);
-		fieldsInfo = new FieldsInfo(dataInputStream, constantPool);
+		interfacesInfo = new LegacyInterfacesInfo(dataInputStream, constantPool);
+		fieldsInfo = new LegacyFieldsInfo(dataInputStream, constantPool);
 		methodsInfo = new MethodsInfo(dataInputStream, constantPool);
 		annotationsInfo = new LegacyAnnotationsInfo(dataInputStream, constantPool);
 		new ClassValidator(this).validate();

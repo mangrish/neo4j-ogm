@@ -13,44 +13,14 @@
 
 package org.neo4j.ogm.metadata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Vince Bickers
  */
-public class InterfacesInfo {
+public interface InterfacesInfo {
 
-    private final Map<String, InterfaceInfo> interfaceMap = new HashMap<>();
+	Collection<InterfaceInfo> list();
 
-    public InterfacesInfo() {}
-
-    public InterfacesInfo(DataInputStream dataInputStream, ConstantPool constantPool) throws IOException {
-        int interfaceCount = dataInputStream.readUnsignedShort();
-        for (int i = 0; i < interfaceCount; i++) {
-            String interfaceName = constantPool.lookup(dataInputStream.readUnsignedShort()).replace('/', '.');
-            interfaceMap.put(interfaceName, new InterfaceInfo(interfaceName));
-        }
-    }
-
-    public Collection<InterfaceInfo> list() {
-        return interfaceMap.values();
-    }
-
-    public InterfaceInfo get(String interfaceName) {
-        return interfaceMap.get(interfaceName);
-    }
-
-    void add(InterfaceInfo interfaceInfo) {
-        interfaceMap.put(interfaceInfo.name(), interfaceInfo);
-    }
-
-    public void append(InterfacesInfo interfacesInfo) {
-        for (InterfaceInfo interfaceInfo : interfacesInfo.list()) {
-            add(interfaceInfo);
-        }
-    }
+	void append(InterfacesInfo interfacesInfo);
 }

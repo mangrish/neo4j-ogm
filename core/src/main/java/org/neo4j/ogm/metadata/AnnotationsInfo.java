@@ -13,21 +13,16 @@
 
 package org.neo4j.ogm.metadata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Vince Bickers
  */
 public interface AnnotationsInfo {
 
-    Collection<AnnotationInfo> list();
+	Collection<AnnotationInfo> list();
 
-    AnnotationInfo get(String entity);
+	AnnotationInfo get(String entity);
 
 	void append(AnnotationsInfo annotationsInfo);
 }

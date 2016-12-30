@@ -48,7 +48,7 @@ public class ObjectAnnotations {
         return annotations.isEmpty();
     }
 
-    Object getConverter() {
+    public Object getConverter() {
 
         // try to get a custom type converter
         AnnotationInfo customType = get(Convert.CLASS);

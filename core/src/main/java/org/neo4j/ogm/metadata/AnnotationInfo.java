@@ -13,20 +13,15 @@
 
 package org.neo4j.ogm.metadata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Vince Bickers
  * @author Mark Angrish
  */
 public interface AnnotationInfo {
 
-    String getName();
+	String getName();
 
-    String get(String name, String propertyName);
+	String get(String name, String propertyName);
 
-    Object get(String name);
+	String get(String name);
 }

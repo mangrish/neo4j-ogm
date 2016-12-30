@@ -18,35 +18,7 @@ package org.neo4j.ogm.metadata;
  *
  * @author Vince Bickers
  */
-public class InterfaceInfo {
+public interface InterfaceInfo {
 
-    private final String interfaceName;
-
-    public InterfaceInfo(String name) {
-        this.interfaceName = name;
-    }
-
-    String name() {
-        return interfaceName;
-    }
-
-    public String toString() {
-        return name();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        InterfaceInfo that = (InterfaceInfo) o;
-
-        return interfaceName.equals(that.interfaceName);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return interfaceName.hashCode();
-    }
+	String name();
 }

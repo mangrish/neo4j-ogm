@@ -11,10 +11,12 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.metadata;
+package org.neo4j.ogm.metadata.impl.legacy;
 
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.exception.MappingException;
+import org.neo4j.ogm.metadata.ClassInfo;
+import org.neo4j.ogm.metadata.FieldInfo;
 
 public class ClassValidator {
 
