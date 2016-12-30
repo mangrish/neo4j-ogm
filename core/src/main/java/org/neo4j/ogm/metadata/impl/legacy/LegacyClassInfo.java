@@ -42,7 +42,7 @@ public class LegacyClassInfo implements ClassInfo {
 	private boolean isEnum;
 	private boolean hydrated;
 	private FieldsInfo fieldsInfo = new LegacyFieldsInfo();
-	private MethodsInfo methodsInfo = new MethodsInfo();
+	private MethodsInfo methodsInfo = new LegacyMethodsInfo();
 	private AnnotationsInfo annotationsInfo = new LegacyAnnotationsInfo();
 	private InterfacesInfo interfacesInfo = new LegacyInterfacesInfo();
 	private ClassInfo directSuperclass;
@@ -86,7 +86,7 @@ public class LegacyClassInfo implements ClassInfo {
 		}
 		interfacesInfo = new LegacyInterfacesInfo(dataInputStream, constantPool);
 		fieldsInfo = new LegacyFieldsInfo(dataInputStream, constantPool);
-		methodsInfo = new MethodsInfo(dataInputStream, constantPool);
+		methodsInfo = new LegacyMethodsInfo(dataInputStream, constantPool);
 		annotationsInfo = new LegacyAnnotationsInfo(dataInputStream, constantPool);
 		new ClassValidator(this).validate();
 		primaryIndexField = primaryIndexField();
@@ -101,7 +101,7 @@ public class LegacyClassInfo implements ClassInfo {
 	public LegacyClassInfo(String name, ClassInfo subclass) {
 		this.className = name;
 		this.hydrated = false;
-		addSubclass((LegacyClassInfo) subclass);
+		addSubclass(subclass);
 	}
 
 	/**
