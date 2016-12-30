@@ -14,9 +14,7 @@
 package org.neo4j.ogm.annotations.relationships;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -30,100 +28,96 @@ import org.neo4j.ogm.entity.io.FieldWriter;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyDomainInfo;
 
 /**
  * @author Vince Bickers
  */
 public class RelationshipWriterAnnotatedFieldsTest {
 
-    private EntityAccessManager entityAccessStrategy = new EntityAccessManager();
-    private DomainInfo domainInfo = new DomainInfo(this.getClass().getPackage().getName());
+	private EntityAccessManager entityAccessStrategy = new EntityAccessManager();
+	private DomainInfo domainInfo = new LegacyDomainInfo(this.getClass().getPackage().getName());
 
-    @Test
-    public void shouldFindWriterForCollection() {
+	@Test
+	public void shouldFindWriterForCollection() {
 
-        ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
+		ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
 
-        RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "LIST", Relationship.OUTGOING, new T());
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the field", objectAccess instanceof FieldWriter);
-        assertEquals("LIST", objectAccess.relationshipName());
-        assertEquals(List.class, objectAccess.type());
+		RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "LIST", Relationship.OUTGOING, new T());
+		assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
+		assertTrue("The access mechanism should be via the field", objectAccess instanceof FieldWriter);
+		assertEquals("LIST", objectAccess.relationshipName());
+		assertEquals(List.class, objectAccess.type());
+	}
 
-    }
+	@Test
+	public void shouldFindWriterForScalar() {
 
-    @Test
-    public void shouldFindWriterForScalar() {
+		ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
 
-        ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
-
-        RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "SCALAR", Relationship.OUTGOING, new T());
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the field", objectAccess instanceof FieldWriter);
-        assertEquals("SCALAR", objectAccess.relationshipName());
-        assertEquals(T.class, objectAccess.type());
-
-    }
+		RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "SCALAR", Relationship.OUTGOING, new T());
+		assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
+		assertTrue("The access mechanism should be via the field", objectAccess instanceof FieldWriter);
+		assertEquals("SCALAR", objectAccess.relationshipName());
+		assertEquals(T.class, objectAccess.type());
+	}
 
 
-    @Test
-    public void shouldFindWriterForArray() {
+	@Test
+	public void shouldFindWriterForArray() {
 
-        ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
+		ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
 
-        RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "ARRAY", Relationship.OUTGOING, new T());
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        assertTrue("The access mechanism should be via the field", objectAccess instanceof FieldWriter);
-        assertEquals("ARRAY", objectAccess.relationshipName());
-        assertEquals(T[].class, objectAccess.type());
+		RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "ARRAY", Relationship.OUTGOING, new T());
+		assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
+		assertTrue("The access mechanism should be via the field", objectAccess instanceof FieldWriter);
+		assertEquals("ARRAY", objectAccess.relationshipName());
+		assertEquals(T[].class, objectAccess.type());
+	}
 
-    }
+	private Class getGenericType(Collection<?> collection) {
 
-    private Class getGenericType(Collection<?> collection) {
+		// if we have an object in the collection, use that to determine the type
+		if (!collection.isEmpty()) {
+			return collection.iterator().next().getClass();
+		}
 
-        // if we have an object in the collection, use that to determine the type
-        if (!collection.isEmpty()) {
-            return collection.iterator().next().getClass();
-        }
+		// otherwise, see if the collection is an anonymous class wrapper
+		// new List<T>(){}
+		// which does not remove runtime type information
 
-        // otherwise, see if the collection is an anonymous class wrapper
-        // new List<T>(){}
-        // which does not remove runtime type information
+		Class klazz = collection.getClass();
 
-        Class klazz = collection.getClass();
+		// obtain anonymous , if any, class for 'this' instance
+		final Type superclass = klazz.getGenericSuperclass();
 
-        // obtain anonymous , if any, class for 'this' instance
-        final Type superclass = klazz.getGenericSuperclass();
+		// obtain Runtime type info of first parameter
+		try {
+			ParameterizedType parameterizedType = (ParameterizedType) superclass;
+			Type[] types = parameterizedType.getActualTypeArguments();
+			return (Class) types[0];
+		} catch (Exception e) {
+			// we can't handle this collection type.
+			return null;
+		}
+	}
 
-        // obtain Runtime type info of first parameter
-        try {
-            ParameterizedType parameterizedType = (ParameterizedType) superclass;
-            Type[] types = parameterizedType.getActualTypeArguments();
-            return (Class) types[0];
-        } catch (Exception e) {
-            // we can't handle this collection type.
-            return null;
-        }
-    }
+	static class S {
 
-    static class S {
+		Long id;
 
-        Long id;
+		@Relationship(type = "LIST", direction = Relationship.OUTGOING)
+		List<T> list;
 
-        @Relationship(type = "LIST", direction = Relationship.OUTGOING)
-        List<T> list;
+		@Relationship(type = "ARRAY", direction = Relationship.OUTGOING)
+		T[] array;
 
-        @Relationship(type = "ARRAY", direction = Relationship.OUTGOING)
-        T[] array;
+		@Relationship(type = "SCALAR", direction = Relationship.OUTGOING)
+		T scalar;
+	}
 
-        @Relationship(type = "SCALAR", direction = Relationship.OUTGOING)
-        T scalar;
+	static class T {
 
-    }
-
-    static class T {
-
-        Long id;
-
-    }
+		Long id;
+	}
 }

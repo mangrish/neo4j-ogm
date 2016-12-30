@@ -30,7 +30,7 @@ public class LegacyFieldsInfo implements FieldsInfo {
 			String fieldName = constantPool.readString(dataInputStream.readUnsignedShort()); // name_index
 			String descriptor = constantPool.readString(dataInputStream.readUnsignedShort()); // descriptor_index
 			int attributesCount = dataInputStream.readUnsignedShort();
-			ObjectAnnotations objectAnnotations = new ObjectAnnotations();
+			LegacyObjectAnnotations objectAnnotations = new LegacyObjectAnnotations();
 			String typeParameterDescriptor = null; // available as an attribute for parameterised collections
 			for (int j = 0; j < attributesCount; j++) {
 				String attributeName = constantPool.readString(dataInputStream.readUnsignedShort());

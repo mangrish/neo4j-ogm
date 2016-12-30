@@ -13,9 +13,7 @@
 
 package org.neo4j.ogm.annotations.relationshipEntities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,83 +27,87 @@ import org.neo4j.ogm.entity.io.EntityAccessManager;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyDomainInfo;
 
 /**
  * @author Luanne Misquitta
  */
 public class NonAnnotatedFieldWithAnnotatedSetterTest {
 
-    private EntityAccessManager entityAccessStrategy = new EntityAccessManager();
-    private DomainInfo domainInfo = new DomainInfo("org.neo4j.ogm.annotations.relationshipEntities");
+	private EntityAccessManager entityAccessStrategy = new EntityAccessManager();
+	private DomainInfo domainInfo = new LegacyDomainInfo("org.neo4j.ogm.annotations.relationshipEntities");
 
 
-    @Test
-    public void shouldPreferAnnotatedSetterOverNonAnnotatedFieldForRelationshipEntity() {
-        ClassInfo classInfo = this.domainInfo.getClass(End.class.getName());
-        Set<RelEntity> parameter = new HashSet<>();
-        parameter.add(new RelEntity());
+	@Test
+	public void shouldPreferAnnotatedSetterOverNonAnnotatedFieldForRelationshipEntity() {
+		ClassInfo classInfo = this.domainInfo.getClass(End.class.getName());
+		Set<RelEntity> parameter = new HashSet<>();
+		parameter.add(new RelEntity());
 
-        RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "REL_ENTITY_TYPE", Relationship.INCOMING, new RelEntity());
-        assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
-        End end = new End();
-        objectAccess.write(end, parameter);
-        assertEquals(end.getRelEntities(), parameter);
-    }
+		RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "REL_ENTITY_TYPE", Relationship.INCOMING, new RelEntity());
+		assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
+		End end = new End();
+		objectAccess.write(end, parameter);
+		assertEquals(end.getRelEntities(), parameter);
+	}
 
-    @RelationshipEntity(type = "REL_ENTITY_TYPE")
-    public static class RelEntity {
-        Long id;
-        @StartNode
-        Start start;
-        @EndNode
-        End end;
+	@RelationshipEntity(type = "REL_ENTITY_TYPE")
+	public static class RelEntity {
 
-        public RelEntity() {
-        }
+		Long id;
+		@StartNode
+		Start start;
+		@EndNode
+		End end;
 
-        public End getEnd() {
-            return end;
-        }
+		public RelEntity() {
+		}
 
-        public void setEnd(End end) {
-            this.end = end;
-        }
+		public End getEnd() {
+			return end;
+		}
 
-        public Start getStart() {
-            return start;
-        }
+		public void setEnd(End end) {
+			this.end = end;
+		}
 
-        public void setStart(Start start) {
-            this.start = start;
-        }
-    }
+		public Start getStart() {
+			return start;
+		}
 
-    public static class Start {
-        Long id;
-        String name;
-        @Relationship(type = "REL_ENTITY_TYPE", direction = "OUTGOING")
-        Set<RelEntity> relEntities;
+		public void setStart(Start start) {
+			this.start = start;
+		}
+	}
 
-        public Start() {
-        }
-    }
+	public static class Start {
 
-    public static class End {
-        Long id;
-        String name;
+		Long id;
+		String name;
+		@Relationship(type = "REL_ENTITY_TYPE", direction = "OUTGOING")
+		Set<RelEntity> relEntities;
 
-        @Relationship(type = "REL_ENTITY_TYPE", direction = "INCOMING")
-        Set<RelEntity> relEntities = new HashSet<>();
+		public Start() {
+		}
+	}
 
-        public End() {
-        }
+	public static class End {
 
-        public Set<RelEntity> getRelEntities() {
-            return relEntities;
-        }
+		Long id;
+		String name;
 
-        public void setRelEntities(Set<RelEntity> relEntities) {
-            this.relEntities = relEntities;
-        }
-    }
+		@Relationship(type = "REL_ENTITY_TYPE", direction = "INCOMING")
+		Set<RelEntity> relEntities = new HashSet<>();
+
+		public End() {
+		}
+
+		public Set<RelEntity> getRelEntities() {
+			return relEntities;
+		}
+
+		public void setRelEntities(Set<RelEntity> relEntities) {
+			this.relEntities = relEntities;
+		}
+	}
 }

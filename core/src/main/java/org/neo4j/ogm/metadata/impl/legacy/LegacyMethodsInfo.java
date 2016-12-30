@@ -28,7 +28,7 @@ public class LegacyMethodsInfo implements MethodsInfo {
 			dataInputStream.skipBytes(2); // access_flags
 			String methodName = constantPool.readString(dataInputStream.readUnsignedShort()); // name_index
 			String descriptor = constantPool.readString(dataInputStream.readUnsignedShort()); // descriptor
-			ObjectAnnotations objectAnnotations = new ObjectAnnotations();
+			LegacyObjectAnnotations objectAnnotations = new LegacyObjectAnnotations();
 			int attributesCount = dataInputStream.readUnsignedShort();
 			String typeParameterDescriptor = null; // available as an attribute for parameterised collections
 			for (int j = 0; j < attributesCount; j++) {

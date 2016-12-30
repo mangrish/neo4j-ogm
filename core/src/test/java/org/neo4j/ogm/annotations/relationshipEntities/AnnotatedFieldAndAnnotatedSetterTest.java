@@ -29,6 +29,7 @@ import org.neo4j.ogm.entity.io.EntityAccessManager;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyDomainInfo;
 
 /**
  * @author Luanne Misquitta
@@ -36,7 +37,7 @@ import org.neo4j.ogm.metadata.DomainInfo;
 public class AnnotatedFieldAndAnnotatedSetterTest {
 
     private EntityAccessManager entityAccessStrategy = new EntityAccessManager();
-    private DomainInfo domainInfo = new DomainInfo("org.neo4j.ogm.annotations.relationshipEntities");
+    private DomainInfo domainInfo = new LegacyDomainInfo("org.neo4j.ogm.annotations.relationshipEntities");
 
 
     @Test

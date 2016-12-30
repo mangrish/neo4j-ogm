@@ -26,6 +26,7 @@ import org.neo4j.ogm.entity.io.EntityAccessManager;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyDomainInfo;
 
 /**
  * @author Vince Bickers
@@ -33,7 +34,7 @@ import org.neo4j.ogm.metadata.DomainInfo;
 public class RelationshipWriterAnnotatedSetterTest {
 
     private EntityAccessManager entityAccessStrategy = new EntityAccessManager();
-    private DomainInfo domainInfo = new DomainInfo(this.getClass().getPackage().getName());
+    private DomainInfo domainInfo = new LegacyDomainInfo(this.getClass().getPackage().getName());
 
     @Test
     public void shouldFindWriterForCollection() {

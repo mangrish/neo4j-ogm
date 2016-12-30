@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.neo4j.ogm.metadata.AnnotationInfo;
 import org.neo4j.ogm.metadata.AnnotationsInfo;
-import org.neo4j.ogm.metadata.ConstantPool;
 
 /**
  * Created by markangrish on 29/12/2016.

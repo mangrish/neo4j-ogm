@@ -33,6 +33,7 @@ import org.neo4j.ogm.entity.io.RelationalReader;
 import org.neo4j.ogm.entity.io.RelationalWriter;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.DomainInfo;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyDomainInfo;
 
 /**
  * @author Luanne Misquitta
@@ -47,7 +48,7 @@ public class IterableRelationalReaderWriterTest {
     @Before
     public void setup() {
         entityAccessStrategy = new EntityAccessManager();
-        domainInfo = new DomainInfo("org.neo4j.ogm.domain.entityMapping.iterables");
+        domainInfo = new LegacyDomainInfo("org.neo4j.ogm.domain.entityMapping.iterables");
     }
 
     /**

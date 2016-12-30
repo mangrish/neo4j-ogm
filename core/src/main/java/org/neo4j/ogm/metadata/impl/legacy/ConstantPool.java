@@ -11,7 +11,7 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.metadata;
+package org.neo4j.ogm.metadata.impl.legacy;
 
 import java.io.DataInputStream;
 import java.io.IOException;

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.ogm.metadata.ConstantPool;
 import org.neo4j.ogm.metadata.InterfaceInfo;
 import org.neo4j.ogm.metadata.InterfacesInfo;
 
