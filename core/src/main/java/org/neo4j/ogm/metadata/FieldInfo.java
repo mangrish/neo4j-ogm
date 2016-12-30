@@ -71,4 +71,14 @@ public interface FieldInfo {
 	boolean isLabelField();
 
 	String relationshipTypeAnnotation();
+
+	boolean isDate();
+
+	boolean isBigInteger();
+
+	boolean isBigDecimal();
+
+	boolean isByteArray();
+
+	boolean isByteArrayWrapper();
 }

@@ -134,6 +134,31 @@ public class LegacyFieldInfo implements FieldInfo {
 		return null;
 	}
 
+	@Override
+	public boolean isDate() {
+		return false;
+	}
+
+	@Override
+	public boolean isBigInteger() {
+		return false;
+	}
+
+	@Override
+	public boolean isBigDecimal() {
+		return false;
+	}
+
+	@Override
+	public boolean isByteArray() {
+		return false;
+	}
+
+	@Override
+	public boolean isByteArrayWrapper() {
+		return false;
+	}
+
 	public ObjectAnnotations getAnnotations() {
 		return annotations;
 	}

@@ -168,10 +168,8 @@ public class User {
         User user = (User) o;
         if (name == null || user.getName() == null) return false;
 
-        if (!name.equals(user.name)) return false;
-
-        return true;
-    }
+		return name.equals(user.name);
+	}
 
     @Override
     public int hashCode() {

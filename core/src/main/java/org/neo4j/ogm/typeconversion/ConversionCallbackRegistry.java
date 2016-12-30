@@ -18,14 +18,7 @@ package org.neo4j.ogm.typeconversion;
  */
 public class ConversionCallbackRegistry {
 
-    private ConversionCallback conversionCallback;
-
-    public ConversionCallback lookUpConverter() {
-        return this.conversionCallback;
-    }
-
-    public void registerConversionCallback(ConversionCallback conversionCallback) {
-        this.conversionCallback = conversionCallback;
-    }
-
+	public ConversionCallback lookUpConverter() {
+		return null;
+	}
 }

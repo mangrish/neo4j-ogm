@@ -66,7 +66,7 @@ public class RelationshipWriterPlainSetterTest {
 
         ClassInfo classInfo = this.domainInfo.getClass(S.class.getName());
 
-        RelationalWriter objectAccess = this.entityAccessStrategy.getRelationalWriter(classInfo, "ARRAY", Relationship.OUTGOING, new T());
+        RelationalWriter objectAccess = EntityAccessManager.getRelationalWriter(classInfo, "ARRAY", Relationship.OUTGOING, new T());
         assertNotNull("The resultant object accessor shouldn't be null", objectAccess);
         assertEquals("ARRAY", objectAccess.relationshipName());
         assertEquals(T[].class, objectAccess.type());

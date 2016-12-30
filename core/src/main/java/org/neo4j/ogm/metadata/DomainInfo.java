@@ -17,14 +17,12 @@ package org.neo4j.ogm.metadata;
 import java.util.List;
 import java.util.Map;
 
-import org.neo4j.ogm.typeconversion.ConversionCallback;
-
 /**
  * @author Vince Bickers
  * @author Luanne Misquitta
  * @author Mark Angrish
  */
-public interface DomainInfo extends ClassFileProcessor {
+public interface DomainInfo {
 
 	ClassInfo getClassSimpleName(String name);
 
@@ -35,8 +33,6 @@ public interface DomainInfo extends ClassFileProcessor {
 	Map<String, ClassInfo> getClassInfoMap();
 
 	List<ClassInfo> getClassInfos(String interfaceName);
-
-	void registerConversionCallback(ConversionCallback conversionCallback);
 
 	ClassInfo getClass(String name);
 }

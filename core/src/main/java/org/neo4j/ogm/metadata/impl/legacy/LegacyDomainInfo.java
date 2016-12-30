@@ -2,14 +2,12 @@ package org.neo4j.ogm.metadata.impl.legacy;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.*;
 
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.exception.MappingException;
 import org.neo4j.ogm.metadata.*;
-import org.neo4j.ogm.scanner.ClassPathScanner;
-import org.neo4j.ogm.typeconversion.ConversionCallback;
+import org.neo4j.ogm.metadata.impl.legacy.scanner.ClassPathScanner;
 import org.neo4j.ogm.typeconversion.ConversionCallbackRegistry;
 import org.neo4j.ogm.typeconversion.ConvertibleTypes;
 import org.neo4j.ogm.typeconversion.ProxyAttributeConverter;
@@ -22,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LegacyDomainInfo implements DomainInfo {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ClassFileProcessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LegacyDomainInfo.class);
 
 	private static final String dateSignature = "java/util/Date";
 	private static final String bigDecimalSignature = "java/math/BigDecimal";
@@ -49,12 +47,6 @@ public class LegacyDomainInfo implements DomainInfo {
 		LOGGER.info("{} classes loaded in {} nanoseconds", classNameToClassInfo.entrySet().size(), (System.nanoTime() - startTime));
 	}
 
-	public LegacyDomainInfo(Class... classes) {
-		long startTime = System.nanoTime();
-		load(classes);
-
-		LOGGER.info("{} classes loaded in {} nanoseconds", classNameToClassInfo.entrySet().size(), (System.nanoTime() - startTime));
-	}
 
 	private void buildAnnotationNameToClassInfoMap() {
 
@@ -85,11 +77,6 @@ public class LegacyDomainInfo implements DomainInfo {
 		}
 	}
 
-	public void registerConversionCallback(ConversionCallback conversionCallback) {
-		this.conversionCallbackRegistry.registerConversionCallback(conversionCallback);
-	}
-
-	@Override
 	public void finish() {
 
 		LOGGER.info("Starting Post-processing phase");
@@ -219,7 +206,6 @@ public class LegacyDomainInfo implements DomainInfo {
 		}
 	}
 
-	@Override
 	public void process(final InputStream inputStream) throws IOException {
 
 		ClassInfo classInfo = new LegacyClassInfo(inputStream);
@@ -253,24 +239,6 @@ public class LegacyDomainInfo implements DomainInfo {
 			if (thisClassInfo.isEnum()) {
 				LOGGER.debug("Registering enum class: {}", thisClassInfo.name());
 				enumTypes.add(thisClassInfo.getUnderlyingClass());
-			}
-		}
-	}
-
-	private void load(Class... classes) {
-		classPaths.clear();
-		classNameToClassInfo.clear();
-		annotationNameToClassInfo.clear();
-		interfaceNameToClassInfo.clear();
-
-		for (Class clazz : classes) {
-			// This can be done as all OGM managed classes must have different "simple names"'s.
-			final URL resource = clazz.getResource(clazz.getSimpleName() + ".class");
-
-			try (InputStream inputStream = resource.openStream()) {
-				process(inputStream);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			}
 		}
 	}
