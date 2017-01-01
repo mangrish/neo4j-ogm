@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javassist.Modifier;
 import org.neo4j.ogm.metadata.*;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyInterfacesInfo;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyMethodsInfo;
 
 /**
  * Created by markangrish on 30/12/2016.
@@ -31,18 +33,15 @@ public class ReflectionsClassInfo implements ClassInfo {
 		return underlyingClass.isInterface();
 	}
 
-	@Override
 	public boolean isEnum() {
 		return underlyingClass.isEnum();
 	}
 
-	@Override
 	public String superclassName() {
 		return underlyingClass.getSuperclass().getName();
 	}
 
-	@Override
-	public InterfacesInfo interfacesInfo() {
+	public LegacyInterfacesInfo interfacesInfo() {
 		return null;
 	}
 
@@ -56,17 +55,14 @@ public class ReflectionsClassInfo implements ClassInfo {
 		return null;
 	}
 
-	@Override
-	public MethodsInfo methodsInfo() {
+	public LegacyMethodsInfo methodsInfo() {
 		return null;
 	}
 
-	@Override
 	public ClassInfo directSuperclass() {
 		return null;
 	}
 
-	@Override
 	public Collection<String> collectLabels(Collection<String> labelNames) {
 		return null;
 	}
@@ -101,7 +97,6 @@ public class ReflectionsClassInfo implements ClassInfo {
 		return null;
 	}
 
-	@Override
 	public Collection<AnnotationInfo> annotations() {
 		return null;
 	}
@@ -111,12 +106,10 @@ public class ReflectionsClassInfo implements ClassInfo {
 		return false;
 	}
 
-	@Override
 	public String simpleName() {
 		return null;
 	}
 
-	@Override
 	public boolean isTransient() {
 		return false;
 	}
@@ -126,27 +119,22 @@ public class ReflectionsClassInfo implements ClassInfo {
 		return null;
 	}
 
-	@Override
 	public void extend(ClassInfo superclass) {
 
 	}
 
-	@Override
 	public boolean hydrated() {
 		return false;
 	}
 
-	@Override
 	public void hydrate(ClassInfo classInfo) {
 
 	}
 
-	@Override
 	public void addSubclass(ClassInfo classInfo) {
 
 	}
 
-	@Override
 	public List<ClassInfo> directInterfaces() {
 		return null;
 	}

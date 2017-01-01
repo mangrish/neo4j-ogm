@@ -19,9 +19,5 @@ package org.neo4j.ogm.metadata;
  */
 public interface AnnotationInfo {
 
-	String getName();
-
 	String get(String name, String propertyName);
-
-	String get(String name);
 }

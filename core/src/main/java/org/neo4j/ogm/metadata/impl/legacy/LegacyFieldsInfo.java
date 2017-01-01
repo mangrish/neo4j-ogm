@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.util.*;
 
 import org.neo4j.ogm.annotation.Transient;
-import org.neo4j.ogm.metadata.*;
+import org.neo4j.ogm.metadata.FieldInfo;
+import org.neo4j.ogm.metadata.FieldsInfo;
 
 /**
  * Created by markangrish on 30/12/2016.
@@ -38,7 +39,7 @@ public class LegacyFieldsInfo implements FieldsInfo {
 				if ("RuntimeVisibleAnnotations".equals(attributeName)) {
 					int annotationCount = dataInputStream.readUnsignedShort();
 					for (int m = 0; m < annotationCount; m++) {
-						AnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
+						LegacyAnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
 						// todo: maybe register just the annotations we're interested in.
 						objectAnnotations.put(info.getName(), info);
 					}

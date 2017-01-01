@@ -6,7 +6,6 @@ import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.classloader.MetaDataClassLoader;
 import org.neo4j.ogm.metadata.AnnotationInfo;
-import org.neo4j.ogm.metadata.MethodInfo;
 import org.neo4j.ogm.metadata.ObjectAnnotations;
 import org.neo4j.ogm.typeconversion.AttributeConverter;
 import org.neo4j.ogm.typeconversion.CompositeAttributeConverter;
@@ -16,7 +15,7 @@ import org.neo4j.ogm.utils.RelationshipUtils;
 /**
  * Created by markangrish on 30/12/2016.
  */
-public class LegacyMethodInfo implements MethodInfo {
+public class LegacyMethodInfo {
 
 
 	private static final String primitiveGetters = "()I,()J,()S,()B,()C,()F,()D,()Z,()[I,()[J,()[S,()[B,()[C,()[F,()[D,()[Z";
@@ -69,7 +68,7 @@ public class LegacyMethodInfo implements MethodInfo {
 
 	private final String name;
 	private final String descriptor;
-	private final ObjectAnnotations annotations;
+	private final LegacyObjectAnnotations annotations;
 	private final String typeParameterDescriptor;
 
 	/**
@@ -93,7 +92,7 @@ public class LegacyMethodInfo implements MethodInfo {
 	 * expresses its generic type, or <code>null</code> if that's not appropriate
 	 * @param annotations The {@link ObjectAnnotations} applied to the field
 	 */
-	public LegacyMethodInfo(String name, String descriptor, String typeParameterDescriptor, ObjectAnnotations annotations) {
+	public LegacyMethodInfo(String name, String descriptor, String typeParameterDescriptor, LegacyObjectAnnotations annotations) {
 		this.name = name;
 		this.descriptor = descriptor;
 		this.typeParameterDescriptor = typeParameterDescriptor;
@@ -185,11 +184,11 @@ public class LegacyMethodInfo implements MethodInfo {
 		return null;
 	}
 
-	public ObjectAnnotations getAnnotations() {
+	public LegacyObjectAnnotations getAnnotations() {
 		return annotations;
 	}
 
-	public boolean isEquallyNamed(MethodInfo other) {
+	public boolean isEquallyNamed(LegacyMethodInfo other) {
 		return other != null && getName().equals(other.getName());
 	}
 

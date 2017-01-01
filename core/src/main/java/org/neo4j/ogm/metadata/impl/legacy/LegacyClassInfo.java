@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
 public class LegacyClassInfo implements ClassInfo {
 
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ClassInfo.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LegacyClassInfo.class);
 	private final List<ClassInfo> directSubclasses = new ArrayList<>();
-	private final List<ClassInfo> directInterfaces = new ArrayList<>();
+	private final List<LegacyClassInfo> directInterfaces = new ArrayList<>();
 	private final List<ClassInfo> directImplementingClasses = new ArrayList<>();
 	/**
 	 * ISSUE-180: synchronized can be used instead of this lock but right now this mechanism is here to see if
@@ -42,9 +42,9 @@ public class LegacyClassInfo implements ClassInfo {
 	private boolean isEnum;
 	private boolean hydrated;
 	private FieldsInfo fieldsInfo = new LegacyFieldsInfo();
-	private MethodsInfo methodsInfo = new LegacyMethodsInfo();
+	private LegacyMethodsInfo methodsInfo = new LegacyMethodsInfo();
 	private AnnotationsInfo annotationsInfo = new LegacyAnnotationsInfo();
-	private InterfacesInfo interfacesInfo = new LegacyInterfacesInfo();
+	private LegacyInterfacesInfo interfacesInfo = new LegacyInterfacesInfo();
 	private ClassInfo directSuperclass;
 	private Map<Class, List<FieldInfo>> iterableFieldsForType = new HashMap<>();
 	private Map<FieldInfo, Field> fieldInfoFields = new ConcurrentHashMap<>();
@@ -109,7 +109,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 *
 	 * @param classInfoDetails ClassInfo details
 	 */
-	public void hydrate(ClassInfo classInfoDetails) {
+	public void hydrate(LegacyClassInfo classInfoDetails) {
 
 		if (!this.hydrated) {
 			this.hydrated = true;
@@ -123,17 +123,16 @@ public class LegacyClassInfo implements ClassInfo {
 
 			this.interfacesInfo.append(classInfoDetails.interfacesInfo());
 
-			this.annotationsInfo.append(classInfoDetails.annotationsInfo());
-			this.fieldsInfo.append(classInfoDetails.fieldsInfo());
+			((LegacyAnnotationsInfo)this.annotationsInfo).append(classInfoDetails.annotationsInfo());
+			((LegacyFieldsInfo)this.fieldsInfo).append(classInfoDetails.fieldsInfo());
 			this.methodsInfo.append(classInfoDetails.methodsInfo());
 		}
 	}
 
-	@Override
 	public void extend(ClassInfo classInfo) {
-		this.interfacesInfo.append(classInfo.interfacesInfo());
-		this.fieldsInfo.append(classInfo.fieldsInfo());
-		this.methodsInfo.append(classInfo.methodsInfo());
+		this.interfacesInfo.append(((LegacyClassInfo)classInfo).interfacesInfo());
+		((LegacyFieldsInfo)this.fieldsInfo).append(classInfo.fieldsInfo());
+		this.methodsInfo.append(((LegacyClassInfo)classInfo).methodsInfo());
 	}
 
 	/**
@@ -141,13 +140,12 @@ public class LegacyClassInfo implements ClassInfo {
 	 *
 	 * @param subclass the subclass
 	 */
-	@Override
 	public void addSubclass(ClassInfo subclass) {
-		if (subclass.directSuperclass() != null && subclass.directSuperclass() != this) {
-			throw new RuntimeException(subclass.name() + " has two superclasses: " + subclass.directSuperclass().name() + ", " + this.className);
+		if (((LegacyClassInfo)subclass).directSuperclass() != null && ((LegacyClassInfo)subclass).directSuperclass() != this) {
+			throw new RuntimeException(subclass.name() + " has two superclasses: " + ((LegacyClassInfo)subclass).directSuperclass().name() + ", " + this.className);
 		}
 		((LegacyClassInfo)subclass).directSuperclass = this;
-		this.directSubclasses.add(subclass);
+		this.directSubclasses.add(((LegacyClassInfo)subclass));
 	}
 
 	public boolean hydrated() {
@@ -159,12 +157,10 @@ public class LegacyClassInfo implements ClassInfo {
 		return className;
 	}
 
-	@Override
 	public String simpleName() {
 		return className.substring(className.lastIndexOf('.') + 1);
 	}
 
-	@Override
 	public ClassInfo directSuperclass() {
 		return directSuperclass;
 	}
@@ -212,16 +208,15 @@ public class LegacyClassInfo implements ClassInfo {
 		return neo4jName;
 	}
 
-	@Override
 	public Collection<String> collectLabels(Collection<String> labelNames) {
 		if (!isAbstract || annotationsInfo.get(NodeEntity.class.getCanonicalName()) != null) {
 			labelNames.add(neo4jName());
 		}
 		if (directSuperclass != null && !"java.lang.Object".equals(directSuperclass.name())) {
-			directSuperclass.collectLabels(labelNames);
+			((LegacyClassInfo)directSuperclass).collectLabels(labelNames);
 		}
 		for (ClassInfo interfaceInfo : directInterfaces()) {
-			interfaceInfo.collectLabels(labelNames);
+			((LegacyClassInfo)interfaceInfo).collectLabels(labelNames);
 		}
 		return labelNames;
 	}
@@ -236,18 +231,16 @@ public class LegacyClassInfo implements ClassInfo {
 		return directImplementingClasses;
 	}
 
-	public List<ClassInfo> directInterfaces() {
+	public List<LegacyClassInfo> directInterfaces() {
 		return directInterfaces;
 	}
 
-	@Override
-	public org.neo4j.ogm.metadata.InterfacesInfo interfacesInfo() {
+	public LegacyInterfacesInfo interfacesInfo() {
 		return interfacesInfo;
 	}
 
-	@Override
-	public Collection<AnnotationInfo> annotations() {
-		return annotationsInfo.list();
+	public Collection<LegacyAnnotationInfo> annotations() {
+		return ((LegacyAnnotationsInfo)annotationsInfo).list();
 	}
 
 	@Override
@@ -255,28 +248,25 @@ public class LegacyClassInfo implements ClassInfo {
 		return isInterface;
 	}
 
-	@Override
 	public boolean isEnum() {
 		return isEnum;
 	}
 
 	@Override
-	public org.neo4j.ogm.metadata.AnnotationsInfo annotationsInfo() {
+	public AnnotationsInfo annotationsInfo() {
 		return annotationsInfo;
 	}
 
-	@Override
 	public String superclassName() {
 		return directSuperclassName;
 	}
 
 	@Override
-	public org.neo4j.ogm.metadata.FieldsInfo fieldsInfo() {
+	public FieldsInfo fieldsInfo() {
 		return fieldsInfo;
 	}
 
-	@Override
-	public org.neo4j.ogm.metadata.MethodsInfo methodsInfo() {
+	public LegacyMethodsInfo methodsInfo() {
 		return methodsInfo;
 	}
 
@@ -297,7 +287,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * The identity field is a field annotated with @NodeId, or if none exists, a field
 	 * of type Long called 'id'
 	 *
-	 * @return A {@link FieldInfo} object representing the identity field never <code>null</code>
+	 * @return A {@link LegacyFieldInfo} object representing the identity field never <code>null</code>
 	 * @throws MappingException if no identity field can be found
 	 */
 	public FieldInfo identityField() {
@@ -335,7 +325,7 @@ public class LegacyClassInfo implements ClassInfo {
 	/**
 	 * The label field is an optional field annotated with @Labels.
 	 *
-	 * @return A {@link FieldInfo} object representing the label field. Optionally <code>null</code>
+	 * @return A {@link LegacyFieldInfo} object representing the label field. Optionally <code>null</code>
 	 */
 	public FieldInfo labelFieldOrNull() {
 		if (labelFieldMapped) {
@@ -345,8 +335,8 @@ public class LegacyClassInfo implements ClassInfo {
 			lock.lock();
 			if (!labelFieldMapped) {
 				for (FieldInfo fieldInfo : fieldsInfo().fields()) {
-					if (fieldInfo.isLabelField()) {
-						if (!fieldInfo.isIterable()) {
+					if (((LegacyFieldInfo)fieldInfo).isLabelField()) {
+						if (!((LegacyFieldInfo)fieldInfo).isIterable()) {
 							throw new MappingException(String.format(
 									"Field '%s' in class '%s' includes the @Labels annotation, however this field is not a " +
 											"type of collection.", fieldInfo.getName(), this.name()));
@@ -367,7 +357,7 @@ public class LegacyClassInfo implements ClassInfo {
 
 	public boolean isRelationshipEntity() {
 		for (AnnotationInfo info : annotations()) {
-			if (info.getName().equals(RelationshipEntity.class.getCanonicalName())) {
+			if (((LegacyAnnotationInfo)info).getName().equals(RelationshipEntity.class.getCanonicalName())) {
 				return true;
 			}
 		}
@@ -378,7 +368,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * A property field is any field annotated with @Property, or any field that can be mapped to a
 	 * node property. The identity field is not a property field.
 	 *
-	 * @return A Collection of FieldInfo objects describing the classInfo's property fields
+	 * @return A Collection of LegacyFieldInfo objects describing the classInfo's property fields
 	 */
 	public Collection<FieldInfo> propertyFields() {
 		if (fieldInfos == null) {
@@ -388,10 +378,10 @@ public class LegacyClassInfo implements ClassInfo {
 					FieldInfo identityField = identityFieldOrNull();
 					fieldInfos = new HashSet<>();
 					for (FieldInfo fieldInfo : fieldsInfo().fields()) {
-						if (fieldInfo != identityField && !fieldInfo.isLabelField()) {
+						if (fieldInfo != identityField && !((LegacyFieldInfo)fieldInfo).isLabelField()) {
 							AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(Property.class.getCanonicalName());
 							if (annotationInfo == null) {
-								if (fieldInfo.persistableAsProperty()) {
+								if (((LegacyFieldInfo)fieldInfo).persistableAsProperty()) {
 									fieldInfos.add(fieldInfo);
 								}
 							} else {
@@ -412,7 +402,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * Note that this method does not allow for property names with differing case. //TODO
 	 *
 	 * @param propertyName the propertyName of the field to find
-	 * @return A FieldInfo object describing the required property field, or null if it doesn't exist.
+	 * @return A LegacyFieldInfo object describing the required property field, or null if it doesn't exist.
 	 */
 	public FieldInfo propertyField(String propertyName) {
 		if (propertyFields == null) {
@@ -439,12 +429,12 @@ public class LegacyClassInfo implements ClassInfo {
 	 * Finds the property field with a specific field name from the ClassInfo's property fields
 	 *
 	 * @param propertyName the propertyName of the field to find
-	 * @return A FieldInfo object describing the required property field, or null if it doesn't exist.
+	 * @return A LegacyFieldInfo object describing the required property field, or null if it doesn't exist.
 	 */
-	public FieldInfo propertyFieldByName(String propertyName) {
+	public LegacyFieldInfo propertyFieldByName(String propertyName) {
 		for (FieldInfo fieldInfo : propertyFields()) {
 			if (fieldInfo.getName().equalsIgnoreCase(propertyName)) {
-				return fieldInfo;
+				return (LegacyFieldInfo) fieldInfo;
 			}
 		}
 		return null;
@@ -454,7 +444,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * A relationship field is any field annotated with @Relationship, or any field that cannot be mapped to a
 	 * node property. The identity field is not a relationship field.
 	 *
-	 * @return A Collection of FieldInfo objects describing the classInfo's relationship fields
+	 * @return A Collection of LegacyFieldInfo objects describing the classInfo's relationship fields
 	 */
 	public Collection<FieldInfo> relationshipFields() {
 		FieldInfo identityField = identityFieldOrNull();
@@ -463,7 +453,7 @@ public class LegacyClassInfo implements ClassInfo {
 			if (fieldInfo != identityField) {
 				AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(Relationship.class.getCanonicalName());
 				if (annotationInfo == null) {
-					if (!fieldInfo.persistableAsProperty()) {
+					if (!((LegacyFieldInfo)fieldInfo).persistableAsProperty()) {
 						fieldInfos.add(fieldInfo);
 					}
 				} else {
@@ -478,7 +468,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * Finds the relationship field with a specific name from the ClassInfo's relationship fields
 	 *
 	 * @param relationshipName the relationshipName of the field to find
-	 * @return A FieldInfo object describing the required relationship field, or null if it doesn't exist.
+	 * @return A LegacyFieldInfo object describing the required relationship field, or null if it doesn't exist.
 	 */
 	public FieldInfo relationshipField(String relationshipName) {
 		for (FieldInfo fieldInfo : relationshipFields()) {
@@ -494,12 +484,12 @@ public class LegacyClassInfo implements ClassInfo {
 	 *
 	 * @param relationshipName the relationshipName of the field to find
 	 * @param relationshipDirection the direction of the relationship
-	 * @param strict if true, does not infer relationship type but looks for it in the @Relationship annotation. Null if missing. If false, infers relationship type from FieldInfo
-	 * @return A FieldInfo object describing the required relationship field, or null if it doesn't exist.
+	 * @param strict if true, does not infer relationship type but looks for it in the @Relationship annotation. Null if missing. If false, infers relationship type from LegacyFieldInfo
+	 * @return A LegacyFieldInfo object describing the required relationship field, or null if it doesn't exist.
 	 */
 	public FieldInfo relationshipField(String relationshipName, String relationshipDirection, boolean strict) {
 		for (FieldInfo fieldInfo : relationshipFields()) {
-			String relationship = strict ? fieldInfo.relationshipTypeAnnotation() : fieldInfo.relationship();
+			String relationship = strict ? ((LegacyFieldInfo)fieldInfo).relationshipTypeAnnotation() : fieldInfo.relationship();
 			if (relationshipName.equalsIgnoreCase(relationship)) {
 				if (((fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.INCOMING) || fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.UNDIRECTED)) && (relationshipDirection.equals(Relationship.INCOMING)))
 						|| (relationshipDirection.equals(Relationship.OUTGOING) && !(fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.INCOMING)))) {
@@ -515,14 +505,14 @@ public class LegacyClassInfo implements ClassInfo {
 	 *
 	 * @param relationshipName the relationshipName of the field to find
 	 * @param relationshipDirection the direction of the relationship
-	 * @param strict if true, does not infer relationship type but looks for it in the @Relationship annotation. Null if missing. If false, infers relationship type from FieldInfo
-	 * @return Set of  FieldInfo objects describing the required relationship field, or empty set if it doesn't exist.
+	 * @param strict if true, does not infer relationship type but looks for it in the @Relationship annotation. Null if missing. If false, infers relationship type from LegacyFieldInfo
+	 * @return Set of  LegacyFieldInfo objects describing the required relationship field, or empty set if it doesn't exist.
 	 */
 	@Override
 	public Set<FieldInfo> candidateRelationshipFields(String relationshipName, String relationshipDirection, boolean strict) {
 		Set<FieldInfo> candidateFields = new HashSet<>();
 		for (FieldInfo fieldInfo : relationshipFields()) {
-			String relationship = strict ? fieldInfo.relationshipTypeAnnotation() : fieldInfo.relationship();
+			String relationship = strict ? ((LegacyFieldInfo)fieldInfo).relationshipTypeAnnotation() : fieldInfo.relationship();
 			if (relationshipName.equalsIgnoreCase(relationship)) {
 				if (((fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.INCOMING) || fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.UNDIRECTED)) && (relationshipDirection.equals(Relationship.INCOMING)))
 						|| (relationshipDirection.equals(Relationship.OUTGOING) && !(fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.INCOMING)))) {
@@ -537,7 +527,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * Finds the relationship field with a specific property name from the ClassInfo's relationship fields
 	 *
 	 * @param fieldName the name of the field
-	 * @return A FieldInfo object describing the required relationship field, or null if it doesn't exist.
+	 * @return A LegacyFieldInfo object describing the required relationship field, or null if it doesn't exist.
 	 */
 	public FieldInfo relationshipFieldByName(String fieldName) {
 		for (FieldInfo fieldInfo : relationshipFields()) {
@@ -576,7 +566,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * Find all FieldInfos for the specified ClassInfo whose type matches the supplied fieldType
 	 *
 	 * @param fieldType The field type to look for
-	 * @return A {@link List} of {@link FieldInfo} objects that are of the given type, never <code>null</code>
+	 * @return A {@link List} of {@link LegacyFieldInfo} objects that are of the given type, never <code>null</code>
 	 */
 	public List<FieldInfo> findFields(Class<?> fieldType) {
 		String fieldSignature = "L" + fieldType.getName().replace(".", "/") + ";";
@@ -593,7 +583,7 @@ public class LegacyClassInfo implements ClassInfo {
 	 * Find all FieldInfos for the specified ClassInfo which have the specified annotation
 	 *
 	 * @param annotation The annotation
-	 * @return A {@link List} of {@link FieldInfo} objects that are of the given type, never <code>null</code>
+	 * @return A {@link List} of {@link LegacyFieldInfo} objects that are of the given type, never <code>null</code>
 	 */
 	public List<FieldInfo> findFields(String annotation) {
 		List<FieldInfo> fieldInfos = new ArrayList<>();
@@ -606,10 +596,10 @@ public class LegacyClassInfo implements ClassInfo {
 	}
 
 	/**
-	 * Retrieves a {@link List} of {@link FieldInfo} representing all of the fields that can be iterated over
+	 * Retrieves a {@link List} of {@link LegacyFieldInfo} representing all of the fields that can be iterated over
 	 * using a "foreach" loop.
 	 *
-	 * @return {@link List} of {@link FieldInfo}
+	 * @return {@link List} of {@link LegacyFieldInfo}
 	 */
 	public List<FieldInfo> findIterableFields() {
 		List<FieldInfo> fieldInfos = new ArrayList<>();
@@ -631,7 +621,6 @@ public class LegacyClassInfo implements ClassInfo {
 	 * where X is the generic parameter type of the Array or Iterable
 	 *
 	 * @param iteratedType the type of iterable
-	 * @return {@link List} of {@link MethodInfo}, never <code>null</code>
 	 */
 	public List<FieldInfo> findIterableFields(Class iteratedType) {
 		if (iterableFieldsForType.containsKey(iteratedType)) {
@@ -643,9 +632,9 @@ public class LegacyClassInfo implements ClassInfo {
 		try {
 			for (FieldInfo fieldInfo : fieldsInfo().fields()) {
 				String fieldType = fieldInfo.getTypeDescriptor();
-				if (fieldInfo.isArray() && (fieldType.equals(arrayOfTypeSignature) || fieldInfo.isParameterisedTypeOf(iteratedType))) {
+				if (((LegacyFieldInfo)fieldInfo).isArray() && (fieldType.equals(arrayOfTypeSignature) || fieldInfo.isParameterisedTypeOf(iteratedType))) {
 					fieldInfos.add(fieldInfo);
-				} else if (fieldInfo.isIterable() && (fieldType.equals(typeSignature) || fieldInfo.isParameterisedTypeOf(iteratedType))) {
+				} else if (((LegacyFieldInfo)fieldInfo).isIterable() && (fieldType.equals(typeSignature) || fieldInfo.isParameterisedTypeOf(iteratedType))) {
 					fieldInfos.add(fieldInfo);
 				}
 			}
@@ -664,13 +653,12 @@ public class LegacyClassInfo implements ClassInfo {
 	 * @param iteratedType the type of iterable
 	 * @param relationshipType the relationship type
 	 * @param relationshipDirection the relationship direction
-	 * @param strict if true, does not infer relationship type but looks for it in the @Relationship annotation. Null if missing. If false, infers relationship type from FieldInfo
-	 * @return {@link List} of {@link MethodInfo}, never <code>null</code>
+	 * @param strict if true, does not infer relationship type but looks for it in the @Relationship annotation. Null if missing. If false, infers relationship type from LegacyFieldInfo
 	 */
 	public List<FieldInfo> findIterableFields(Class iteratedType, String relationshipType, String relationshipDirection, boolean strict) {
 		List<FieldInfo> fieldInfos = new ArrayList<>();
 		for (FieldInfo fieldInfo : findIterableFields(iteratedType)) {
-			String relationship = strict ? fieldInfo.relationshipTypeAnnotation() : fieldInfo.relationship();
+			String relationship = strict ? ((LegacyFieldInfo)fieldInfo).relationshipTypeAnnotation() : fieldInfo.relationship();
 			if (relationshipType.equals(relationship)) {
 				if (((fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.INCOMING) || fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.UNDIRECTED)) && relationshipDirection.equals(Relationship.INCOMING))
 						|| (relationshipDirection.equals(Relationship.OUTGOING) && !(fieldInfo.relationshipDirection(Relationship.OUTGOING).equals(Relationship.INCOMING)))) {
@@ -775,7 +763,7 @@ public class LegacyClassInfo implements ClassInfo {
 	}
 
 	/**
-	 * @return The <code>FieldInfo</code>s representing the Indexed fields in this class.
+	 * @return The <code>LegacyFieldInfo</code>s representing the Indexed fields in this class.
 	 */
 	@Override
 	public Collection<FieldInfo> getIndexFields() {
@@ -822,7 +810,7 @@ public class LegacyClassInfo implements ClassInfo {
 			final String indexAnnotation = Index.class.getCanonicalName();
 
 			for (FieldInfo fieldInfo : fieldsInfo().fields()) {
-				AnnotationInfo annotationInfo = fieldInfo.getAnnotations().get(indexAnnotation);
+				LegacyAnnotationInfo annotationInfo = (LegacyAnnotationInfo) fieldInfo.getAnnotations().get(indexAnnotation);
 				if (annotationInfo != null && annotationInfo.get("primary") != null && annotationInfo.get("primary").equals("true")) {
 
 					if (primaryIndexField == null) {

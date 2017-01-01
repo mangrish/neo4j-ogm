@@ -6,17 +6,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.ogm.metadata.InterfaceInfo;
-import org.neo4j.ogm.metadata.InterfacesInfo;
-
 /**
  * Created by markangrish on 30/12/2016.
  */
-public class LegacyInterfacesInfo implements InterfacesInfo{
+public class LegacyInterfacesInfo {
 
-	private final Map<String, InterfaceInfo> interfaceMap = new HashMap<>();
+	private final Map<String, LegacyInterfaceInfo> interfaceMap = new HashMap<>();
 
-	public LegacyInterfacesInfo() {}
+	public LegacyInterfacesInfo() {
+	}
 
 	public LegacyInterfacesInfo(DataInputStream dataInputStream, ConstantPool constantPool) throws IOException {
 		int interfaceCount = dataInputStream.readUnsignedShort();
@@ -26,21 +24,20 @@ public class LegacyInterfacesInfo implements InterfacesInfo{
 		}
 	}
 
-	@Override
-	public Collection<InterfaceInfo> list() {
+	public Collection<LegacyInterfaceInfo> list() {
 		return interfaceMap.values();
 	}
 
-	public InterfaceInfo get(String interfaceName) {
+	public LegacyInterfaceInfo get(String interfaceName) {
 		return interfaceMap.get(interfaceName);
 	}
 
-	void add(InterfaceInfo interfaceInfo) {
+	void add(LegacyInterfaceInfo interfaceInfo) {
 		interfaceMap.put(interfaceInfo.name(), interfaceInfo);
 	}
 
-	public void append(InterfacesInfo interfacesInfo) {
-		for (InterfaceInfo interfaceInfo : interfacesInfo.list()) {
+	public void append(LegacyInterfacesInfo interfacesInfo) {
+		for (LegacyInterfaceInfo interfaceInfo : interfacesInfo.list()) {
 			add(interfaceInfo);
 		}
 	}

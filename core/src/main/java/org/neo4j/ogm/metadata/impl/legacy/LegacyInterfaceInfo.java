@@ -1,11 +1,10 @@
 package org.neo4j.ogm.metadata.impl.legacy;
 
-import org.neo4j.ogm.metadata.InterfaceInfo;
 
 /**
  * Created by markangrish on 30/12/2016.
  */
-public class LegacyInterfaceInfo implements InterfaceInfo {
+public class LegacyInterfaceInfo {
 
 	private final String interfaceName;
 
@@ -13,7 +12,6 @@ public class LegacyInterfaceInfo implements InterfaceInfo {
 		this.interfaceName = name;
 	}
 
-	@Override
 	public String name() {
 		return interfaceName;
 	}
@@ -27,7 +25,7 @@ public class LegacyInterfaceInfo implements InterfaceInfo {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		InterfaceInfo that = (InterfaceInfo) o;
+		LegacyInterfaceInfo that = (LegacyInterfaceInfo) o;
 
 		return interfaceName.equals(that.name());
 	}

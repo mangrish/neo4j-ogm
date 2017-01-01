@@ -44,21 +44,9 @@ public interface ClassInfo {
 
 	boolean isInterface();
 
-	boolean isEnum();
-
-	String superclassName();
-
-	InterfacesInfo interfacesInfo();
-
 	AnnotationsInfo annotationsInfo();
 
 	FieldsInfo fieldsInfo();
-
-	MethodsInfo methodsInfo();
-
-	ClassInfo directSuperclass();
-
-	Collection<String> collectLabels(Collection<String> labelNames);
 
 	Field getField(FieldInfo fieldInfo);
 
@@ -72,25 +60,9 @@ public interface ClassInfo {
 
 	List<ClassInfo> directImplementingClasses();
 
-	Collection<AnnotationInfo> annotations();
-
 	boolean isRelationshipEntity();
 
-	String simpleName();
-
-	boolean isTransient();
-
 	Class getUnderlyingClass();
-
-	void extend(ClassInfo superclass);
-
-	boolean hydrated();
-
-	void hydrate(ClassInfo classInfo);
-
-	void addSubclass(ClassInfo classInfo);
-
-	List<ClassInfo> directInterfaces();
 
 	FieldInfo propertyFieldByName(String propertyName);
 
@@ -126,11 +98,16 @@ public interface ClassInfo {
 
 	List<FieldInfo> findFields(Class<?> aClass);
 
+	// for testing
 	FieldInfo relationshipField(String relationshipType);
 
+	// for testing
 	Object getTypeParameterDescriptorForRelationship(String type, String direction);
 
+	// for testing
 	List<FieldInfo> findIterableFields();
+
+
 }
 
 

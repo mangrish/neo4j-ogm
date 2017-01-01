@@ -13,20 +13,19 @@
 
 package org.neo4j.ogm.typeconversion;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
 import org.junit.Test;
 import org.neo4j.ogm.MetaData;
 import org.neo4j.ogm.annotation.typeconversion.DateString;
-import org.neo4j.ogm.domain.convertible.date.Memo;
 import org.neo4j.ogm.metadata.ClassInfo;
 import org.neo4j.ogm.metadata.FieldInfo;
-import org.neo4j.ogm.metadata.MethodInfo;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Vince Bickers
@@ -34,78 +33,78 @@ import static org.junit.Assert.assertTrue;
  */
 public class DateConversionTest {
 
-    private static final MetaData metaData = new MetaData("org.neo4j.ogm.domain.convertible.date");
-    private static final ClassInfo memoInfo = metaData.classInfo("Memo");
-    SimpleDateFormat simpleDateISO8601format = new SimpleDateFormat(DateString.ISO_8601);
+	private static final MetaData metaData = new MetaData("org.neo4j.ogm.domain.convertible.date");
+	private static final ClassInfo memoInfo = metaData.classInfo("Memo");
+	SimpleDateFormat simpleDateISO8601format = new SimpleDateFormat(DateString.ISO_8601);
 
-    @Test
-    public void assertFieldDateConversionToISO8601FormatByDefault() {
-        FieldInfo fieldInfo = memoInfo.propertyField("recorded");
-        assertTrue(fieldInfo.hasPropertyConverter());
-        AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
-        assertTrue(attributeConverter.getClass().isAssignableFrom(DateStringConverter.class));
-        assertEquals("1970-01-01T00:00:00.000Z", attributeConverter.toGraphProperty(new Date(0)));
-    }
+	@Test
+	public void assertFieldDateConversionToISO8601FormatByDefault() {
+		FieldInfo fieldInfo = memoInfo.propertyField("recorded");
+		assertTrue(fieldInfo.hasPropertyConverter());
+		AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
+		assertTrue(attributeConverter.getClass().isAssignableFrom(DateStringConverter.class));
+		assertEquals("1970-01-01T00:00:00.000Z", attributeConverter.toGraphProperty(new Date(0)));
+	}
 
-    @Test
-    public void assertFieldDateConversionWithUserDefinedFormat() {
-        FieldInfo fieldInfo = memoInfo.propertyField("actioned");
-        assertTrue(fieldInfo.hasPropertyConverter());
-        AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
-        assertTrue(attributeConverter.getClass().isAssignableFrom(DateStringConverter.class));
-        assertEquals("1970-01-01", attributeConverter.toGraphProperty(new Date(0)));
-    }
+	@Test
+	public void assertFieldDateConversionWithUserDefinedFormat() {
+		FieldInfo fieldInfo = memoInfo.propertyField("actioned");
+		assertTrue(fieldInfo.hasPropertyConverter());
+		AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
+		assertTrue(attributeConverter.getClass().isAssignableFrom(DateStringConverter.class));
+		assertEquals("1970-01-01", attributeConverter.toGraphProperty(new Date(0)));
+	}
 
-    @Test
-    public void assertFieldDateLongConversion() {
-        FieldInfo fieldInfo = memoInfo.propertyField("closed");
-        assertTrue(fieldInfo.hasPropertyConverter());
-        AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
-        assertTrue(attributeConverter.getClass().isAssignableFrom(DateLongConverter.class));
-        Date date = new Date(0);
-        Long value = (Long) attributeConverter.toGraphProperty(date);
-        assertEquals(new Long(0), value);
-    }
+	@Test
+	public void assertFieldDateLongConversion() {
+		FieldInfo fieldInfo = memoInfo.propertyField("closed");
+		assertTrue(fieldInfo.hasPropertyConverter());
+		AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
+		assertTrue(attributeConverter.getClass().isAssignableFrom(DateLongConverter.class));
+		Date date = new Date(0);
+		Long value = (Long) attributeConverter.toGraphProperty(date);
+		assertEquals(new Long(0), value);
+	}
 
-    @Test
-    public void assertFieldCustomTypeConversion() {
-        FieldInfo fieldInfo = memoInfo.propertyField("approved");
-        assertTrue(fieldInfo.hasPropertyConverter());
-        AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
-        assertEquals("20090213113130", attributeConverter.toGraphProperty(new Date(1234567890123L)));
-    }
+	@Test
+	public void assertFieldCustomTypeConversion() {
+		FieldInfo fieldInfo = memoInfo.propertyField("approved");
+		assertTrue(fieldInfo.hasPropertyConverter());
+		AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
+		assertEquals("20090213113130", attributeConverter.toGraphProperty(new Date(1234567890123L)));
+	}
 
-    /**
-     * @see DATAGRAPH-550
-     */
-    @Test
-    public void assertArrayFieldDateConversionToISO8601FormatByDefault() {//here
-        simpleDateISO8601format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date[] dates = new Date[]{new Date(0), new Date(20000)};
-        FieldInfo fieldInfo = memoInfo.propertyField("escalations");
-        assertTrue(fieldInfo.hasPropertyConverter());
-        AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
-        assertTrue(attributeConverter.getClass().isAssignableFrom(DateArrayStringConverter.class));
-        String[] converted = (String[]) attributeConverter.toGraphProperty(dates);
-        assertTrue(converted[0].equals("1970-01-01T00:00:00.000Z") || converted[1].equals("1970-01-01T00:00:00.000Z"));
-        assertTrue(converted[0].equals(simpleDateISO8601format.format(new Date(20000))) || converted[1].equals(simpleDateISO8601format.format(new Date(20000))));
-    }
+	/**
+	 * @see DATAGRAPH-550
+	 */
+	@Test
+	public void assertArrayFieldDateConversionToISO8601FormatByDefault() {//here
+		simpleDateISO8601format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date[] dates = new Date[]{new Date(0), new Date(20000)};
+		FieldInfo fieldInfo = memoInfo.propertyField("escalations");
+		assertTrue(fieldInfo.hasPropertyConverter());
+		AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
+		assertTrue(attributeConverter.getClass().isAssignableFrom(DateArrayStringConverter.class));
+		String[] converted = (String[]) attributeConverter.toGraphProperty(dates);
+		assertTrue(converted[0].equals("1970-01-01T00:00:00.000Z") || converted[1].equals("1970-01-01T00:00:00.000Z"));
+		assertTrue(converted[0].equals(simpleDateISO8601format.format(new Date(20000))) || converted[1].equals(simpleDateISO8601format.format(new Date(20000))));
+	}
 
-    /**
-     * @see DATAGRAPH-550
-     */
-    @Test
-    public void assertCollectionFieldDateConversionToISO8601FormatByDefault() {//here
-        simpleDateISO8601format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        List<Date> dates = new ArrayList<>();
-        dates.add(new Date(0));
-        dates.add(new Date(20000));
-        FieldInfo fieldInfo = memoInfo.propertyField("implementations");
-        assertTrue(fieldInfo.hasPropertyConverter());
-        AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
-        assertTrue(attributeConverter.getClass().isAssignableFrom(DateCollectionStringConverter.class));
-        String[] converted = (String[]) attributeConverter.toGraphProperty(dates);
-        assertTrue(converted[0].equals("1970-01-01T00:00:00.000Z") || converted[1].equals("1970-01-01T00:00:00.000Z"));
-        assertTrue(converted[0].equals(simpleDateISO8601format.format(new Date(20000))) || converted[1].equals(simpleDateISO8601format.format(new Date(20000))));
-    }
+	/**
+	 * @see DATAGRAPH-550
+	 */
+	@Test
+	public void assertCollectionFieldDateConversionToISO8601FormatByDefault() {//here
+		simpleDateISO8601format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		List<Date> dates = new ArrayList<>();
+		dates.add(new Date(0));
+		dates.add(new Date(20000));
+		FieldInfo fieldInfo = memoInfo.propertyField("implementations");
+		assertTrue(fieldInfo.hasPropertyConverter());
+		AttributeConverter attributeConverter = fieldInfo.getPropertyConverter();
+		assertTrue(attributeConverter.getClass().isAssignableFrom(DateCollectionStringConverter.class));
+		String[] converted = (String[]) attributeConverter.toGraphProperty(dates);
+		assertTrue(converted[0].equals("1970-01-01T00:00:00.000Z") || converted[1].equals("1970-01-01T00:00:00.000Z"));
+		assertTrue(converted[0].equals(simpleDateISO8601format.format(new Date(20000))) || converted[1].equals(simpleDateISO8601format.format(new Date(20000))));
+	}
 }

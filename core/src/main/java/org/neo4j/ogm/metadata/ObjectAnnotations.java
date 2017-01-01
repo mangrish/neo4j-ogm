@@ -18,12 +18,7 @@ package org.neo4j.ogm.metadata;
  */
 public interface ObjectAnnotations {
 
-
 	AnnotationInfo get(String name);
 
-	// for testing
 	boolean isEmpty();
-
-	// for testing
-	Object getConverter();
 }

@@ -13,16 +13,10 @@
 
 package org.neo4j.ogm.metadata;
 
-import java.util.Collection;
-
 /**
  * @author Vince Bickers
  */
 public interface AnnotationsInfo {
 
-	Collection<AnnotationInfo> list();
-
 	AnnotationInfo get(String entity);
-
-	void append(AnnotationsInfo annotationsInfo);
 }

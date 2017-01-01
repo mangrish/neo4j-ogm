@@ -14,14 +14,14 @@
 package org.neo4j.ogm.defects;
 
 
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.ogm.MetaData;
 import org.neo4j.ogm.metadata.ClassInfo;
-import org.neo4j.ogm.metadata.MethodInfo;
-
-import static org.junit.Assert.*;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyClassInfo;
 
 /**
  * @author Luanne Misquitta
@@ -29,19 +29,18 @@ import static org.junit.Assert.*;
 @Ignore
 public class MetaDataTest {
 
-    private MetaData metaData;
+	private MetaData metaData;
 
-    @Before
-    public void setUp() {
-        metaData = new MetaData("org.neo4j.ogm.domain.forum", "org.neo4j.ogm.domain.canonical", "org.neo4j.ogm.integration.hierarchy.domain", "org.neo4j.ogm.domain.cineasts.annotated");
-    }
+	@Before
+	public void setUp() {
+		metaData = new MetaData("org.neo4j.ogm.domain.forum", "org.neo4j.ogm.domain.canonical", "org.neo4j.ogm.integration.hierarchy.domain", "org.neo4j.ogm.domain.cineasts.annotated");
+	}
 
-    @Test
-    public void testThatJavaDotLangDotEnumIsAnEnum() {
-        ClassInfo classInfo = metaData.classInfo("Enum");
-        assertNotNull("I was expecting java.lang.Enum to be in the meta-data", classInfo);
-        assertEquals("java.lang.Enum", classInfo.name());
-        assertTrue("Surely java.lang.Enum should be considered an enum", classInfo.isEnum());
-    }
-
+	@Test
+	public void testThatJavaDotLangDotEnumIsAnEnum() {
+		ClassInfo classInfo = metaData.classInfo("Enum");
+		assertNotNull("I was expecting java.lang.Enum to be in the meta-data", classInfo);
+		assertEquals("java.lang.Enum", classInfo.name());
+		assertTrue("Surely java.lang.Enum should be considered an enum", ((LegacyClassInfo)classInfo).isEnum());
+	}
 }

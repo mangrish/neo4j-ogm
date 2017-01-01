@@ -35,6 +35,7 @@ import org.neo4j.ogm.domain.forum.activity.Activity;
 import org.neo4j.ogm.domain.forum.activity.Post;
 import org.neo4j.ogm.domain.pizza.Pizza;
 import org.neo4j.ogm.exception.MappingException;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyClassInfo;
 import org.neo4j.ogm.utils.EntityUtils;
 
 
@@ -289,12 +290,12 @@ public class ClassInfoTest {
 
     @Test
     public void testClassInfoForAbstractClassImplementingInterface() {
-        assertEquals(1, metaData.classInfo("Membership").interfacesInfo().list().size());
+        assertEquals(1, ((LegacyClassInfo)metaData.classInfo("Membership")).interfacesInfo().list().size());
     }
 
     @Test
     public void testClassInfoForAbstractClassImplementingInterfaceName() {
-        assertTrue(metaData.classInfo("Membership").interfacesInfo().list().iterator().next().toString().contains("IMembership"));
+        assertTrue(((LegacyClassInfo)metaData.classInfo("Membership")).interfacesInfo().list().iterator().next().toString().contains("IMembership"));
     }
 
     @Test

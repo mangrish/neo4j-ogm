@@ -25,6 +25,4 @@ public interface FieldsInfo {
 	FieldInfo get(String propertyName);
 
 	Collection<FieldInfo> compositeFields();
-
-	void append(FieldsInfo fieldsInfo);
 }

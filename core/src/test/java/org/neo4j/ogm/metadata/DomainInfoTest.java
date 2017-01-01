@@ -14,6 +14,7 @@ package org.neo4j.ogm.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.ogm.metadata.impl.legacy.LegacyClassInfo;
 import org.neo4j.ogm.metadata.impl.legacy.LegacyDomainInfo;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +53,7 @@ public class DomainInfoTest {
 
         ClassInfo classInfo = domainInfo.getClassSimpleName("Membership");
         assertNotNull(classInfo);
-        assertEquals(1, classInfo.directInterfaces().size());
+        assertEquals(1, ((LegacyClassInfo)classInfo).directInterfaces().size());
 
     }
 
@@ -61,7 +62,7 @@ public class DomainInfoTest {
 
         ClassInfo classInfo = domainInfo.getClassSimpleName("SilverMembership");
         assertNotNull(classInfo);
-        assertEquals(1, classInfo.interfacesInfo().list().size());
+        assertEquals(1, ((LegacyClassInfo)classInfo).interfacesInfo().list().size());
 
     }
 

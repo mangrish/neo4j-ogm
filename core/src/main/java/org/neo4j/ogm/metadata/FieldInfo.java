@@ -40,17 +40,7 @@ public interface FieldInfo {
 
 	String getTypeDescriptor();
 
-	boolean persistableAsProperty();
-
 	boolean hasPropertyConverter();
-
-	void setPropertyConverter(AttributeConverter<?, ?> attributeConverter);
-
-	String getCollectionClassname();
-
-	boolean isIterable();
-
-	boolean isArray();
 
 	String property();
 
@@ -67,10 +57,6 @@ public interface FieldInfo {
 	boolean isScalar();
 
 	Class<?> convertedType();
-
-	boolean isLabelField();
-
-	String relationshipTypeAnnotation();
 
 	boolean isDate();
 

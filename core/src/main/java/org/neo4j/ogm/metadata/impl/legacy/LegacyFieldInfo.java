@@ -76,7 +76,7 @@ public class LegacyFieldInfo implements FieldInfo {
 		this.typeParameterDescriptor = typeParameterDescriptor;
 		this.annotations = annotations;
 		if (!this.annotations.isEmpty()) {
-			Object converter = getAnnotations().getConverter();
+			Object converter = ((LegacyObjectAnnotations)getAnnotations()).getConverter();
 			if (converter instanceof AttributeConverter) {
 				setPropertyConverter((AttributeConverter<?, ?>) converter);
 			} else if (converter instanceof CompositeAttributeConverter) {

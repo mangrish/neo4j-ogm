@@ -52,7 +52,7 @@ public class LegacyDomainInfo implements DomainInfo {
 
 		LOGGER.info("Building annotation class map");
 		for (ClassInfo classInfo : classNameToClassInfo.values()) {
-			for (AnnotationInfo annotation : classInfo.annotations()) {
+			for (LegacyAnnotationInfo annotation : ((LegacyClassInfo)classInfo).annotations()) {
 				ArrayList<ClassInfo> classInfoList = annotationNameToClassInfo.get(annotation.getName());
 				if (classInfoList == null) {
 					annotationNameToClassInfo.put(annotation.getName(), classInfoList = new ArrayList<>());
@@ -65,8 +65,8 @@ public class LegacyDomainInfo implements DomainInfo {
 	private void buildInterfaceNameToClassInfoMap() {
 		LOGGER.info("Building interface class map for {} classes", classNameToClassInfo.values().size());
 		for (ClassInfo classInfo : classNameToClassInfo.values()) {
-			LOGGER.debug(" - {} implements {} interfaces", classInfo.simpleName(), classInfo.interfacesInfo().list().size());
-			for (InterfaceInfo iface : classInfo.interfacesInfo().list()) {
+			LOGGER.debug(" - {} implements {} interfaces", ((LegacyClassInfo)classInfo).simpleName(), ((LegacyClassInfo)classInfo).interfacesInfo().list().size());
+			for (LegacyInterfaceInfo iface : ((LegacyClassInfo)classInfo).interfacesInfo().list()) {
 				ArrayList<ClassInfo> classInfoList = interfaceNameToClassInfo.get(iface.name());
 				if (classInfoList == null) {
 					interfaceNameToClassInfo.put(iface.name(), classInfoList = new ArrayList<>());
@@ -92,18 +92,18 @@ public class LegacyDomainInfo implements DomainInfo {
 
 			LOGGER.debug("Post-processing: {}", classInfo.name());
 
-			if (classInfo.isTransient()) {
+			if (((LegacyClassInfo)classInfo).isTransient()) {
 				LOGGER.debug(" - Registering @Transient baseclass: {}", classInfo.name());
 				transientClasses.add(classInfo);
 				continue;
 			}
 
-			if (classInfo.superclassName() == null || classInfo.superclassName().equals("java.lang.Object")) {
+			if (((LegacyClassInfo)classInfo).superclassName() == null || ((LegacyClassInfo)classInfo).superclassName().equals("java.lang.Object")) {
 				extend(classInfo, classInfo.directSubclasses());
 			}
 
-			for (InterfaceInfo interfaceInfo : classInfo.interfacesInfo().list()) {
-				implement(classInfo, interfaceInfo);
+			for (LegacyInterfaceInfo interfaceInfo : ((LegacyClassInfo)classInfo).interfacesInfo().list()) {
+				implement((LegacyClassInfo) classInfo, interfaceInfo);
 			}
 		}
 
@@ -113,7 +113,7 @@ public class LegacyDomainInfo implements DomainInfo {
 		Collection<ArrayList<ClassInfo>> interfaceInfos = interfaceNameToClassInfo.values();
 		for (ArrayList<ClassInfo> classInfos : interfaceInfos) {
 			for (ClassInfo classInfo : classInfos) {
-				if (classInfo.isTransient()) {
+				if (((LegacyClassInfo)classInfo).isTransient()) {
 					LOGGER.debug("Registering @Transient baseclass: {}", classInfo.name());
 					transientClasses.add(classInfo);
 				}
@@ -135,12 +135,12 @@ public class LegacyDomainInfo implements DomainInfo {
 	private void postProcessFields(Set<Class> transientClassesRemoved) {
 		for (ClassInfo classInfo : classNameToClassInfo.values()) {
 			boolean registerConverters = false;
-			if (!classInfo.isEnum() && !classInfo.isInterface()) {
+			if (!((LegacyClassInfo)classInfo).isEnum() && !classInfo.isInterface()) {
 				registerConverters = true;
 			}
 			Iterator<FieldInfo> fieldInfoIterator = classInfo.fieldsInfo().fields().iterator();
 			while (fieldInfoIterator.hasNext()) {
-				FieldInfo fieldInfo = fieldInfoIterator.next();
+				LegacyFieldInfo fieldInfo = (LegacyFieldInfo) fieldInfoIterator.next();
 				if (!fieldInfo.persistableAsProperty()) {
 					Class fieldClass = null;
 					try {
@@ -179,19 +179,19 @@ public class LegacyDomainInfo implements DomainInfo {
 
 	private void extend(ClassInfo superclass, List<ClassInfo> subclasses) {
 		for (ClassInfo subclass : subclasses) {
-			subclass.extend(superclass);
+			((LegacyClassInfo)subclass).extend(superclass);
 			extend(subclass, subclass.directSubclasses());
 		}
 	}
 
-	private void implement(ClassInfo implementingClass, InterfaceInfo interfaceInfo) {
+	private void implement(LegacyClassInfo implementingClass, LegacyInterfaceInfo interfaceInfo) {
 
 		ClassInfo interfaceClass = classNameToClassInfo.get(interfaceInfo.name());
 
 		if (interfaceClass != null) {
 			if (!implementingClass.directInterfaces().contains(interfaceClass)) {
-				LOGGER.debug(" - Setting {} implements {}", implementingClass.simpleName(), interfaceClass.simpleName());
-				implementingClass.directInterfaces().add(interfaceClass);
+				LOGGER.debug(" - Setting {} implements {}", implementingClass.simpleName(), ((LegacyClassInfo)interfaceClass).simpleName());
+				implementingClass.directInterfaces().add((LegacyClassInfo)interfaceClass);
 			}
 
 			if (!interfaceClass.directImplementingClasses().contains(implementingClass)) {
@@ -199,16 +199,16 @@ public class LegacyDomainInfo implements DomainInfo {
 			}
 
 			for (ClassInfo subClassInfo : implementingClass.directSubclasses()) {
-				implement(subClassInfo, interfaceInfo);
+				implement((LegacyClassInfo) subClassInfo, interfaceInfo);
 			}
 		} else {
-			LOGGER.debug(" - No ClassInfo found for interface class: {}", interfaceInfo.name());
+			LOGGER.debug(" - No LegacyClassInfo found for interface class: {}", interfaceInfo.name());
 		}
 	}
 
 	public void process(final InputStream inputStream) throws IOException {
 
-		ClassInfo classInfo = new LegacyClassInfo(inputStream);
+		LegacyClassInfo classInfo = new LegacyClassInfo(inputStream);
 
 		String className = classInfo.name();
 		String superclassName = classInfo.superclassName();
@@ -224,19 +224,19 @@ public class LegacyDomainInfo implements DomainInfo {
 				classNameToClassInfo.put(className, thisClassInfo);
 			}
 
-			if (!thisClassInfo.hydrated()) {
+			if (!((LegacyClassInfo)thisClassInfo).hydrated()) {
 
-				thisClassInfo.hydrate(classInfo);
+				((LegacyClassInfo)thisClassInfo).hydrate(classInfo);
 
 				ClassInfo superclassInfo = classNameToClassInfo.get(superclassName);
 				if (superclassInfo == null) {
 					classNameToClassInfo.put(superclassName, new LegacyClassInfo(superclassName, thisClassInfo));
 				} else {
-					superclassInfo.addSubclass(thisClassInfo);
+					((LegacyClassInfo)superclassInfo).addSubclass(thisClassInfo);
 				}
 			}
 
-			if (thisClassInfo.isEnum()) {
+			if (((LegacyClassInfo)thisClassInfo).isEnum()) {
 				LOGGER.debug("Registering enum class: {}", thisClassInfo.name());
 				enumTypes.add(thisClassInfo.getUnderlyingClass());
 			}
@@ -279,7 +279,7 @@ public class LegacyDomainInfo implements DomainInfo {
 		return null;
 	}
 
-	private ClassInfo getClassInfo(String fullOrPartialClassName, Map<String, ClassInfo> infos) {
+	private LegacyClassInfo getClassInfo(String fullOrPartialClassName, Map<String, ClassInfo> infos) {
 		ClassInfo match = null;
 		for (String fqn : infos.keySet()) {
 			if (fqn.endsWith("." + fullOrPartialClassName) || fqn.equals(fullOrPartialClassName)) {
@@ -290,14 +290,14 @@ public class LegacyDomainInfo implements DomainInfo {
 				}
 			}
 		}
-		return match;
+		return (LegacyClassInfo) match;
 	}
 
 	public List<ClassInfo> getClassInfosWithAnnotation(String annotation) {
 		return annotationNameToClassInfo.get(annotation);
 	}
 
-	private void registerDefaultFieldConverters(ClassInfo classInfo, FieldInfo fieldInfo) {
+	private void registerDefaultFieldConverters(ClassInfo classInfo, LegacyFieldInfo fieldInfo) {
 
 		if (!fieldInfo.hasPropertyConverter() && !fieldInfo.hasCompositeConverter()) {
 
@@ -346,7 +346,7 @@ public class LegacyDomainInfo implements DomainInfo {
 	}
 
 
-	private void setEnumFieldConverter(FieldInfo fieldInfo, Class enumClass) {
+	private void setEnumFieldConverter(LegacyFieldInfo fieldInfo, Class enumClass) {
 		if (fieldInfo.isArray()) {
 			fieldInfo.setPropertyConverter(ConvertibleTypes.getEnumArrayConverter(enumClass));
 		} else if (fieldInfo.isIterable()) {
@@ -356,7 +356,7 @@ public class LegacyDomainInfo implements DomainInfo {
 		}
 	}
 
-	private void setBigDecimalConverter(FieldInfo fieldInfo) {
+	private void setBigDecimalConverter(LegacyFieldInfo fieldInfo) {
 		if (fieldInfo.isArray()) {
 			fieldInfo.setPropertyConverter(ConvertibleTypes.getBigDecimalArrayConverter());
 		} else if (fieldInfo.isIterable()) {
@@ -366,7 +366,7 @@ public class LegacyDomainInfo implements DomainInfo {
 		}
 	}
 
-	private void setBigIntegerFieldConverter(FieldInfo fieldInfo) {
+	private void setBigIntegerFieldConverter(LegacyFieldInfo fieldInfo) {
 		if (fieldInfo.isArray()) {
 			fieldInfo.setPropertyConverter(ConvertibleTypes.getBigIntegerArrayConverter());
 		} else if (fieldInfo.isIterable()) {
@@ -376,7 +376,7 @@ public class LegacyDomainInfo implements DomainInfo {
 		}
 	}
 
-	private void setDateFieldConverter(FieldInfo fieldInfo) {
+	private void setDateFieldConverter(LegacyFieldInfo fieldInfo) {
 		if (fieldInfo.isArray()) {
 			fieldInfo.setPropertyConverter(ConvertibleTypes.getDateArrayConverter());
 		} else if (fieldInfo.isIterable()) {

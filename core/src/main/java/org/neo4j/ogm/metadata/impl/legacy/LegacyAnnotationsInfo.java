@@ -15,7 +15,7 @@ import org.neo4j.ogm.metadata.AnnotationsInfo;
 public class LegacyAnnotationsInfo implements AnnotationsInfo {
 
 
-	private final Map<String, AnnotationInfo> classAnnotations = new HashMap<>();
+	private final Map<String, LegacyAnnotationInfo> classAnnotations = new HashMap<>();
 
 	public LegacyAnnotationsInfo() {}
 
@@ -27,7 +27,7 @@ public class LegacyAnnotationsInfo implements AnnotationsInfo {
 			if ("RuntimeVisibleAnnotations".equals(attributeName)) {
 				int annotationCount = dataInputStream.readUnsignedShort();
 				for (int m = 0; m < annotationCount; m++) {
-					AnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
+					LegacyAnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
 					// todo: maybe register just the annotations we're interested in.
 					classAnnotations.put(info.getName(), info);
 				}
@@ -38,7 +38,7 @@ public class LegacyAnnotationsInfo implements AnnotationsInfo {
 		}
 	}
 
-	public Collection<AnnotationInfo> list() {
+	public Collection<LegacyAnnotationInfo> list() {
 		return classAnnotations.values();
 	}
 
@@ -50,12 +50,12 @@ public class LegacyAnnotationsInfo implements AnnotationsInfo {
 		return classAnnotations.get(annotationName);
 	}
 
-	void add(AnnotationInfo annotationInfo) {
+	void add(LegacyAnnotationInfo annotationInfo) {
 		classAnnotations.put(annotationInfo.getName(), annotationInfo);
 	}
 
 	public void append(AnnotationsInfo annotationsInfo) {
-		for (AnnotationInfo annotationInfo : annotationsInfo.list()) {
+		for (LegacyAnnotationInfo annotationInfo : ((LegacyAnnotationsInfo)annotationsInfo).list()) {
 			add(annotationInfo);
 		}
 	}

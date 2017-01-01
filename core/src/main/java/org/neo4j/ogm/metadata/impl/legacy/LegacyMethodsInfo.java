@@ -12,12 +12,12 @@ import org.neo4j.ogm.metadata.*;
 /**
  * Created by markangrish on 30/12/2016.
  */
-public class LegacyMethodsInfo implements MethodsInfo {
+public class LegacyMethodsInfo  {
 
 
-	private final Map<String, MethodInfo> methods = new HashMap<>();
-	private final Map<String, MethodInfo> getters = new HashMap<>();
-	private final Map<String, MethodInfo> setters = new HashMap<>();
+	private final Map<String, LegacyMethodInfo> methods = new HashMap<>();
+	private final Map<String, LegacyMethodInfo> getters = new HashMap<>();
+	private final Map<String, LegacyMethodInfo> setters = new HashMap<>();
 
 	public LegacyMethodsInfo() {}
 
@@ -37,7 +37,7 @@ public class LegacyMethodsInfo implements MethodsInfo {
 				if ("RuntimeVisibleAnnotations".equals(attributeName)) {
 					int annotationCount = dataInputStream.readUnsignedShort();
 					for (int m = 0; m < annotationCount; m++) {
-						AnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
+						LegacyAnnotationInfo info = new LegacyAnnotationInfo(dataInputStream, constantPool);
 						// todo: maybe register just the annotations we're interested in.
 						objectAnnotations.put(info.getName(), info);
 					}
@@ -56,36 +56,36 @@ public class LegacyMethodsInfo implements MethodsInfo {
 		}
 	}
 
-	public Collection<MethodInfo> methods() {
+	public Collection<LegacyMethodInfo> methods() {
 		return methods.values();
 	}
 
-	public Collection<MethodInfo> getters() {
+	public Collection<LegacyMethodInfo> getters() {
 		return getters.values();
 	}
 
-	public Collection<MethodInfo> setters() {
+	public Collection<LegacyMethodInfo> setters() {
 		return setters.values();
 	}
 
-	public MethodInfo get(String methodName) {
+	public LegacyMethodInfo get(String methodName) {
 		return methods.get(methodName);
 	}
 
-	public void append(MethodsInfo methodsInfo) {
-		for (MethodInfo methodInfo : methodsInfo.methods()) {
+	public void append(LegacyMethodsInfo methodsInfo) {
+		for (LegacyMethodInfo methodInfo : methodsInfo.methods()) {
 			if (!methods.containsKey(methodInfo.getName())) {
 				addMethod(methodInfo);
 			}
 		}
 	}
 
-	void removeGettersAndSetters(MethodInfo methodInfo) {
+	void removeGettersAndSetters(LegacyMethodInfo methodInfo) {
 		getters.remove(methodInfo.getName());
 		setters.remove(methodInfo.getName());
 	}
 
-	private void addMethod(MethodInfo methodInfo) {
+	private void addMethod(LegacyMethodInfo methodInfo) {
 		String methodName = methodInfo.getName();
 		methods.put(methodName, methodInfo);
 		if (methodInfo.isGetter()) {

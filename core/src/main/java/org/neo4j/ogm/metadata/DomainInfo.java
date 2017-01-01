@@ -34,5 +34,6 @@ public interface DomainInfo {
 
 	List<ClassInfo> getClassInfos(String interfaceName);
 
+	// for testing
 	ClassInfo getClass(String name);
 }
