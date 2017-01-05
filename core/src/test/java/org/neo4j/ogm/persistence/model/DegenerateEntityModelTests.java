@@ -44,7 +44,7 @@ import org.neo4j.ogm.testutil.MultiDriverTestClass;
  * @author Luanne Misquitta
  *
  */
-public class DegenerateEntityModelTests extends MultiDriverTestClass {
+public abstract class DegenerateEntityModelTests  {
 
     private Folder f;
     private Document a;
@@ -85,6 +85,8 @@ public class DegenerateEntityModelTests extends MultiDriverTestClass {
     private GraphDatabaseService getDatabase() {
         return getGraphDatabaseService();
     }
+
+    protected abstract GraphDatabaseService getGraphDatabaseService();
 
     @Test
     public void testSaveDegenerateDocument() {

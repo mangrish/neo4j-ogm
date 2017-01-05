@@ -22,15 +22,15 @@ import org.neo4j.ogm.domain.filesystem.Document;
 import org.neo4j.ogm.session.Neo4jSession;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.Utils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author vince
  */
-public class DirtyObjectsTest extends MultiDriverTestClass {
+public abstract class DirtyObjectsTest {
 
 	private Neo4jSession session;
 	private SessionFactory sessionFactory;
+
 	@Before
 	public void init() throws IOException {
 		sessionFactory = new SessionFactory("org.neo4j.ogm.domain.filesystem");
@@ -77,7 +77,6 @@ public class DirtyObjectsTest extends MultiDriverTestClass {
 		session.save(d);
 		session.clear();
 		Assert.assertTrue(session.context().isDirty(d));
-
 	}
 
 	@Test
@@ -91,7 +90,6 @@ public class DirtyObjectsTest extends MultiDriverTestClass {
 
 		Assert.assertFalse(session.context().isDirty(d));
 		Assert.assertFalse(session.context().isDirty(d2));
-
 	}
 
 	@Test
@@ -101,7 +99,6 @@ public class DirtyObjectsTest extends MultiDriverTestClass {
 
 		session.save(d);
 		Assert.assertSame(d, session.load(Document.class, d.getId()));
-
 	}
 
 	@Test
@@ -124,6 +121,5 @@ public class DirtyObjectsTest extends MultiDriverTestClass {
 		Assert.assertEquals(null, d3.getName());
 		// and in fact, d3 and d are the same object.
 		Assert.assertSame(d, d3);
-
 	}
 }

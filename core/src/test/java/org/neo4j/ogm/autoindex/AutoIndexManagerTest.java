@@ -11,6 +11,7 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.ogm.MetaData;
 import org.neo4j.ogm.config.Configuration;
 import org.neo4j.ogm.service.Components;
@@ -21,7 +22,7 @@ import org.neo4j.ogm.testutil.MultiDriverTestClass;
  *
  * @author Mark Angrish
  */
-public class AutoIndexManagerTest extends MultiDriverTestClass {
+public abstract class AutoIndexManagerTest {
 
 	private MetaData metaData = new MetaData("org.neo4j.ogm.domain.forum");
 
@@ -122,6 +123,8 @@ public class AutoIndexManagerTest extends MultiDriverTestClass {
 	private void createLoginConstraint() {
 		getGraphDatabaseService().execute(CREATE_LOGIN_CONSTRAINT_CYPHER);
 	}
+
+	protected abstract GraphDatabaseService getGraphDatabaseService();
 
 	private void dropLoginConstraint() {
 		getGraphDatabaseService().execute(DROP_LOGIN_CONSTRAINT_CYPHER);

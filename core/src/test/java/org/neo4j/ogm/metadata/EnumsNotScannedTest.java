@@ -12,9 +12,7 @@
  */
 package org.neo4j.ogm.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.math.RoundingMode;
 
@@ -25,107 +23,104 @@ import org.neo4j.ogm.domain.food.entities.notScanned.Pizza;
 import org.neo4j.ogm.domain.food.entities.scanned.Risk;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * Tests behaviour of enums that have not been scanned when creating a SessionFactory
  *
  * @author Mihai Raulea
  * @author Luanne Misquitta
- *
  * @see issue #145
  */
-public class EnumsNotScannedTest extends MultiDriverTestClass {
+public abstract class EnumsNotScannedTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init()  {
-        session =  new SessionFactory("org.neo4j.ogm.domain.food.entities.notScanned").openSession();
-    }
+	@Before
+	public void init() {
+		session = new SessionFactory("org.neo4j.ogm.domain.food.entities.notScanned").openSession();
+	}
 
-    @After
-    public void tearDown() {
-        session.purgeDatabase();
-    }
+	@After
+	public void tearDown() {
+		session.purgeDatabase();
+	}
 
-    @Test
-    public void shouldHandleEnumWithNoConverterOrPropertyAnnotation() {
-        Pizza pizza = new Pizza();
-        pizza.strokeRisk = Risk.LOW;
-        session.save(pizza);
+	@Test
+	public void shouldHandleEnumWithNoConverterOrPropertyAnnotation() {
+		Pizza pizza = new Pizza();
+		pizza.strokeRisk = Risk.LOW;
+		session.save(pizza);
 
-        session.clear();
+		session.clear();
 
-        pizza = session.load(Pizza.class, pizza.id);
-        assertNotNull(pizza);
-        assertEquals(Risk.LOW, pizza.strokeRisk);
-        assertNull(pizza.cancerRisk);
-        assertNull(pizza.diabetesRisk);
-        assertNull(pizza.hypertensionRisk);
-    }
+		pizza = session.load(Pizza.class, pizza.id);
+		assertNotNull(pizza);
+		assertEquals(Risk.LOW, pizza.strokeRisk);
+		assertNull(pizza.cancerRisk);
+		assertNull(pizza.diabetesRisk);
+		assertNull(pizza.hypertensionRisk);
+	}
 
-    @Test
-    public void shouldHandleEnumWithConverterButNoPropertyAnnotation() {
-        Pizza pizza = new Pizza();
-        pizza.diabetesRisk = Risk.HIGH;
-        session.save(pizza);
+	@Test
+	public void shouldHandleEnumWithConverterButNoPropertyAnnotation() {
+		Pizza pizza = new Pizza();
+		pizza.diabetesRisk = Risk.HIGH;
+		session.save(pizza);
 
-        session.clear();
+		session.clear();
 
-        pizza = session.load(Pizza.class, pizza.id);
-        assertNotNull(pizza);
-        assertEquals(Risk.HIGH, pizza.diabetesRisk);
-        assertNull(pizza.cancerRisk);
-        assertNull(pizza.strokeRisk);
-        assertNull(pizza.hypertensionRisk);
-    }
+		pizza = session.load(Pizza.class, pizza.id);
+		assertNotNull(pizza);
+		assertEquals(Risk.HIGH, pizza.diabetesRisk);
+		assertNull(pizza.cancerRisk);
+		assertNull(pizza.strokeRisk);
+		assertNull(pizza.hypertensionRisk);
+	}
 
-    @Test
-    public void shouldHandleEnumWithPropertyAnnotationButNoConverter() {
-        Pizza pizza = new Pizza();
-        pizza.cancerRisk = Risk.LOW;
-        session.save(pizza);
+	@Test
+	public void shouldHandleEnumWithPropertyAnnotationButNoConverter() {
+		Pizza pizza = new Pizza();
+		pizza.cancerRisk = Risk.LOW;
+		session.save(pizza);
 
-        session.clear();
+		session.clear();
 
-        pizza = session.load(Pizza.class, pizza.id);
-        assertNotNull(pizza);
-        assertEquals(Risk.LOW, pizza.cancerRisk);
-        assertNull(pizza.diabetesRisk);
-        assertNull(pizza.strokeRisk);
-        assertNull(pizza.hypertensionRisk);
-    }
+		pizza = session.load(Pizza.class, pizza.id);
+		assertNotNull(pizza);
+		assertEquals(Risk.LOW, pizza.cancerRisk);
+		assertNull(pizza.diabetesRisk);
+		assertNull(pizza.strokeRisk);
+		assertNull(pizza.hypertensionRisk);
+	}
 
-    @Test
-    public void shouldHandleEnumWithConverterAndPropertyAnnotation() {
-        Pizza pizza = new Pizza();
-        pizza.hypertensionRisk = Risk.HIGH;
-        session.save(pizza);
+	@Test
+	public void shouldHandleEnumWithConverterAndPropertyAnnotation() {
+		Pizza pizza = new Pizza();
+		pizza.hypertensionRisk = Risk.HIGH;
+		session.save(pizza);
 
-        session.clear();
+		session.clear();
 
-        pizza = session.load(Pizza.class, pizza.id);
-        assertNotNull(pizza);
-        assertEquals(Risk.HIGH, pizza.hypertensionRisk);
-        assertNull(pizza.diabetesRisk);
-        assertNull(pizza.strokeRisk);
-        assertNull(pizza.cancerRisk);
-    }
+		pizza = session.load(Pizza.class, pizza.id);
+		assertNotNull(pizza);
+		assertEquals(Risk.HIGH, pizza.hypertensionRisk);
+		assertNull(pizza.diabetesRisk);
+		assertNull(pizza.strokeRisk);
+		assertNull(pizza.cancerRisk);
+	}
 
 	/**
 	 * @see DATAGRAPH-659
-     */
-    @Test
-    public void shouldHandleJavaEnums() {
-        Pizza pizza = new Pizza();
-        pizza.roundingMode = RoundingMode.CEILING;
-        session.save(pizza);
+	 */
+	@Test
+	public void shouldHandleJavaEnums() {
+		Pizza pizza = new Pizza();
+		pizza.roundingMode = RoundingMode.CEILING;
+		session.save(pizza);
 
-        session.clear();
-        pizza = session.load(Pizza.class, pizza.id);
-        assertNotNull(pizza);
-        assertEquals(RoundingMode.CEILING, pizza.roundingMode);
-    }
-
+		session.clear();
+		pizza = session.load(Pizza.class, pizza.id);
+		assertNotNull(pizza);
+		assertEquals(RoundingMode.CEILING, pizza.roundingMode);
+	}
 }

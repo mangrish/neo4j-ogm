@@ -13,167 +13,160 @@
 
 package org.neo4j.ogm.persistence.examples.friendships;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.ogm.domain.friendships.Friendship;
-import org.neo4j.ogm.domain.friendships.Person;
-import org.neo4j.ogm.session.Session;
-import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.neo4j.ogm.domain.friendships.Friendship;
+import org.neo4j.ogm.domain.friendships.Person;
+import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.session.SessionFactory;
 
 /**
  * @author Vince Bickers
  * @author Luanne Misquitta
  */
-public class FriendshipsRelationshipEntityTest extends MultiDriverTestClass {
+public abstract class FriendshipsRelationshipEntityTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.friendships").openSession();
-        session.purgeDatabase();
-    }
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.friendships").openSession();
+		session.purgeDatabase();
+	}
 
-    @Test
-    public void shouldSaveFromStartObjectSetsAllObjectIds() {
+	@Test
+	public void shouldSaveFromStartObjectSetsAllObjectIds() {
 
-        Person mike = new Person("Mike");
-        Person dave = new Person("Dave");
+		Person mike = new Person("Mike");
+		Person dave = new Person("Dave");
 
-        // could use addFriend(...) but hey
-        dave.getFriends().add(new Friendship(dave, mike, 5));
+		// could use addFriend(...) but hey
+		dave.getFriends().add(new Friendship(dave, mike, 5));
 
-        session.save(dave);
+		session.save(dave);
 
-        assertNotNull(dave.getId());
-        assertNotNull(mike.getId());
-        assertNotNull(dave.getFriends().get(0).getId());
+		assertNotNull(dave.getId());
+		assertNotNull(mike.getId());
+		assertNotNull(dave.getFriends().get(0).getId());
+	}
 
-    }
+	@Test
+	public void shouldSaveAndReloadAllSetsAllObjectIdsAndReferencesCorrectly() {
 
-    @Test
-    public void shouldSaveAndReloadAllSetsAllObjectIdsAndReferencesCorrectly() {
+		Person mike = new Person("Mike");
+		Person dave = new Person("Dave");
+		dave.getFriends().add(new Friendship(dave, mike, 5));
 
-        Person mike = new Person("Mike");
-        Person dave = new Person("Dave");
-        dave.getFriends().add(new Friendship(dave, mike, 5));
+		session.save(dave);
 
-        session.save(dave);
+		Collection<Person> personList = session.loadAll(Person.class);
 
-        Collection<Person> personList = session.loadAll(Person.class);
+		int expected = 2;
+		assertEquals(expected, personList.size());
+		for (Person person : personList) {
+			if (person.getName().equals("Dave")) {
+				expected--;
+				assertEquals("Mike", person.getFriends().get(0).getFriend().getName());
+			} else if (person.getName().equals("Mike")) {
+				expected--;
+				assertEquals("Dave", person.getFriends().get(0).getPerson().getName());
+			}
+		}
+		assertEquals(0, expected);
+	}
 
-        int expected = 2;
-        assertEquals(expected, personList.size());
-        for (Person person : personList) {
-            if (person.getName().equals("Dave")) {
-                expected--;
-                assertEquals("Mike", person.getFriends().get(0).getFriend().getName());
-            } else if (person.getName().equals("Mike")) {
-                expected--;
-                assertEquals("Dave", person.getFriends().get(0).getPerson().getName());
-            }
-        }
-        assertEquals(0, expected);
-    }
+	@Test
+	public void shouldSaveFromRelationshipEntitySetsAllObjectIds() {
 
-    @Test
-    public void shouldSaveFromRelationshipEntitySetsAllObjectIds() {
+		Person mike = new Person("Mike");
+		Person dave = new Person("Dave");
 
-        Person mike = new Person("Mike");
-        Person dave = new Person("Dave");
+		Friendship friendship = new Friendship(dave, mike, 5);
+		dave.getFriends().add(friendship);
 
-        Friendship friendship = new Friendship(dave, mike, 5);
-        dave.getFriends().add(friendship);
+		session.save(friendship);
 
-        session.save(friendship);
+		assertNotNull(dave.getId());
+		assertNotNull(mike.getId());
+		assertNotNull(dave.getFriends().get(0).getId());
+	}
 
-        assertNotNull(dave.getId());
-        assertNotNull(mike.getId());
-        assertNotNull(dave.getFriends().get(0).getId());
+	@Test
+	public void shouldLoadStartObjectHydratesProperly() {
 
-    }
+		Person mike = new Person("Mike");
+		Person dave = new Person("Dave");
+		Friendship friendship = new Friendship(dave, mike, 5);
+		dave.getFriends().add(friendship);
 
-    @Test
-    public void shouldLoadStartObjectHydratesProperly() {
+		session.save(dave);
 
-        Person mike = new Person("Mike");
-        Person dave = new Person("Dave");
-        Friendship friendship = new Friendship(dave, mike, 5);
-        dave.getFriends().add(friendship);
+		Person daveCopy = session.load(Person.class, dave.getId());
+		Friendship friendshipCopy = daveCopy.getFriends().get(0);
+		Person mikeCopy = friendshipCopy.getFriend();
 
-        session.save(dave);
+		assertNotNull(daveCopy.getId());
+		assertNotNull(mikeCopy.getId());
+		assertNotNull(friendshipCopy.getId());
 
-        Person daveCopy = session.load(Person.class, dave.getId());
-        Friendship friendshipCopy = daveCopy.getFriends().get(0);
-        Person mikeCopy = friendshipCopy.getFriend();
+		assertEquals("Dave", daveCopy.getName());
+		assertEquals("Mike", mikeCopy.getName());
+		assertEquals(5, friendshipCopy.getStrength());
+	}
 
-        assertNotNull(daveCopy.getId());
-        assertNotNull(mikeCopy.getId());
-        assertNotNull(friendshipCopy.getId());
+	@Test
+	public void shouldLoadRelationshipEntityObjectHydratesProperly() {
 
-        assertEquals("Dave", daveCopy.getName());
-        assertEquals("Mike", mikeCopy.getName());
-        assertEquals(5, friendshipCopy.getStrength());
+		Person mike = new Person("Mike");
+		Person dave = new Person("Dave");
+		Friendship friendship = new Friendship(dave, mike, 5);
+		dave.getFriends().add(friendship);
 
-    }
+		session.save(dave);
 
-    @Test
-    public void shouldLoadRelationshipEntityObjectHydratesProperly() {
+		Friendship friendshipCopy = session.load(Friendship.class, friendship.getId());
+		Person daveCopy = friendshipCopy.getPerson();
+		Person mikeCopy = friendshipCopy.getFriend();
 
-        Person mike = new Person("Mike");
-        Person dave = new Person("Dave");
-        Friendship friendship = new Friendship(dave, mike, 5);
-        dave.getFriends().add(friendship);
+		assertNotNull(daveCopy.getId());
+		assertNotNull(mikeCopy.getId());
+		assertNotNull(friendshipCopy.getId());
 
-        session.save(dave);
+		assertEquals("Dave", daveCopy.getName());
+		assertEquals("Mike", mikeCopy.getName());
+		assertEquals(5, friendshipCopy.getStrength());
+	}
 
-        Friendship friendshipCopy = session.load(Friendship.class, friendship.getId());
-        Person daveCopy = friendshipCopy.getPerson();
-        Person mikeCopy = friendshipCopy.getFriend();
+	/**
+	 * @see DATAGRAPH-644
+	 */
+	@Test
+	public void shouldRetrieveRelationshipEntitySetPropertyCorrecly() {
 
-        assertNotNull(daveCopy.getId());
-        assertNotNull(mikeCopy.getId());
-        assertNotNull(friendshipCopy.getId());
+		Person mike = new Person("Mike");
+		Person dave = new Person("Dave");
 
-        assertEquals("Dave", daveCopy.getName());
-        assertEquals("Mike", mikeCopy.getName());
-        assertEquals(5, friendshipCopy.getStrength());
+		Set<String> hobbies = new HashSet<>();
+		hobbies.add("Swimming");
+		hobbies.add("Cooking");
+		dave.getFriends().add(new Friendship(dave, mike, 5, hobbies));
 
-    }
+		session.save(dave);
 
-    /**
-     * @see DATAGRAPH-644
-     */
-    @Test
-    public void shouldRetrieveRelationshipEntitySetPropertyCorrecly() {
+		assertNotNull(dave.getId());
+		assertNotNull(mike.getId());
+		assertNotNull(dave.getFriends().get(0).getId());
 
-        Person mike = new Person("Mike");
-        Person dave = new Person("Dave");
+		session.clear();
 
-        Set<String> hobbies = new HashSet<>();
-        hobbies.add("Swimming");
-        hobbies.add("Cooking");
-        dave.getFriends().add(new Friendship(dave, mike, 5, hobbies));
-
-        session.save(dave);
-
-        assertNotNull(dave.getId());
-        assertNotNull(mike.getId());
-        assertNotNull(dave.getFriends().get(0).getId());
-
-        session.clear();
-
-        mike = session.load(Person.class, mike.getId());
-        assertEquals(2, mike.getFriends().get(0).getSharedHobbies().size());
-
-    }
+		mike = session.load(Person.class, mike.getId());
+		assertEquals(2, mike.getFriends().get(0).getSharedHobbies().size());
+	}
 }

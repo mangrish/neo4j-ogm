@@ -28,7 +28,7 @@ import java.util.UUID;
  * @author Michal Bachman
  * @author Mark Angrish
  */
-public class MovieTest {
+public abstract class MovieTest {
 
     @Test
     public void testDeserialiseMovie() {

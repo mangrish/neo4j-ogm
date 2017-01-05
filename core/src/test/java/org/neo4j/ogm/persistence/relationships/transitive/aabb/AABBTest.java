@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * @author Vince Bickers
  * @author Luanne Misquitta
  */
-public class AABBTest extends RelationshipTrait {
+public abstract class AABBTest extends RelationshipTrait {
 
     private static SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.relationships.transitive.aabb");
     private Session session;

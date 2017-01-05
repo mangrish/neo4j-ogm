@@ -15,6 +15,8 @@ package org.neo4j.ogm.persistence.transaction;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,135 +28,132 @@ import org.neo4j.ogm.domain.music.Studio;
 import org.neo4j.ogm.exception.TransactionException;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.Transaction;
-
-import java.io.IOException;
 
 /**
  * @author Luanne Misquitta
  */
-public class TransactionTest extends MultiDriverTestClass {
-    private Session session;
+public abstract class TransactionTest {
 
-    @Before
-    public void init() throws IOException {
-        SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.music");
-        session = sessionFactory.openSession();
-        session.purgeDatabase();
-    }
+	private Session session;
 
-    @After
-    public void clearDatabase() {
-        session.purgeDatabase();
-    }
+	@Before
+	public void init() throws IOException {
+		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.music");
+		session = sessionFactory.openSession();
+		session.purgeDatabase();
+	}
 
-    @Test
-    public void shouldNotCommitWhenTransactionIsManaged() {
-        Transaction tx = session.beginTransaction();
-        Studio emi = new Studio("EMI Studios, London");
+	@After
+	public void clearDatabase() {
+		session.purgeDatabase();
+	}
 
-        Artist theBeatles = new Artist("The Beatles");
-        Album please = new Album("Please Please Me");
-        Recording pleaseRecording = new Recording(please, emi, 1963);
-        please.setRecording(pleaseRecording);
-        theBeatles.getAlbums().add(please);
-        please.setArtist(theBeatles);
-        session.save(theBeatles);
+	@Test
+	public void shouldNotCommitWhenTransactionIsManaged() {
+		Transaction tx = session.beginTransaction();
+		Studio emi = new Studio("EMI Studios, London");
 
-        tx.rollback(); //the previous saves shouldn't have been committed
+		Artist theBeatles = new Artist("The Beatles");
+		Album please = new Album("Please Please Me");
+		Recording pleaseRecording = new Recording(please, emi, 1963);
+		please.setRecording(pleaseRecording);
+		theBeatles.getAlbums().add(please);
+		please.setArtist(theBeatles);
+		session.save(theBeatles);
 
-        assertEquals(0, session.countEntitiesOfType(Artist.class));
-    }
+		tx.rollback(); //the previous saves shouldn't have been committed
 
-    /**
-     * @see Issue 126
-     */
-    @Test
-    public void shouldBeAbleToRetrySaveOnTransactionRollback() {
+		assertEquals(0, session.countEntitiesOfType(Artist.class));
+	}
 
-        Transaction tx = session.beginTransaction();
+	/**
+	 * @see Issue 126
+	 */
+	@Test
+	public void shouldBeAbleToRetrySaveOnTransactionRollback() {
 
-        Studio emi = new Studio("EMI Studios, London");
-        Artist theBeatles = new Artist("The Beatles");
-        Album please = new Album("Please Please Me");
-        Recording pleaseRecording = new Recording(please, emi, 1963);
+		Transaction tx = session.beginTransaction();
 
-        please.setRecording(pleaseRecording);
-        theBeatles.getAlbums().add(please);
-        please.setArtist(theBeatles);
-        session.save(theBeatles);
+		Studio emi = new Studio("EMI Studios, London");
+		Artist theBeatles = new Artist("The Beatles");
+		Album please = new Album("Please Please Me");
+		Recording pleaseRecording = new Recording(please, emi, 1963);
 
-        tx.rollback();
+		please.setRecording(pleaseRecording);
+		theBeatles.getAlbums().add(please);
+		please.setArtist(theBeatles);
+		session.save(theBeatles);
 
-        session.save(theBeatles);
+		tx.rollback();
 
-        session.clear();
+		session.save(theBeatles);
 
-        theBeatles = session.loadAll(Artist.class, -1).iterator().next();
-        assertEquals("The Beatles", theBeatles.getName());
-        assertEquals(1, theBeatles.getAlbums().size());
-        assertEquals("Please Please Me", theBeatles.getAlbums().iterator().next().getName());
-        assertEquals("EMI Studios, London", theBeatles.getAlbums().iterator().next().getRecording().getStudio().getName());
-    }
+		session.clear();
 
-    @Test
-    public void shouldNotBeReadOnlyByDefault() {
+		theBeatles = session.loadAll(Artist.class, -1).iterator().next();
+		assertEquals("The Beatles", theBeatles.getName());
+		assertEquals(1, theBeatles.getAlbums().size());
+		assertEquals("Please Please Me", theBeatles.getAlbums().iterator().next().getName());
+		assertEquals("EMI Studios, London", theBeatles.getAlbums().iterator().next().getRecording().getStudio().getName());
+	}
 
-        try (Transaction tx = session.beginTransaction()) {
-            Assert.assertFalse(tx.isReadOnly());
-        }
-    }
+	@Test
+	public void shouldNotBeReadOnlyByDefault() {
 
-    @Test
-    public void shouldBeAbleToCreateReadOnlyTransaction() {
+		try (Transaction tx = session.beginTransaction()) {
+			Assert.assertFalse(tx.isReadOnly());
+		}
+	}
 
-        try (Transaction tx = session.beginTransaction(Transaction.Type.READ_ONLY)) {
-            Assert.assertTrue(tx.isReadOnly());
-        }
-    }
+	@Test
+	public void shouldBeAbleToCreateReadOnlyTransaction() {
 
-    @Test
-    public void shouldNotBeAbleToExtendAReadTransactionWithAReadWriteInnerTransaction() {
+		try (Transaction tx = session.beginTransaction(Transaction.Type.READ_ONLY)) {
+			Assert.assertTrue(tx.isReadOnly());
+		}
+	}
 
-        try (
-                Transaction tx1 = session.beginTransaction(Transaction.Type.READ_ONLY);
-                Transaction tx2 = session.beginTransaction(Transaction.Type.READ_WRITE)) {
-            fail("Should not have allowed transaction extension of different type");
-        } catch (TransactionException tme) {
-            Assert.assertEquals("Incompatible transaction type specified: must be 'READ_ONLY'", tme.getLocalizedMessage());
-        }
-    }
+	@Test
+	public void shouldNotBeAbleToExtendAReadTransactionWithAReadWriteInnerTransaction() {
 
-    @Test
-    public void shouldNotBeAbleToExtendAReadWriteTransactionWithAReadOnlyInnerTransaction() {
+		try (
+				Transaction tx1 = session.beginTransaction(Transaction.Type.READ_ONLY);
+				Transaction tx2 = session.beginTransaction(Transaction.Type.READ_WRITE)) {
+			fail("Should not have allowed transaction extension of different type");
+		} catch (TransactionException tme) {
+			Assert.assertEquals("Incompatible transaction type specified: must be 'READ_ONLY'", tme.getLocalizedMessage());
+		}
+	}
 
-        try (
-                Transaction tx1 = session.beginTransaction(Transaction.Type.READ_WRITE);
-                Transaction tx2 = session.beginTransaction(Transaction.Type.READ_ONLY)) {
-            fail("Should not have allowed transaction extension of different type");
-        } catch (TransactionException tme) {
-            Assert.assertEquals("Incompatible transaction type specified: must be 'READ_WRITE'", tme.getLocalizedMessage());
-        }
-    }
+	@Test
+	public void shouldNotBeAbleToExtendAReadWriteTransactionWithAReadOnlyInnerTransaction() {
 
-    @Test
-    public void shouldAutomaticallyExtendAReadOnlyTransactionWithAReadOnlyExtension() {
+		try (
+				Transaction tx1 = session.beginTransaction(Transaction.Type.READ_WRITE);
+				Transaction tx2 = session.beginTransaction(Transaction.Type.READ_ONLY)) {
+			fail("Should not have allowed transaction extension of different type");
+		} catch (TransactionException tme) {
+			Assert.assertEquals("Incompatible transaction type specified: must be 'READ_WRITE'", tme.getLocalizedMessage());
+		}
+	}
 
-        try (
-                Transaction tx1 = session.beginTransaction(Transaction.Type.READ_ONLY);
-                Transaction tx2 = session.beginTransaction()) {
-            Assert.assertTrue(tx2.isReadOnly());
-        }
-    }
+	@Test
+	public void shouldAutomaticallyExtendAReadOnlyTransactionWithAReadOnlyExtension() {
 
-    @Test
-    public void shouldAutomaticallyExtendAReadWriteTransactionWithAReadWriteExtension() {
+		try (
+				Transaction tx1 = session.beginTransaction(Transaction.Type.READ_ONLY);
+				Transaction tx2 = session.beginTransaction()) {
+			Assert.assertTrue(tx2.isReadOnly());
+		}
+	}
 
-        try (Transaction tx1 = session.beginTransaction(Transaction.Type.READ_WRITE);
-             Transaction tx2 = session.beginTransaction()) {
-            Assert.assertFalse(tx2.isReadOnly());
-        }
-    }
+	@Test
+	public void shouldAutomaticallyExtendAReadWriteTransactionWithAReadWriteExtension() {
 
+		try (Transaction tx1 = session.beginTransaction(Transaction.Type.READ_WRITE);
+			 Transaction tx2 = session.beginTransaction()) {
+			Assert.assertFalse(tx2.isReadOnly());
+		}
+	}
 }

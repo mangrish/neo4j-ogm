@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 /**
  * @author Vince Bickers
  */
-public class BikeTest {
+public abstract class BikeTest {
 
     @Test
     public void testDeserialiseBikeModel() throws Exception {

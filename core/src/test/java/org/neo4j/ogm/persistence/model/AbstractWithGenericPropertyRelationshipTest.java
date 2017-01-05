@@ -25,7 +25,7 @@ import org.neo4j.ogm.testutil.MultiDriverTestClass;
  * @author Vince Bickers
  */
 
-public class AbstractWithGenericPropertyRelationshipTest extends MultiDriverTestClass {
+public abstract class AbstractWithGenericPropertyRelationshipTest {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.model", "org.neo4j.ogm.persistence.examples.stage");
 

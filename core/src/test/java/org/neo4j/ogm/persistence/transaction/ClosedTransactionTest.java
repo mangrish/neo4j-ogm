@@ -20,19 +20,17 @@ import org.neo4j.ogm.exception.TransactionException;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.transaction.DefaultTransactionManager;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.AbstractTransaction;
 import org.neo4j.ogm.transaction.Transaction;
 
 /**
- *
  * This test class defines the behaviour of a transaction which is open
  * on the client, but closed on the server (for whatever reason), under
  * the different scenarios of commit, rollback and close.
  *
  * @author vince
  */
-public class ClosedTransactionTest extends MultiDriverTestClass {
+public abstract class ClosedTransactionTest {
 
 
 	private final SessionFactory sessionFactory = new SessionFactory("");

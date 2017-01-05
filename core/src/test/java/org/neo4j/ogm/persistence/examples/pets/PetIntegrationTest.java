@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Luanne Misquitta
  */
 
-public class PetIntegrationTest extends MultiDriverTestClass {
+public abstract class PetIntegrationTest {
 
     private Session session;
 

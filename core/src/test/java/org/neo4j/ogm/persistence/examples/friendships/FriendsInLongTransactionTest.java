@@ -13,54 +13,50 @@
 
 package org.neo4j.ogm.persistence.examples.friendships;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.neo4j.ogm.domain.friendships.Person;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.session.transaction.DefaultTransactionManager;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.Transaction;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Luanne Misquitta
  */
-public class FriendsInLongTransactionTest extends MultiDriverTestClass {
+public abstract class FriendsInLongTransactionTest {
 
-    Session session = new SessionFactory("org.neo4j.ogm.domain.friendships").openSession();
+	Session session = new SessionFactory("org.neo4j.ogm.domain.friendships").openSession();
 
-    /**
-     * @see DATAGRAPH-703
-     */
-    @Test
-    public void createPersonAndFriendsInLongTransaction() {
-        try (Transaction tx = session.beginTransaction()) {
-            assertEquals(Transaction.Status.OPEN, tx.status());
-            Person john = new Person("John");
-            session.save(john);
+	/**
+	 * @see DATAGRAPH-703
+	 */
+	@Test
+	public void createPersonAndFriendsInLongTransaction() {
+		try (Transaction tx = session.beginTransaction()) {
+			assertEquals(Transaction.Status.OPEN, tx.status());
+			Person john = new Person("John");
+			session.save(john);
 
-            Person bob = new Person("Bob");
-            session.save(bob);
+			Person bob = new Person("Bob");
+			session.save(bob);
 
-            Person bill = new Person("Bill");
-            session.save(bill);
+			Person bill = new Person("Bill");
+			session.save(bill);
 
-            john = session.load(Person.class, john.getId());
-            bob = session.load(Person.class, bob.getId());
-            john.addFriend(bob);
-            session.save(john);
+			john = session.load(Person.class, john.getId());
+			bob = session.load(Person.class, bob.getId());
+			john.addFriend(bob);
+			session.save(john);
 
-            john = session.load(Person.class, john.getId());
-            bill = session.load(Person.class, bill.getId());
-            john.addFriend(bill);
-            session.save(john);
+			john = session.load(Person.class, john.getId());
+			bill = session.load(Person.class, bill.getId());
+			john.addFriend(bill);
+			session.save(john);
 
-            session.clear();
-            session.load(Person.class, john.getId());
-            assertEquals(2, john.getFriends().size());
-        }
-
-    }
-
+			session.clear();
+			session.load(Person.class, john.getId());
+			assertEquals(2, john.getFriends().size());
+		}
+	}
 }

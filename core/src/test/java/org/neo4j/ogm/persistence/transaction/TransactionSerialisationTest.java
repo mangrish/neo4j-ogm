@@ -23,79 +23,77 @@ import org.neo4j.ogm.exception.CypherException;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.Utils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.Transaction;
 
 /**
- * @see Issue #130
- *
  * @author vince
+ * @see Issue #130
  */
-public class TransactionSerialisationTest extends MultiDriverTestClass {
+public abstract class TransactionSerialisationTest {
 
-    @Test
-    public void shouldBeAbleToRunMultiThreadedLongRunningQueriesWithoutLosingConnectionResources() throws InterruptedException {
+	@Test
+	public void shouldBeAbleToRunMultiThreadedLongRunningQueriesWithoutLosingConnectionResources() throws InterruptedException {
 
-        int numThreads = Runtime.getRuntime().availableProcessors() * 4;
+		int numThreads = Runtime.getRuntime().availableProcessors() * 4;
 
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-        CountDownLatch latch = new CountDownLatch(numThreads);
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		CountDownLatch latch = new CountDownLatch(numThreads);
 
-        String query = "FOREACH (n in RANGE(1, 1000) | CREATE (a)-[:KNOWS]->(b))";
+		String query = "FOREACH (n in RANGE(1, 1000) | CREATE (a)-[:KNOWS]->(b))";
 
-        for (int i = 0; i < numThreads; i++) {
-            executor.submit(new QueryRunner(latch, query));
-        }
-        latch.await(); // pause until the count reaches 0
+		for (int i = 0; i < numThreads; i++) {
+			executor.submit(new QueryRunner(latch, query));
+		}
+		latch.await(); // pause until the count reaches 0
 
-        executor.shutdownNow();
-    }
+		executor.shutdownNow();
+	}
 
-    @Test
-    public void shouldBeAbleToHandleMultiThreadedFailingQueriesWithoutLosingConnectionResources() throws InterruptedException {
+	@Test
+	public void shouldBeAbleToHandleMultiThreadedFailingQueriesWithoutLosingConnectionResources() throws InterruptedException {
 
-        int numThreads = Runtime.getRuntime().availableProcessors() * 4;
+		int numThreads = Runtime.getRuntime().availableProcessors() * 4;
 
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-        CountDownLatch latch = new CountDownLatch(numThreads);
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		CountDownLatch latch = new CountDownLatch(numThreads);
 
-        // invalid query. should fail, response should be closed automatically, and connection released
-        // if this does not happen, the session.query method in the query runner will block forever,
-        // once the available connections are used up.
-        String query = "FOREACH (n in RANGE(1, 1000) ? CREATE (a)-[:KNOWS]->(b))";
+		// invalid query. should fail, response should be closed automatically, and connection released
+		// if this does not happen, the session.query method in the query runner will block forever,
+		// once the available connections are used up.
+		String query = "FOREACH (n in RANGE(1, 1000) ? CREATE (a)-[:KNOWS]->(b))";
 
-        for (int i = 0; i < numThreads; i++) {
-            executor.submit(new QueryRunner(latch, query));
-        }
-        latch.await(); // pause until the count reaches 0
-        executor.shutdownNow();
-    }
+		for (int i = 0; i < numThreads; i++) {
+			executor.submit(new QueryRunner(latch, query));
+		}
+		latch.await(); // pause until the count reaches 0
+		executor.shutdownNow();
+	}
 
 
-    class QueryRunner implements Runnable {
+	class QueryRunner implements Runnable {
 
-        private final CountDownLatch latch;
-        private final String query;
-        private final SessionFactory sessionFactory = new SessionFactory("");
+		private final CountDownLatch latch;
+		private final String query;
+		private final SessionFactory sessionFactory = new SessionFactory("");
 
-        public QueryRunner(CountDownLatch latch, String query) {
-            this.query = query;
-            this.latch = latch;
-        }
+		public QueryRunner(CountDownLatch latch, String query) {
+			this.query = query;
+			this.latch = latch;
+		}
 
-        @Override
-        public void run() {
+		@Override
+		public void run() {
 
 			Session session = sessionFactory.openSession();
 
 			try (Transaction tx = session.beginTransaction()) {
-                session.query(query, Utils.map());
+				session.query(query, Utils.map());
 				tx.commit();
-            } catch (Exception e) {
-                Assert.assertTrue(e instanceof CypherException);
-            } finally {
-                latch.countDown();
-            }
+			} catch (Exception e) {
+				Assert.assertTrue(e instanceof CypherException);
+			} finally {
+				latch.countDown();
+			}
 
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
@@ -104,7 +102,6 @@ public class TransactionSerialisationTest extends MultiDriverTestClass {
 					Thread.currentThread().interrupt(); //propagate interrupt
 				}
 			}
-
-        }
-    }
+		}
+	}
 }

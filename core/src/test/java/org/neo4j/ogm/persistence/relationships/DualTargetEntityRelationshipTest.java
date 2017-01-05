@@ -35,7 +35,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Nils Dr\u00F6ge
  * @author Luanne Misquitta
  */
-public class DualTargetEntityRelationshipTest extends MultiDriverTestClass {
+public abstract class DualTargetEntityRelationshipTest  {
     private Session session;
 
     @Before

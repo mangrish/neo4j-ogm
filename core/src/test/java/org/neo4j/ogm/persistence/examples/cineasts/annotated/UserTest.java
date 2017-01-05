@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Luanne Misquitta
  * @author Mark Angrish
  */
-public class UserTest {
+public abstract class UserTest {
 
     @Test
     public void testDeserialiseUserWithArrayOfEnums() {

@@ -11,40 +11,58 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.drivers;
+package org.neo4j.ogm.drivers.bolt;
 
+import static org.junit.Assume.*;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.neo4j.ogm.drivers.AbstractDriverTestSuite;
 import org.neo4j.ogm.exception.ConnectionException;
 import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
+import org.neo4j.ogm.testutil.TestServer;
+
 
 /**
  * @author Luanne Misquitta
- * @see Issue 133
+ * @author Vince Bickers
  */
-public class DriverExceptionTest {
+public class BoltDriverTest extends AbstractDriverTestSuite {
 
-	@Test(expected = ConnectionException.class)
-	public void shouldThrowExceptionWhenHttpDriverCannotConnect() {
-		Components.configure("ogm-http-invalid.properties");
-		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.social");
-		Session session = sessionFactory.openSession();
-		session.purgeDatabase();
+	private static TestServer testServer;
+
+	@BeforeClass
+	public static void configure() {
+		Components.configure("ogm-bolt.properties");
+		System.out.println("Bolt: " + Components.neo4jVersion());
+		if (Components.neo4jVersion() >= 3.0) {
+			testServer = new TestServer.Builder().enableBolt(true).build();
+		}
 	}
 
-	@Test(expected = ConnectionException.class)
-	public void shouldThrowExceptionWhenEmbeddedDriverCannotConnect() {
-		Components.configure("ogm-embedded-invalid.properties");
-		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.social");
-		Session session = sessionFactory.openSession();
-		session.purgeDatabase();
+	@AfterClass
+	public static void reset() {
+		if (Components.neo4jVersion() >= 3.0) {
+			testServer.shutdown();
+		}
+		Components.destroy();
 	}
 
+	@Override
+	public void setUpTest() {
+		assumeTrue(Components.neo4jVersion() >= 3.0);
+	}
+
+	@Override
+	public void tearDownTest() {
+	}
 
 	@Test(expected = ConnectionException.class)
 	public void shouldThrowExceptionWhenBoltDriverCannotConnect() {
-		Components.configure("ogm-bolt-invalid.properties");
+		Components.configure("src/test/resources/ogm-bolt-invalid.properties");
 		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.social");
 		Session session = sessionFactory.openSession();
 		session.purgeDatabase();

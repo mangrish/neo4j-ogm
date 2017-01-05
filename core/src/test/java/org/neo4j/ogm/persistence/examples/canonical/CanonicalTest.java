@@ -13,10 +13,7 @@
 
 package org.neo4j.ogm.persistence.examples.canonical;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,12 +25,12 @@ import org.neo4j.ogm.domain.canonical.Mappable;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author Luanne Misquitta
  */
-public class CanonicalTest extends MultiDriverTestClass {
+public abstract class CanonicalTest {
+
 	private Session session;
 
 	@Before
@@ -49,22 +46,22 @@ public class CanonicalTest extends MultiDriverTestClass {
 
 		Mappable mappable = new Mappable();
 		mappable.setPrimitiveBoolean(false);
-		mappable.setPrimitiveByte((byte)100);
+		mappable.setPrimitiveByte((byte) 100);
 		mappable.setPrimitiveChar('c');
 		mappable.setPrimitiveDouble(123.4);
 		mappable.setPrimitiveFloat(567.8f);
 		mappable.setPrimitiveInt(5);
 		mappable.setPrimitiveLong(8l);
-		mappable.setPrimitiveShort((short)200);
+		mappable.setPrimitiveShort((short) 200);
 
-		mappable.setPrimitiveBooleanArray(new boolean[] {true, false});
-		mappable.setPrimitiveByteArray(new byte[] {(byte)10, (byte)100});
-		mappable.setPrimitiveCharArray(new char[] {'d','\u0001'});
-		mappable.setPrimitiveDoubleArray(new double[] {34.5, 67.8});
-		mappable.setPrimitiveFloatArray(new float[] {1.2f,3.4f});
-		mappable.setPrimitiveIntArray(new int[] {6,7});
-		mappable.setPrimitiveLongArray(new long[] {9,10});
-		mappable.setPrimitiveShortArray(new short[] {(short)30, (short)300});
+		mappable.setPrimitiveBooleanArray(new boolean[]{true, false});
+		mappable.setPrimitiveByteArray(new byte[]{(byte) 10, (byte) 100});
+		mappable.setPrimitiveCharArray(new char[]{'d', '\u0001'});
+		mappable.setPrimitiveDoubleArray(new double[]{34.5, 67.8});
+		mappable.setPrimitiveFloatArray(new float[]{1.2f, 3.4f});
+		mappable.setPrimitiveIntArray(new int[]{6, 7});
+		mappable.setPrimitiveLongArray(new long[]{9, 10});
+		mappable.setPrimitiveShortArray(new short[]{(short) 30, (short) 300});
 
 		mappable.setObjectBoolean(Boolean.FALSE);
 		mappable.setObjectByte(Byte.valueOf("100"));
@@ -76,18 +73,18 @@ public class CanonicalTest extends MultiDriverTestClass {
 		mappable.setObjectString("abc");
 		mappable.setObjectCharacter('d');
 
-		mappable.setObjectBooleanArray(new Boolean[] {Boolean.TRUE, Boolean.FALSE});
-		mappable.setObjectByteArray(new Byte[] {(byte)10, (byte)100});
-		mappable.setObjectCharArray(new Character[] {'d','\u0028'});
-		mappable.setObjectDoubleArray(new Double[] {34.5, 67.8});
-		mappable.setObjectFloatArray(new Float[] {1.2f,3.4f});
-		mappable.setObjectIntegerArray(new Integer[] {6,7});
-		mappable.setObjectLongArray(new Long[] {9l,10l});
-		mappable.setObjectShortArray(new Short[] {(short)30, (short)300});
-		mappable.setObjectStringArray(new String[] {"abc", "xyz"});
+		mappable.setObjectBooleanArray(new Boolean[]{Boolean.TRUE, Boolean.FALSE});
+		mappable.setObjectByteArray(new Byte[]{(byte) 10, (byte) 100});
+		mappable.setObjectCharArray(new Character[]{'d', '\u0028'});
+		mappable.setObjectDoubleArray(new Double[]{34.5, 67.8});
+		mappable.setObjectFloatArray(new Float[]{1.2f, 3.4f});
+		mappable.setObjectIntegerArray(new Integer[]{6, 7});
+		mappable.setObjectLongArray(new Long[]{9l, 10l});
+		mappable.setObjectShortArray(new Short[]{(short) 30, (short) 300});
+		mappable.setObjectStringArray(new String[]{"abc", "xyz"});
 
-		mappable.setListOfString(Arrays.asList("a","bb","cc"));
-		mappable.setListOfCharacter(Arrays.asList('a','b','c'));
+		mappable.setListOfString(Arrays.asList("a", "bb", "cc"));
+		mappable.setListOfCharacter(Arrays.asList('a', 'b', 'c'));
 
 		session.save(mappable);
 
@@ -126,7 +123,6 @@ public class CanonicalTest extends MultiDriverTestClass {
 		assertEquals(mappable.getObjectString(), loaded.getObjectString());
 		assertEquals(mappable.getObjectCharacter(), loaded.getObjectCharacter());
 
-
 		assertArrayEquals(mappable.getObjectBooleanArray(), loaded.getObjectBooleanArray());
 		assertArrayEquals(mappable.getObjectByteArray(), loaded.getObjectByteArray());
 		assertArrayEquals(mappable.getObjectCharArray(), loaded.getObjectCharArray());
@@ -140,5 +136,4 @@ public class CanonicalTest extends MultiDriverTestClass {
 		assertEquals(mappable.getListOfString(), loaded.getListOfString());
 		assertEquals(mappable.getListOfCharacter(), loaded.getListOfCharacter());
 	}
-
 }

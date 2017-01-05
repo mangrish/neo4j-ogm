@@ -13,238 +13,232 @@
 
 package org.neo4j.ogm.persistence.relationships.transitive.ab;
 
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.ogm.annotation.*;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
-
-import java.io.IOException;
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Vince Bickers
  * @author Luanne Misquitta
  */
-public class ABTest extends MultiDriverTestClass {
+public abstract class ABTest {
 
-    private static SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.relationships.transitive.ab");
-    private Session session;
-    private A a;
-    private B b;
-    private R r;
+	private static SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.relationships.transitive.ab");
+	private Session session;
+	private A a;
+	private B b;
+	private R r;
 
-    @Before
-    public void init() throws IOException {
-        session = sessionFactory.openSession();
-        setUpEntityModel();
-    }
+	@Before
+	public void init() throws IOException {
+		session = sessionFactory.openSession();
+		setUpEntityModel();
+	}
 
-    @After
-    public void cleanup() {
-        session.purgeDatabase();
-    }
+	@After
+	public void cleanup() {
+		session.purgeDatabase();
+	}
 
-    private void setUpEntityModel() {
+	private void setUpEntityModel() {
 
-        a = new A();
-        b = new B();
-        r = new R();
+		a = new A();
+		b = new B();
+		r = new R();
 
-        r.a = a;
-        r.b = b;
+		r.a = a;
+		r.b = b;
 
-        a.r = r;
-        b.r = r;
+		a.r = r;
+		b.r = r;
+	}
 
-    }
+	@Test
+	public void shouldFindBFromA() {
 
-    @Test
-    public void shouldFindBFromA() {
+		session.save(b);
 
-        session.save(b);
+		a = session.load(A.class, a.id);
 
-        a = session.load(A.class, a.id);
+		assertEquals(b, a.r.b);
+	}
 
-        assertEquals(b, a.r.b);
+	@Test
+	public void shouldFindAFromB() {
 
-    }
+		session.save(a);
 
-    @Test
-    public void shouldFindAFromB() {
+		b = session.load(B.class, b.id);
 
-        session.save(a);
+		assertEquals(a, b.r.a);
+	}
 
-        b = session.load(B.class, b.id);
+	@Test
+	public void shouldReflectRemovalA() {
 
-        assertEquals(a, b.r.a);
+		session.save(a);
 
-    }
+		// given that we remove the relationship
 
-    @Test
-    public void shouldReflectRemovalA() {
+		b.r = null;
+		a.r = null;
 
-        session.save(a);
+		session.save(b);
 
-        // given that we remove the relationship
+		// when we reload a
+		a = session.load(A.class, a.id);
 
-        b.r = null;
-        a.r = null;
+		// expect the relationship to have gone.
+		assertNull(a.r);
+	}
 
-        session.save(b);
+	/**
+	 * @see DATAGRAPH-714
+	 */
+	@Test
+	public void shouldBeAbleToUpdateRBySavingA() {
+		A a1 = new A();
+		B b3 = new B();
+		R r3 = new R();
+		r3.a = a1;
+		r3.b = b3;
+		r3.number = 1;
+		a1.r = r3;
+		b3.r = r3;
 
-        // when we reload a
-        a = session.load(A.class, a.id);
+		session.save(a1);
+		r3.number = 2;
+		session.save(a1);
 
-        // expect the relationship to have gone.
-        assertNull(a.r);
+		session.clear();
+		b3 = session.load(B.class, b3.id);
+		assertEquals(2, b3.r.number);
+	}
 
-    }
+	/**
+	 * @see DATAGRAPH-714
+	 */
+	@Test
+	public void shouldBeAbleToUpdateRBySavingB() {
+		A a1 = new A();
+		B b3 = new B();
+		R r3 = new R();
+		r3.a = a1;
+		r3.b = b3;
+		r3.number = 1;
+		a1.r = r3;
+		b3.r = r3;
 
-    /**
-     * @see DATAGRAPH-714
-     */
-    @Test
-    public void shouldBeAbleToUpdateRBySavingA() {
-        A a1 = new A();
-        B b3 = new B();
-        R r3 = new R();
-        r3.a = a1;
-        r3.b = b3;
-        r3.number = 1;
-        a1.r = r3;
-        b3.r = r3;
+		session.save(a1);
+		r3.number = 2;
+		session.save(b3);
 
-        session.save(a1);
-        r3.number = 2;
-        session.save(a1);
+		session.clear();
+		b3 = session.load(B.class, b3.id);
+		assertEquals(2, b3.r.number);
+	}
 
-        session.clear();
-        b3 = session.load(B.class, b3.id);
-        assertEquals(2, b3.r.number);
-    }
+	/**
+	 * @see DATAGRAPH-714
+	 */
+	@Test
+	public void shouldBeAbleToUpdateRBySavingR() {
+		A a1 = new A();
+		B b3 = new B();
+		R r3 = new R();
+		r3.a = a1;
+		r3.b = b3;
+		r3.number = 1;
+		a1.r = r3;
+		b3.r = r3;
 
-    /**
-     * @see DATAGRAPH-714
-     */
-    @Test
-    public void shouldBeAbleToUpdateRBySavingB() {
-        A a1 = new A();
-        B b3 = new B();
-        R r3 = new R();
-        r3.a = a1;
-        r3.b = b3;
-        r3.number = 1;
-        a1.r = r3;
-        b3.r = r3;
+		session.save(a1);
+		r3.number = 2;
+		session.save(r3);
 
-        session.save(a1);
-        r3.number = 2;
-        session.save(b3);
+		session.clear();
+		b3 = session.load(B.class, b3.id);
+		assertEquals(2, b3.r.number);
+	}
 
-        session.clear();
-        b3 = session.load(B.class, b3.id);
-        assertEquals(2, b3.r.number);
-    }
+	@NodeEntity(label = "A")
+	public static class A extends E {
 
-    /**
-     * @see DATAGRAPH-714
-     */
-    @Test
-    public void shouldBeAbleToUpdateRBySavingR() {
-        A a1 = new A();
-        B b3 = new B();
-        R r3 = new R();
-        r3.a = a1;
-        r3.b = b3;
-        r3.number = 1;
-        a1.r = r3;
-        b3.r = r3;
+		@Relationship(type = "EDGE", direction = Relationship.OUTGOING)
+		R r;
+	}
 
-        session.save(a1);
-        r3.number = 2;
-        session.save(r3);
+	@NodeEntity(label = "B")
+	public static class B extends E {
 
-        session.clear();
-        b3 = session.load(B.class, b3.id);
-        assertEquals(2, b3.r.number);
-    }
+		@Relationship(type = "EDGE", direction = Relationship.INCOMING)
+		R r;
+	}
 
-    @NodeEntity(label = "A")
-    public static class A extends E {
-        @Relationship(type = "EDGE", direction = Relationship.OUTGOING)
-        R r;
-    }
+	@RelationshipEntity(type = "EDGE")
+	public static class R {
 
-    @NodeEntity(label = "B")
-    public static class B extends E {
-        @Relationship(type = "EDGE", direction = Relationship.INCOMING)
-        R r;
-    }
+		Long id;
 
-    @RelationshipEntity(type = "EDGE")
-    public static class R {
+		@StartNode
+		A a;
+		@EndNode
+		B b;
 
-        Long id;
+		int number;
 
-        @StartNode
-        A a;
-        @EndNode
-        B b;
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName() + ":" + a.id + "->" + b.id;
+		}
+	}
 
-        int number;
+	/**
+	 * Can be used as the basic class at the root of any entity for these tests,
+	 * provides the mandatory id field, a unique ref, a simple to-string method
+	 * and equals/hashcode implementation.
+	 * <p/>
+	 * Note that without an equals/hashcode implementation, reloading
+	 * an object which already has a collection of items in it
+	 * will result in the collection items being added again, because
+	 * of the behaviour of the ogm merge function when handling
+	 * arrays and iterables.
+	 */
+	public abstract static class E {
 
-        @Override
-        public String toString() {
-            return this.getClass().getSimpleName() + ":" + a.id + "->" + b.id;
-        }
+		public Long id;
+		public String key;
 
-    }
+		public E() {
+			this.key = UUID.randomUUID().toString();
+		}
 
-    /**
-     * Can be used as the basic class at the root of any entity for these tests,
-     * provides the mandatory id field, a unique ref, a simple to-string method
-     * and equals/hashcode implementation.
-     * <p/>
-     * Note that without an equals/hashcode implementation, reloading
-     * an object which already has a collection of items in it
-     * will result in the collection items being added again, because
-     * of the behaviour of the ogm merge function when handling
-     * arrays and iterables.
-     */
-    public abstract static class E {
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName() + ":" + id + ":" + key;
+		}
 
-        public Long id;
-        public String key;
+		@Override
+		public boolean equals(Object o) {
 
-        public E() {
-            this.key = UUID.randomUUID().toString();
-        }
+			if (this == o) return true;
 
-        @Override
-        public String toString() {
-            return this.getClass().getSimpleName() + ":" + id + ":" + key;
-        }
+			if (o == null || getClass() != o.getClass()) return false;
 
-        @Override
-        public boolean equals(Object o) {
+			return (key.equals(((E) o).key));
+		}
 
-            if (this == o) return true;
-
-            if (o == null || getClass() != o.getClass()) return false;
-
-            return (key.equals(((E) o).key));
-        }
-
-        @Override
-        public int hashCode() {
-            return key.hashCode();
-        }
-    }
-
+		@Override
+		public int hashCode() {
+			return key.hashCode();
+		}
+	}
 }

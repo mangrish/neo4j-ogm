@@ -12,20 +12,18 @@
  */
 package org.neo4j.ogm.persistence.identity;
 
+import static org.junit.Assert.*;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.ogm.annotation.*;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * These tests relate to the concept of node and relationship identity in the OGM. Identity
@@ -34,148 +32,145 @@ import static org.junit.Assert.assertNotNull;
  *
  * @author vince
  */
-public class IdentityTest extends MultiDriverTestClass {
+public abstract class IdentityTest {
 
-    private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.identity");
+	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.identity");
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() {
-        session = sessionFactory.openSession();
-    }
+	@Before
+	public void init() {
+		session = sessionFactory.openSession();
+	}
 
-    @After
-    public void tearDown() {
-        session.purgeDatabase();
-    }
+	@After
+	public void tearDown() {
+		session.purgeDatabase();
+	}
 
-    @Test
-    public void shouldCreateRelationshipEntityWhenDifferentStartAndEndNodesAreHashCodeEqual() {
+	@Test
+	public void shouldCreateRelationshipEntityWhenDifferentStartAndEndNodesAreHashCodeEqual() {
 
-        Node start = new Node();
-        Node end = new Node();
+		Node start = new Node();
+		Node end = new Node();
 
-        // user code deliberately sets the nodes to be equal
-        assertEquals(start, end);
-        Set<Node> nodes = new HashSet();
-        nodes.add(start);
-        nodes.add(end);
+		// user code deliberately sets the nodes to be equal
+		assertEquals(start, end);
+		Set<Node> nodes = new HashSet();
+		nodes.add(start);
+		nodes.add(end);
 
-        // same hashcode, so a single object, not two in set
-        assertEquals(1, nodes.size());
+		// same hashcode, so a single object, not two in set
+		assertEquals(1, nodes.size());
 
+		session.save(start);
+		session.save(end);
 
-        session.save(start);
-        session.save(end);
+		Edge edge = new Edge();
 
-        Edge edge = new Edge();
+		edge.start = start;
+		edge.end = end;
 
-        edge.start = start;
-        edge.end = end;
+		start.link = edge;
 
-        start.link = edge;
+		session.save(edge);
 
-        session.save(edge);
+		session.clear();
 
-        session.clear();
+		Node checkNode = session.load(Node.class, start.id);
 
-        Node checkNode = session.load(Node.class, start.id);
+		assertNotNull(checkNode.link);
+		assertEquals(start.id, checkNode.link.start.id);
+		assertEquals(end.id, checkNode.link.end.id);
+	}
 
-        assertNotNull(checkNode.link);
-        assertEquals(start.id, checkNode.link.start.id);
-        assertEquals(end.id, checkNode.link.end.id);
+	@Test
+	public void shouldBeAbleToLoadAllNodesOfATypeEvenIfTheyAreConsideredEqual() {
+		Node nodeA = new Node();
+		session.save(nodeA);
 
-    }
+		Node nodeB = new Node();
+		session.save(nodeB);
 
-    @Test
-    public void shouldBeAbleToLoadAllNodesOfATypeEvenIfTheyAreConsideredEqual() {
-        Node nodeA = new Node();
-        session.save(nodeA);
+		session.clear();
+		Collection<Node> allNodes = session.loadAll(Node.class);
+		assertEquals(2, allNodes.size());
+	}
 
-        Node nodeB = new Node();
-        session.save(nodeB);
+	@Test
+	public void shouldBeAbleToLoadAllREsEvenIfTheyAreConsideredEqual() {
+		Node nodeA = new Node();
+		session.save(nodeA);
 
-        session.clear();
-        Collection<Node> allNodes = session.loadAll(Node.class);
-        assertEquals(2, allNodes.size());
-    }
+		Node nodeB = new Node();
+		session.save(nodeB);
 
-    @Test
-    public void shouldBeAbleToLoadAllREsEvenIfTheyAreConsideredEqual() {
-        Node nodeA = new Node();
-        session.save(nodeA);
+		Node nodeC = new Node();
+		session.save(nodeC);
 
-        Node nodeB = new Node();
-        session.save(nodeB);
+		Edge edge1 = new Edge();
+		edge1.start = nodeA;
+		edge1.end = nodeB;
+		session.save(edge1);
 
-        Node nodeC = new Node();
-        session.save(nodeC);
+		Edge edge2 = new Edge();
+		edge2.start = nodeB;
+		edge2.end = nodeC;
+		session.save(edge2);
 
-        Edge edge1 = new Edge();
-        edge1.start = nodeA;
-        edge1.end = nodeB;
-        session.save(edge1);
+		session.clear();
+		Collection<Edge> allEdges = session.loadAll(Edge.class);
+		assertEquals(2, allEdges.size());
+	}
 
-        Edge edge2 = new Edge();
-        edge2.start = nodeB;
-        edge2.end = nodeC;
-        session.save(edge2);
+	@NodeEntity(label = "NODE")
+	public static class Node {
 
-        session.clear();
-        Collection<Edge> allEdges = session.loadAll(Edge.class);
-        assertEquals(2, allEdges.size());
-    }
+		Long id;
 
-    @NodeEntity(label = "NODE")
-    public static class Node {
+		@Relationship(type = "EDGE")
+		Edge link;
 
-        Long id;
+		@Override
+		public boolean equals(Object o) {
 
-        @Relationship(type = "EDGE")
-        Edge link;
+			if (this == o) return true;
 
-        @Override
-        public boolean equals(Object o) {
+			if (o == null || getClass() != o.getClass()) return false;
 
-            if (this == o) return true;
+			return true; // all Node objects are the same, from perspective of client code
+		}
 
-            if (o == null || getClass() != o.getClass()) return false;
+		@Override
+		public int hashCode() {
+			return 1;
+		}
+	}
 
-            return true; // all Node objects are the same, from perspective of client code
-        }
+	@RelationshipEntity(type = "EDGE")
+	public static class Edge {
 
-        @Override
-        public int hashCode() {
-            return 1;
-        }
-    }
+		Long id;
 
-    @RelationshipEntity(type = "EDGE")
-    public static class Edge {
+		@StartNode
+		Node start;
 
-        Long id;
+		@EndNode
+		Node end;
 
-        @StartNode
-        Node start;
+		@Override
+		public boolean equals(Object o) {
 
-        @EndNode
-        Node end;
+			if (this == o) return true;
 
-        @Override
-        public boolean equals(Object o) {
+			if (o == null || getClass() != o.getClass()) return false;
 
-            if (this == o) return true;
+			return true; // all Edge objects are the same, from perspective of client code
+		}
 
-            if (o == null || getClass() != o.getClass()) return false;
-
-            return true; // all Edge objects are the same, from perspective of client code
-        }
-
-        @Override
-        public int hashCode() {
-            return 1;
-        }
-    }
-
+		@Override
+		public int hashCode() {
+			return 1;
+		}
+	}
 }

@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Michal Bachman
  */
-public class TxHandlerIntegrationTest extends MultiDriverTestClass {
+public abstract class TxHandlerIntegrationTest  {
 
     private static SessionFactory sessionFactory;
     private Session session;
@@ -59,6 +60,8 @@ public class TxHandlerIntegrationTest extends MultiDriverTestClass {
         });
         session = sessionFactory.openSession();
     }
+
+    protected abstract GraphDatabaseService getGraphDatabaseService();
 
     @Test
     @Ignore  // FIXME (but how?)

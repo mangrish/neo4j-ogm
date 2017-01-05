@@ -19,27 +19,26 @@ import org.neo4j.ogm.domain.music.Album;
 import org.neo4j.ogm.domain.music.Recording;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author vince
  */
-public class DeleteCapabilityTest extends MultiDriverTestClass {
+public abstract class DeleteCapabilityTest {
 
-    private Session session = new SessionFactory("org.neo4j.ogm.domain.music").openSession();
+	private Session session = new SessionFactory("org.neo4j.ogm.domain.music").openSession();
 
-    @Before
-    public void init() {
-        session.clear();
-    }
+	@Before
+	public void init() {
+		session.clear();
+	}
 
-    @Test
-    public void shouldNotFailIfDeleteNodeEntityAgainstEmptyDatabase() {
-        session.deleteAll(Album.class);
-    }
+	@Test
+	public void shouldNotFailIfDeleteNodeEntityAgainstEmptyDatabase() {
+		session.deleteAll(Album.class);
+	}
 
-    @Test
-    public void shouldNotFailIfDeleteRelationshipEntityAgainstEmptyDatabase() {
-        session.deleteAll(Recording.class);
-    }
+	@Test
+	public void shouldNotFailIfDeleteRelationshipEntityAgainstEmptyDatabase() {
+		session.deleteAll(Recording.class);
+	}
 }

@@ -35,7 +35,7 @@ import org.neo4j.ogm.testutil.MultiDriverTestClass;
  * @author Mark Angrish
  * @author Luanne Misquitta
  */
-public class RelationshipMappingTest extends MultiDriverTestClass {
+public abstract class RelationshipMappingTest  {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.policy", "org.neo4j.ogm.domain.election");
 
@@ -50,6 +50,8 @@ public class RelationshipMappingTest extends MultiDriverTestClass {
 	private GraphDatabaseService getDatabase() {
 		return getGraphDatabaseService();
 	}
+
+	protected abstract GraphDatabaseService getGraphDatabaseService();
 
 
 	@Test

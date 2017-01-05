@@ -28,7 +28,7 @@ import java.util.UUID;
 /**
  * @author Vince Bickers
  */
-public class AABBTest extends RelationshipTrait {
+public abstract class AABBTest extends RelationshipTrait {
 
     private static SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.relationships.direct.aabb");
     private Session session;

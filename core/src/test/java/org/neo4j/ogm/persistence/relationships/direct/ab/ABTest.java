@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNull;
 /**
  * @author Vince Bickers
  */
-public class ABTest extends RelationshipTrait {
+public abstract class ABTest extends RelationshipTrait {
 
     private static SessionFactory sessionFactory  = new SessionFactory("org.neo4j.ogm.persistence.relationships.direct.ab");
     private Session session;

@@ -13,8 +13,7 @@
 
 package org.neo4j.ogm.persistence.examples.hierarchy.dualRelationships;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -28,19 +27,18 @@ import org.neo4j.ogm.domain.hierarchy.dualRelation.ThingOwned;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.Utils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * This test passes because DataView and DataViewOwned have their setSharedWith annotated with @Relationship.
  * If the setter were not annotated, these tests would fail.
  * //TODO revisit this after we take a decision on mapping strategies
  *
- * @see Issue 144
- *
  * @author Vince Bickers
  * @author Luanne Misquitta
+ * @see Issue 144
  */
-public class DualRelationshipTest extends MultiDriverTestClass{
+public abstract class DualRelationshipTest {
+
 	private Session session;
 
 	@Before
@@ -76,7 +74,6 @@ public class DualRelationshipTest extends MultiDriverTestClass{
 		assertEquals("owner", found.getOwner().getName());
 		assertEquals("shared", found.getSharedWith().get(0).getName());
 		assertEquals(1, found.getSharedWith().size());
-
 	}
 
 	@Test
@@ -104,7 +101,6 @@ public class DualRelationshipTest extends MultiDriverTestClass{
 		assertEquals(1, found.getSharedWith().size());
 		assertEquals("owner", found.getOwner().getName());
 		assertEquals("shared", found.getSharedWith().get(0).getName());
-
 	}
 
 	@Test
@@ -127,11 +123,9 @@ public class DualRelationshipTest extends MultiDriverTestClass{
 
 		DataViewOwned found = session.load(DataViewOwned.class, dataview.getId());
 
-
 		assertEquals("owner", found.getOwner().getName());
 		assertEquals("shared", found.getSharedWith().get(0).getName());
 		assertEquals(1, found.getSharedWith().size());
-
 	}
 
 	@Test
@@ -160,6 +154,5 @@ public class DualRelationshipTest extends MultiDriverTestClass{
 		assertEquals(1, found.getSharedWith().size());
 		assertEquals("owner", found.getOwner().getName());
 		assertEquals("shared", found.getSharedWith().get(0).getName());
-
 	}
 }

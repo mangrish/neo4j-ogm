@@ -11,7 +11,7 @@
 
 package org.neo4j.ogm.persistence.examples.hierarchy.dualTarget;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -24,13 +24,13 @@ import org.neo4j.ogm.domain.hierarchy.dualTarget.Member;
 import org.neo4j.ogm.domain.hierarchy.dualTarget.Tag;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
- * @see Issue 161
  * @author Luanne Misquitta
+ * @see Issue 161
  */
-public class DualTargetRelationshipsTest  extends MultiDriverTestClass{
+public abstract class DualTargetRelationshipsTest {
+
 	private Session session;
 
 	@Before
@@ -67,7 +67,7 @@ public class DualTargetRelationshipsTest  extends MultiDriverTestClass{
 
 		session.clear();
 
-		Event e = session.load(Event.class, event.getId(),2); //Depth 2 required for it to fail
+		Event e = session.load(Event.class, event.getId(), 2); //Depth 2 required for it to fail
 		assertEquals(0, e.getTags().size());
 		assertEquals(member.getId(), e.getCreator().getId());
 		assertEquals(1, e.getCreator().getEvents().size());
@@ -76,7 +76,6 @@ public class DualTargetRelationshipsTest  extends MultiDriverTestClass{
 		Member m = session.load(Member.class, member.getId(), 2);
 		assertEquals(1, m.getTags().size());
 		assertEquals(1, m.getEvents().size());
-
 	}
 
 	@Test
@@ -112,14 +111,11 @@ public class DualTargetRelationshipsTest  extends MultiDriverTestClass{
 
 		session.save(member);
 
-		Member m = session.loadAll(Member.class, new Filter("name","Member1"), 2).iterator().next();
+		Member m = session.loadAll(Member.class, new Filter("name", "Member1"), 2).iterator().next();
 		assertEquals(2, m.getTags().size());
 		assertEquals(2, m.getEvents().size());
 
 		Event e = session.load(Event.class, event1.getId(), 2);
 		assertEquals(2, e.getTags().size());
-
 	}
-
-
 }

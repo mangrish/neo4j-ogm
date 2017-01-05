@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author vince
  */
-public class CollectionsTest extends EventTestBaseClass {
+public abstract class CollectionsTest extends EventTestBaseClass {
 
     @Test
     public void shouldFireEventsWhenSavingACollection() {

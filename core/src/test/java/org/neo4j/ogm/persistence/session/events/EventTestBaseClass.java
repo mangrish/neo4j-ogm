@@ -35,7 +35,7 @@ import org.neo4j.ogm.testutil.MultiDriverTestClass;
  * @author Mihai Raulea
  * @author Vince Bickers
  */
-public abstract class EventTestBaseClass extends MultiDriverTestClass {
+public abstract class EventTestBaseClass {
 
     protected Session session;
     protected Document a;

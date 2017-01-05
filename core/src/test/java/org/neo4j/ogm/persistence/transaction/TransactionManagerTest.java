@@ -23,7 +23,6 @@ import org.neo4j.ogm.exception.TransactionManagerException;
 import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.transaction.DefaultTransactionManager;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.Transaction;
 
 /**
@@ -38,7 +37,7 @@ import org.neo4j.ogm.transaction.Transaction;
  * @author Vince Bickers
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TransactionManagerTest extends MultiDriverTestClass {
+public abstract class TransactionManagerTest {
 
 	@Test
 	public void shouldBeAbleToCreateManagedTransaction() {

@@ -13,9 +13,7 @@
 
 package org.neo4j.ogm.persistence.examples.convertible;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -27,55 +25,53 @@ import org.neo4j.ogm.domain.convertible.parametrized.StringMapEntity;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.Utils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author vince
  * @author Luanne Misquitta
  */
-public class ParameterizedConversionTest extends MultiDriverTestClass {
+public abstract class ParameterizedConversionTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.convertible.parametrized").openSession();
-    }
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.convertible.parametrized").openSession();
+	}
 
-    @After
-    public void tearDown() {
-        session.purgeDatabase();
-    }
+	@After
+	public void tearDown() {
+		session.purgeDatabase();
+	}
 
-    @Test
-    public void shouldConvertParametrizedMap() {
+	@Test
+	public void shouldConvertParametrizedMap() {
 
-        JsonNode jsonNode = new JsonNode();
-        jsonNode.payload = Utils.map("key", "value");
+		JsonNode jsonNode = new JsonNode();
+		jsonNode.payload = Utils.map("key", "value");
 
-        session.save(jsonNode);
+		session.save(jsonNode);
 
-        session.clear();
+		session.clear();
 
-        JsonNode found = session.load(JsonNode.class, jsonNode.id);
+		JsonNode found = session.load(JsonNode.class, jsonNode.id);
 
-        assertTrue(found.payload.containsKey("key"));
-        assertEquals("value", found.payload.get("key"));
-
-    }
+		assertTrue(found.payload.containsKey("key"));
+		assertEquals("value", found.payload.get("key"));
+	}
 
 	/**
 	 * @see Issue 102
-     */
-    @Test
-    public void shouldConvertParameterizedStringMap() {
-        StringMapEntity entity = new StringMapEntity();
-        session.save(entity);
+	 */
+	@Test
+	public void shouldConvertParameterizedStringMap() {
+		StringMapEntity entity = new StringMapEntity();
+		session.save(entity);
 
-        session.clear();
+		session.clear();
 
-        StringMapEntity loaded = session.load(StringMapEntity.class, entity.getId());
-        assertNotNull(loaded);
-        assertEquals(3, loaded.getStringMap().size());
-    }
+		StringMapEntity loaded = session.load(StringMapEntity.class, entity.getId());
+		assertNotNull(loaded);
+		assertEquals(3, loaded.getStringMap().size());
+	}
 }

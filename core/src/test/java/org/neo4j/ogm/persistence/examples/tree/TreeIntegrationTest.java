@@ -13,10 +13,7 @@
 
 package org.neo4j.ogm.persistence.examples.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,91 +27,89 @@ import org.neo4j.ogm.domain.tree.Entity;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.Utils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author Luanne Misquitta
  */
-public class TreeIntegrationTest extends MultiDriverTestClass {
+public abstract class TreeIntegrationTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.tree").openSession();
-    }
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.tree").openSession();
+	}
 
-    @After
-    public void teardown() {
-        session.purgeDatabase();
-    }
-
-    /**
-     * @see DATAGRAPH-731
-     */
-    @Test
-    public void shouldCreateTreeProperly() {
-        Entity parent = new Entity("parent");
-        Entity child01 = new Entity("child01").setParent(parent);
-        Entity child02 = new Entity("child02").setParent(parent);
-
-        session.save(parent);
-
-        session.clear();
-
-        parent = session.load(Entity.class, parent.getId());
-        assertNotNull(parent);
-        assertEquals(2, parent.getChildren().size());
-        assertNull(parent.getParent());
-        List<String> childNames = new ArrayList<>();
-        for (Entity child : parent.getChildren()) {
-            childNames.add(child.getName());
-            assertEquals(parent.getName(), child.getParent().getName());
-        }
-        assertTrue(childNames.contains(child01.getName()));
-        assertTrue(childNames.contains(child02.getName()));
-    }
-
-    /**
-     * @see DATAGRAPH-731
-     */
-    @Test
-    public void shouldLoadTreeProperly() {
-        String cypher = "CREATE (parent:Entity {name:'parent'}) CREATE (child1:Entity {name:'c1'}) CREATE (child2:Entity {name:'c2'}) CREATE (child1)-[:REL]->(parent) CREATE (child2)-[:REL]->(parent)";
-        session.query(cypher, Utils.map());
-        session.clear();
-        Entity parent = session.loadAll(Entity.class, new Filter("name", "parent")).iterator().next();
-        assertNotNull(parent);
-        assertEquals(2, parent.getChildren().size());
-        assertNull(parent.getParent());
-        List<String> childNames = new ArrayList<>();
-        for (Entity child : parent.getChildren()) {
-            childNames.add(child.getName());
-            assertEquals(parent.getName(), child.getParent().getName());
-        }
-        assertTrue(childNames.contains("c1"));
-        assertTrue(childNames.contains("c2"));
-
-    }
+	@After
+	public void teardown() {
+		session.purgeDatabase();
+	}
 
 	/**
-     * @see Issue 88
-     */
-    @Test
-    public void shouldMapElementsToTreeSetProperly() {
-        String cypher = "CREATE (parent:Entity {name:'parent'}) CREATE (child1:Entity {name:'c1'}) CREATE (child2:Entity {name:'c2'}) CREATE (child1)-[:REL]->(parent) CREATE (child2)-[:REL]->(parent)";
-        session.query(cypher, Utils.map());
-        session.clear();
-        Entity parent = session.loadAll(Entity.class, new Filter("name", "parent")).iterator().next();
-        assertNotNull(parent);
-        assertEquals(2, parent.getChildren().size());
-        assertNull(parent.getParent());
-        List<String> childNames = new ArrayList<>();
-        for (Entity child : parent.getChildren()) {
-            childNames.add(child.getName());
-            assertEquals(parent.getName(), child.getParent().getName());
-        }
-       assertEquals("c1", childNames.get(0));
-       assertEquals("c2", childNames.get(1));
-    }
+	 * @see DATAGRAPH-731
+	 */
+	@Test
+	public void shouldCreateTreeProperly() {
+		Entity parent = new Entity("parent");
+		Entity child01 = new Entity("child01").setParent(parent);
+		Entity child02 = new Entity("child02").setParent(parent);
+
+		session.save(parent);
+
+		session.clear();
+
+		parent = session.load(Entity.class, parent.getId());
+		assertNotNull(parent);
+		assertEquals(2, parent.getChildren().size());
+		assertNull(parent.getParent());
+		List<String> childNames = new ArrayList<>();
+		for (Entity child : parent.getChildren()) {
+			childNames.add(child.getName());
+			assertEquals(parent.getName(), child.getParent().getName());
+		}
+		assertTrue(childNames.contains(child01.getName()));
+		assertTrue(childNames.contains(child02.getName()));
+	}
+
+	/**
+	 * @see DATAGRAPH-731
+	 */
+	@Test
+	public void shouldLoadTreeProperly() {
+		String cypher = "CREATE (parent:Entity {name:'parent'}) CREATE (child1:Entity {name:'c1'}) CREATE (child2:Entity {name:'c2'}) CREATE (child1)-[:REL]->(parent) CREATE (child2)-[:REL]->(parent)";
+		session.query(cypher, Utils.map());
+		session.clear();
+		Entity parent = session.loadAll(Entity.class, new Filter("name", "parent")).iterator().next();
+		assertNotNull(parent);
+		assertEquals(2, parent.getChildren().size());
+		assertNull(parent.getParent());
+		List<String> childNames = new ArrayList<>();
+		for (Entity child : parent.getChildren()) {
+			childNames.add(child.getName());
+			assertEquals(parent.getName(), child.getParent().getName());
+		}
+		assertTrue(childNames.contains("c1"));
+		assertTrue(childNames.contains("c2"));
+	}
+
+	/**
+	 * @see Issue 88
+	 */
+	@Test
+	public void shouldMapElementsToTreeSetProperly() {
+		String cypher = "CREATE (parent:Entity {name:'parent'}) CREATE (child1:Entity {name:'c1'}) CREATE (child2:Entity {name:'c2'}) CREATE (child1)-[:REL]->(parent) CREATE (child2)-[:REL]->(parent)";
+		session.query(cypher, Utils.map());
+		session.clear();
+		Entity parent = session.loadAll(Entity.class, new Filter("name", "parent")).iterator().next();
+		assertNotNull(parent);
+		assertEquals(2, parent.getChildren().size());
+		assertNull(parent.getParent());
+		List<String> childNames = new ArrayList<>();
+		for (Entity child : parent.getChildren()) {
+			childNames.add(child.getName());
+			assertEquals(parent.getName(), child.getParent().getName());
+		}
+		assertEquals("c1", childNames.get(0));
+		assertEquals("c2", childNames.get(1));
+	}
 }

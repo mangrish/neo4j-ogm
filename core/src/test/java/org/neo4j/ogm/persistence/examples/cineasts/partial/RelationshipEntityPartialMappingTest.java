@@ -13,100 +13,93 @@
 
 package org.neo4j.ogm.persistence.examples.cineasts.partial;
 
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.ogm.domain.cineasts.minimum.Actor;
 import org.neo4j.ogm.domain.cineasts.minimum.Movie;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * The purpose of these tests is to describe the behaviour of the
  * mapper when a RelationshipEntity object is not referenced by
  * both of its Related entities, both when writing and reading
- *
  * In this scenario, the Role relationship, which is a RelationshipEntity
  * linking Actors and Movies, is referenced only from the Actor entity.
  *
  * @author Vince Bickers
  */
-public class RelationshipEntityPartialMappingTest extends MultiDriverTestClass {
+public abstract class RelationshipEntityPartialMappingTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() {
-        SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.cineasts.minimum");
-        session = sessionFactory.openSession();
-        session.purgeDatabase();
-    }
+	@Before
+	public void init() {
+		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.cineasts.minimum");
+		session = sessionFactory.openSession();
+		session.purgeDatabase();
+	}
 
-    @Test
-    public void testCreateAndReloadActorRoleAndMovie() {
+	@Test
+	public void testCreateAndReloadActorRoleAndMovie() {
 
-        Actor keanu = new Actor("Keanu Reeves");
-        Movie matrix = new Movie("The Matrix");
-        keanu.addRole("Neo", matrix);
+		Actor keanu = new Actor("Keanu Reeves");
+		Movie matrix = new Movie("The Matrix");
+		keanu.addRole("Neo", matrix);
 
-        session.save(keanu);
+		session.save(keanu);
 
-        Actor keanu2 = session.load(Actor.class, keanu.getId());
+		Actor keanu2 = session.load(Actor.class, keanu.getId());
 
-        assertEquals(1, keanu2.roles().size());
+		assertEquals(1, keanu2.roles().size());
+	}
 
-    }
+	@Test
+	public void testCreateAndReloadActorMultipleRolesAndMovies() {
 
-    @Test
-    public void testCreateAndReloadActorMultipleRolesAndMovies() {
+		Actor keanu = new Actor("Keanu Reeves");
+		Movie matrix = new Movie("The Matrix");
+		Movie speed = new Movie("Speed");
 
-        Actor keanu = new Actor("Keanu Reeves");
-        Movie matrix = new Movie("The Matrix");
-        Movie speed = new Movie("Speed");
+		keanu.addRole("Neo", matrix);
+		keanu.addRole("Jack Traven", speed);
 
-        keanu.addRole("Neo", matrix);
-        keanu.addRole("Jack Traven", speed);
+		session.save(keanu);
 
-        session.save(keanu);
+		Actor keanu2 = session.load(Actor.class, keanu.getId());
 
-        Actor keanu2 = session.load(Actor.class, keanu.getId());
+		assertEquals(2, keanu2.roles().size());
 
-        assertEquals(2, keanu2.roles().size());
+		keanu2.addRole("John Constantine", new Movie("Constantine"));
+		session.save(keanu2);
 
-        keanu2.addRole("John Constantine", new Movie("Constantine"));
-        session.save(keanu2);
+		Actor keanu3 = session.load(Actor.class, keanu2.getId());
+		assertEquals(3, keanu3.roles().size());
+	}
 
-        Actor keanu3 = session.load(Actor.class, keanu2.getId());
-        assertEquals(3, keanu3.roles().size());
+	@Test
+	public void testCreateAndDeleteActorMultipleRolesAndMovies() {
 
-    }
+		Actor keanu = new Actor("Keanu Reeves");
+		Movie matrix = new Movie("The Matrix");
+		Movie hp = new Movie("Harry Potter");
 
-    @Test
-    public void testCreateAndDeleteActorMultipleRolesAndMovies() {
+		keanu.addRole("Neo", matrix);
+		keanu.addRole("Dumbledore", hp);
 
-        Actor keanu = new Actor("Keanu Reeves");
-        Movie matrix = new Movie("The Matrix");
-        Movie hp = new Movie("Harry Potter");
+		session.save(keanu);
 
-        keanu.addRole("Neo", matrix);
-        keanu.addRole("Dumbledore", hp);
+		Actor keanu2 = session.load(Actor.class, keanu.getId());
 
-        session.save(keanu);
+		assertEquals(2, keanu2.roles().size());
 
-        Actor keanu2 = session.load(Actor.class, keanu.getId());
+		keanu2.removeRole("Dumbledore");
 
-        assertEquals(2, keanu2.roles().size());
+		session.save(keanu2);
 
-        keanu2.removeRole("Dumbledore");
-
-        session.save(keanu2);
-
-        Actor keanu3 = session.load(Actor.class, keanu2.getId());
-        assertEquals(1, keanu3.roles().size());
-
-
-    }
-
+		Actor keanu3 = session.load(Actor.class, keanu2.getId());
+		assertEquals(1, keanu3.roles().size());
+	}
 }

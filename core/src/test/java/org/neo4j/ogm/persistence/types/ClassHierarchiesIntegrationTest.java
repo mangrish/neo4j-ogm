@@ -13,11 +13,8 @@
 
 package org.neo4j.ogm.persistence.types;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.neo4j.ogm.testutil.GraphTestUtils.assertSameGraph;
+import static org.junit.Assert.*;
+import static org.neo4j.ogm.testutil.GraphTestUtils.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,37 +26,12 @@ import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.ogm.domain.hierarchy.domain.annotated.*;
-import org.neo4j.ogm.domain.hierarchy.domain.people.Bloke;
-import org.neo4j.ogm.domain.hierarchy.domain.people.Entity;
-import org.neo4j.ogm.domain.hierarchy.domain.people.Female;
-import org.neo4j.ogm.domain.hierarchy.domain.people.Male;
-import org.neo4j.ogm.domain.hierarchy.domain.people.Person;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAbstractParentAndAnnotatedSuperclass;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedAbstractNamedParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedAbstractParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedConcreteNamedParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedConcreteParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedConcreteSuperclass;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedInterfaceParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedNamedInterfaceParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithAnnotatedSuperInterface;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithPlainAbstractParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithPlainConcreteParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithPlainConcreteParentImplementingInterface;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithPlainInterfaceChild;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainChildWithPlainInterfaceParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainConcreteParent;
-import org.neo4j.ogm.domain.hierarchy.domain.plain.PlainSingleClass;
-import org.neo4j.ogm.domain.hierarchy.domain.trans.PlainChildOfTransientInterface;
-import org.neo4j.ogm.domain.hierarchy.domain.trans.PlainChildOfTransientParent;
-import org.neo4j.ogm.domain.hierarchy.domain.trans.PlainClassWithTransientFields;
-import org.neo4j.ogm.domain.hierarchy.domain.trans.TransientChildWithPlainConcreteParent;
-import org.neo4j.ogm.domain.hierarchy.domain.trans.TransientSingleClass;
-import org.neo4j.ogm.domain.hierarchy.domain.trans.TransientSingleClassWithId;
+import org.neo4j.ogm.domain.hierarchy.domain.people.*;
+import org.neo4j.ogm.domain.hierarchy.domain.plain.*;
+import org.neo4j.ogm.domain.hierarchy.domain.trans.*;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.testutil.GraphTestUtils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * Integration test for label-based mapping of class hierarchies.
@@ -77,709 +49,710 @@ import org.neo4j.ogm.testutil.MultiDriverTestClass;
  * @author Michal Bachman
  * @author Luanne Misquitta
  */
-public class ClassHierarchiesIntegrationTest extends MultiDriverTestClass {
+public abstract class ClassHierarchiesIntegrationTest {
 
-    private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.hierarchy.domain");
+	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.hierarchy.domain");
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = sessionFactory.openSession();
-        session.purgeDatabase();
-    }
+	@Before
+	public void init() throws IOException {
+		session = sessionFactory.openSession();
+		session.purgeDatabase();
+	}
 
-    private GraphDatabaseService getDatabase() {
-        return getGraphDatabaseService();
-    }
+	private GraphDatabaseService getDatabase() {
+		return getGraphDatabaseService();
+	}
 
-    @Test
-    public void annotatedChildWithAnnotatedAbstractNamedParent() {
-        session.save(new AnnotatedChildWithAnnotatedAbstractNamedParent());
+	protected abstract GraphDatabaseService getGraphDatabaseService();
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedAbstractNamedParent:Parent)");
+	@Test
+	public void annotatedChildWithAnnotatedAbstractNamedParent() {
+		session.save(new AnnotatedChildWithAnnotatedAbstractNamedParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedAbstractNamedParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedAbstractNamedParent:Parent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void annotatedChildWithAnnotatedNamedInterfaceParent() {
-        session.save(new AnnotatedChildWithAnnotatedNamedInterfaceParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedAbstractNamedParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedNamedInterfaceParent:Parent)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void annotatedChildWithAnnotatedNamedInterfaceParent() {
+		session.save(new AnnotatedChildWithAnnotatedNamedInterfaceParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedNamedInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedNamedInterfaceParent:Parent)");
 
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedNamedInterfaceParent.class).iterator().next());
+	}
 
-    @Test
-    public void annotatedChildWithAnnotatedAbstractParent() {
-        session.save(new AnnotatedChildWithAnnotatedAbstractParent());
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedAbstractParent:AnnotatedAbstractParent)");
+	@Test
+	public void annotatedChildWithAnnotatedAbstractParent() {
+		session.save(new AnnotatedChildWithAnnotatedAbstractParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedAbstractParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedAbstractParent:AnnotatedAbstractParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void annotatedChildWithAnnotatedInterfaceParent() {
-        session.save(new AnnotatedChildWithAnnotatedInterfaceParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedAbstractParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedInterfaceParent:AnnotatedInterface)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void annotatedChildWithAnnotatedInterfaceParent() {
+		session.save(new AnnotatedChildWithAnnotatedInterfaceParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedInterfaceParent:AnnotatedInterface)");
 
-    @Test
-    public void annotatedChildWithAnnotatedConcreteNamedParent() {
-        session.save(new AnnotatedChildWithAnnotatedConcreteNamedParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedConcreteNamedParent:Parent)");
+	@Test
+	public void annotatedChildWithAnnotatedConcreteNamedParent() {
+		session.save(new AnnotatedChildWithAnnotatedConcreteNamedParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedConcreteNamedParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedConcreteNamedParent:Parent)");
 
-    @Test
-    public void annotatedChildWithAnnotatedConcreteParent() {
-        session.save(new AnnotatedChildWithAnnotatedConcreteParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedConcreteNamedParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedConcreteParent:AnnotatedConcreteParent)");
+	@Test
+	public void annotatedChildWithAnnotatedConcreteParent() {
+		session.save(new AnnotatedChildWithAnnotatedConcreteParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedConcreteParent:AnnotatedConcreteParent)");
 
-    @Test
-    public void annotatedChildWithPlainAbstractParent() {
-        session.save(new AnnotatedChildWithPlainAbstractParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithPlainAbstractParent)");
+	@Test
+	public void annotatedChildWithPlainAbstractParent() {
+		session.save(new AnnotatedChildWithPlainAbstractParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithPlainAbstractParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithPlainAbstractParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void annotatedChildWithPlainInterfaceParent() {
-        session.save(new AnnotatedChildWithPlainInterfaceParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithPlainAbstractParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithPlainInterfaceParent)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void annotatedChildWithPlainInterfaceParent() {
+		session.save(new AnnotatedChildWithPlainInterfaceParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithPlainInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithPlainInterfaceParent)");
 
-    @Test
-    public void annotatedChildWithPlainConcreteParent() {
-        session.save(new AnnotatedChildWithPlainConcreteParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithPlainInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithPlainConcreteParent:PlainConcreteParent)");
+	@Test
+	public void annotatedChildWithPlainConcreteParent() {
+		session.save(new AnnotatedChildWithPlainConcreteParent());
 
-        assertNotNull(session.loadAll(AnnotatedChildWithPlainConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithPlainConcreteParent:PlainConcreteParent)");
 
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithAnnotatedAbstractNamedParent() {
-        session.save(new AnnotatedNamedChildWithAnnotatedAbstractNamedParent());
+		assertNotNull(session.loadAll(AnnotatedChildWithPlainConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:Parent)");
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithAnnotatedAbstractNamedParent() {
+		session.save(new AnnotatedNamedChildWithAnnotatedAbstractNamedParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedAbstractNamedParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:Parent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithAnnotatedNamedInterface() {
-        session.save(new AnnotatedNamedChildWithAnnotatedNamedInterfaceParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedAbstractNamedParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:Parent)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithAnnotatedNamedInterface() {
+		session.save(new AnnotatedNamedChildWithAnnotatedNamedInterfaceParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedNamedInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:Parent)");
 
-    @Test
-    //@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithAnnotatedAbstractParent() {
-        session.save(new AnnotatedNamedChildWithAnnotatedAbstractParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedNamedInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:AnnotatedAbstractParent)");
+	@Test
+	//@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithAnnotatedAbstractParent() {
+		session.save(new AnnotatedNamedChildWithAnnotatedAbstractParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedAbstractParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:AnnotatedAbstractParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithAnnotatedInterfaceParent() {
-        session.save(new AnnotatedNamedChildWithAnnotatedInterfaceParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedAbstractParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:AnnotatedInterface)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithAnnotatedInterfaceParent() {
+		session.save(new AnnotatedNamedChildWithAnnotatedInterfaceParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:AnnotatedInterface)");
 
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithAnnotatedConcreteNamedParent() {
-        session.save(new AnnotatedNamedChildWithAnnotatedConcreteNamedParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:Parent)");
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithAnnotatedConcreteNamedParent() {
+		session.save(new AnnotatedNamedChildWithAnnotatedConcreteNamedParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedConcreteNamedParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:Parent)");
 
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithAnnotatedConcreteParent() {
-        session.save(new AnnotatedNamedChildWithAnnotatedConcreteParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedConcreteNamedParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:AnnotatedConcreteParent)");
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithAnnotatedConcreteParent() {
+		session.save(new AnnotatedNamedChildWithAnnotatedConcreteParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:AnnotatedConcreteParent)");
 
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithPlainAbstractParent() {
-        session.save(new AnnotatedNamedChildWithPlainAbstractParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithAnnotatedConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child)");
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithPlainAbstractParent() {
+		session.save(new AnnotatedNamedChildWithPlainAbstractParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithPlainAbstractParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithPlainInterfaceParent() {
-        session.save(new AnnotatedNamedChildWithPlainInterfaceParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithPlainAbstractParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithPlainInterfaceParent() {
+		session.save(new AnnotatedNamedChildWithPlainInterfaceParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithPlainInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child)");
 
-    @Test
-    @Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
-    public void annotatedNamedChildWithPlainConcreteParent() {
-        session.save(new AnnotatedNamedChildWithPlainConcreteParent());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithPlainInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Child:PlainConcreteParent)");
+	@Test
+	@Ignore("class hierarchies are invalid for this test: multiple classes labelled 'Child' and 'Parent'")
+	public void annotatedNamedChildWithPlainConcreteParent() {
+		session.save(new AnnotatedNamedChildWithPlainConcreteParent());
 
-        assertNotNull(session.loadAll(AnnotatedNamedChildWithPlainConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Child:PlainConcreteParent)");
 
-    @Test
-    public void annotatedNamedSingleClass() {
-        session.save(new AnnotatedNamedSingleClass());
+		assertNotNull(session.loadAll(AnnotatedNamedChildWithPlainConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:Single)");
+	@Test
+	public void annotatedNamedSingleClass() {
+		session.save(new AnnotatedNamedSingleClass());
 
-        assertNotNull(session.loadAll(AnnotatedNamedSingleClass.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Single)");
 
-    @Test
-    public void annotatedSingleClass() {
-        session.save(new AnnotatedSingleClass());
+		assertNotNull(session.loadAll(AnnotatedNamedSingleClass.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedSingleClass)");
+	@Test
+	public void annotatedSingleClass() {
+		session.save(new AnnotatedSingleClass());
 
-        assertNotNull(session.loadAll(AnnotatedSingleClass.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedSingleClass)");
 
-    @Test
-    public void plainChildWithAnnotatedAbstractNamedParent() {
-        session.save(new PlainChildWithAnnotatedAbstractNamedParent());
+		assertNotNull(session.loadAll(AnnotatedSingleClass.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedAbstractNamedParent:Parent)");
+	@Test
+	public void plainChildWithAnnotatedAbstractNamedParent() {
+		session.save(new PlainChildWithAnnotatedAbstractNamedParent());
 
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedAbstractNamedParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedAbstractNamedParent:Parent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithAnnotatedNamedInterfaceParent() {
-        session.save(new PlainChildWithAnnotatedNamedInterfaceParent());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedAbstractNamedParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedNamedInterfaceParent:Parent)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithAnnotatedNamedInterfaceParent() {
+		session.save(new PlainChildWithAnnotatedNamedInterfaceParent());
 
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedNamedInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedNamedInterfaceParent:Parent)");
 
-    @Test
-    public void plainChildWithAnnotatedAbstractParent() {
-        session.save(new PlainChildWithAnnotatedAbstractParent());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedNamedInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedAbstractParent:AnnotatedAbstractParent)");
+	@Test
+	public void plainChildWithAnnotatedAbstractParent() {
+		session.save(new PlainChildWithAnnotatedAbstractParent());
 
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedAbstractParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedAbstractParent:AnnotatedAbstractParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithAnnotatedInterfaceParent() {
-        session.save(new PlainChildWithAnnotatedInterfaceParent());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedAbstractParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedInterfaceParent:AnnotatedInterface)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithAnnotatedInterfaceParent() {
+		session.save(new PlainChildWithAnnotatedInterfaceParent());
 
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedInterfaceParent:AnnotatedInterface)");
 
-    @Test
-    public void plainChildWithAnnotatedConcreteNamedParent() {
-        session.save(new PlainChildWithAnnotatedConcreteNamedParent());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedInterfaceParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedConcreteNamedParent:Parent)");
+	@Test
+	public void plainChildWithAnnotatedConcreteNamedParent() {
+		session.save(new PlainChildWithAnnotatedConcreteNamedParent());
 
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteNamedParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedConcreteNamedParent:Parent)");
 
-    @Test
-    public void plainChildWithAnnotatedConcreteParent() {
-        session.save(new PlainChildWithAnnotatedConcreteParent());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteNamedParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedConcreteParent:AnnotatedConcreteParent)");
+	@Test
+	public void plainChildWithAnnotatedConcreteParent() {
+		session.save(new PlainChildWithAnnotatedConcreteParent());
 
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedConcreteParent:AnnotatedConcreteParent)");
 
-    @Test
-    public void plainChildWithPlainAbstractParent() {
-        session.save(new PlainChildWithPlainAbstractParent());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainAbstractParent)");
+	@Test
+	public void plainChildWithPlainAbstractParent() {
+		session.save(new PlainChildWithPlainAbstractParent());
 
-        assertNotNull(session.loadAll(PlainChildWithPlainAbstractParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainAbstractParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithPlainInterfaceParent() {
-        session.save(new PlainChildWithPlainInterfaceParent());
+		assertNotNull(session.loadAll(PlainChildWithPlainAbstractParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainInterfaceParent)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithPlainInterfaceParent() {
+		session.save(new PlainChildWithPlainInterfaceParent());
 
-        assertNotNull(session.loadAll(PlainChildWithPlainInterfaceParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainInterfaceParent)");
 
+		assertNotNull(session.loadAll(PlainChildWithPlainInterfaceParent.class).iterator().next());
+	}
 
-    @Test
-    public void plainChildWithPlainConcreteParent() {
-        session.save(new PlainChildWithPlainConcreteParent());
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainConcreteParent:PlainConcreteParent)");
+	@Test
+	public void plainChildWithPlainConcreteParent() {
+		session.save(new PlainChildWithPlainConcreteParent());
 
-        assertNotNull(session.loadAll(PlainChildWithPlainConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainConcreteParent:PlainConcreteParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithPlainConcreteParentImplementingInterface() {
-        session.save(new PlainChildWithPlainConcreteParentImplementingInterface());
+		assertNotNull(session.loadAll(PlainChildWithPlainConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainConcreteParentImplementingInterface:PlainConcreteParent)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithPlainConcreteParentImplementingInterface() {
+		session.save(new PlainChildWithPlainConcreteParentImplementingInterface());
 
-        assertNotNull(session.loadAll(PlainChildWithPlainConcreteParentImplementingInterface.class).iterator().next());
-        assertNotNull(session.loadAll(PlainConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainConcreteParentImplementingInterface:PlainConcreteParent)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithPlainInterfaceChild() {
-        session.save(new PlainChildWithPlainInterfaceChild());
+		assertNotNull(session.loadAll(PlainChildWithPlainConcreteParentImplementingInterface.class).iterator().next());
+		assertNotNull(session.loadAll(PlainConcreteParent.class).iterator().next());
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainInterfaceChild)");
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithPlainInterfaceChild() {
+		session.save(new PlainChildWithPlainInterfaceChild());
 
-        assertNotNull(session.loadAll(PlainChildWithPlainInterfaceChild.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithPlainInterfaceChild)");
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithAnnotatedSuperInterface() {
-        /*
+		assertNotNull(session.loadAll(PlainChildWithPlainInterfaceChild.class).iterator().next());
+	}
+
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithAnnotatedSuperInterface() {
+		/*
         PlainChildWithAnnotatedSuperInterface->PlainInterfaceChildWithAnnotatedParentInterface->AnnotatedInterface
          */
-        session.save(new PlainChildWithAnnotatedSuperInterface());
+		session.save(new PlainChildWithAnnotatedSuperInterface());
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedSuperInterface:AnnotatedInterface)");
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedSuperInterface.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedSuperInterface:AnnotatedInterface)");
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedSuperInterface.class).iterator().next());
+	}
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void annotatedChildWithAnnotatedInterface() {
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void annotatedChildWithAnnotatedInterface() {
         /*
         AnnotatedChildWithAnnotatedInterface->AnnotatedInterfaceWithSingleImpl
          */
-        session.save(new AnnotatedChildWithAnnotatedInterface());
+		session.save(new AnnotatedChildWithAnnotatedInterface());
 
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedInterface:AnnotatedInterfaceWithSingleImpl)");
-        assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedInterface.class).iterator().next());
-        assertNotNull(session.loadAll(AnnotatedInterfaceWithSingleImpl.class).iterator().next()); //AnnotatedInterfaceWithSingleImpl has a single implementation so we should be able to load it
-        assertEquals("org.neo4j.ogm.domain.hierarchy.domain.annotated.AnnotatedChildWithAnnotatedInterface", session.loadAll(AnnotatedInterfaceWithSingleImpl.class).iterator().next().getClass().getName());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithAnnotatedInterface:AnnotatedInterfaceWithSingleImpl)");
+		assertNotNull(session.loadAll(AnnotatedChildWithAnnotatedInterface.class).iterator().next());
+		assertNotNull(session.loadAll(AnnotatedInterfaceWithSingleImpl.class).iterator().next()); //AnnotatedInterfaceWithSingleImpl has a single implementation so we should be able to load it
+		assertEquals("org.neo4j.ogm.domain.hierarchy.domain.annotated.AnnotatedChildWithAnnotatedInterface", session.loadAll(AnnotatedInterfaceWithSingleImpl.class).iterator().next().getClass().getName());
+	}
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithAnnotatedSuperclass() {
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithAnnotatedSuperclass() {
         /*
            PlainChildWithAnnotatedConcreteSuperclass->PlainChildWithAnnotatedConcreteParent->AnnotatedConcreteParent
          */
-        session.save(new PlainChildWithAnnotatedConcreteSuperclass());
+		session.save(new PlainChildWithAnnotatedConcreteSuperclass());
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedConcreteSuperclass:PlainChildWithAnnotatedConcreteParent:AnnotatedConcreteParent)");
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteSuperclass.class).iterator().next());
-        assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteParent.class).iterator().next());
-        assertNotNull(session.loadAll(AnnotatedConcreteParent.class).iterator().next());
-    }
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAnnotatedConcreteSuperclass:PlainChildWithAnnotatedConcreteParent:AnnotatedConcreteParent)");
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteSuperclass.class).iterator().next());
+		assertNotNull(session.loadAll(PlainChildWithAnnotatedConcreteParent.class).iterator().next());
+		assertNotNull(session.loadAll(AnnotatedConcreteParent.class).iterator().next());
+	}
 
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildWithAbstractParentAndAnnotatedSuperclass() {
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildWithAbstractParentAndAnnotatedSuperclass() {
         /*
            PlainChildWithAbstractParentAndAnnotatedSuperclass->PlainAbstractWithAnnotatedParent->AnnotatedSingleClass
          */
-        session.save(new PlainChildWithAbstractParentAndAnnotatedSuperclass());
-        assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAbstractParentAndAnnotatedSuperclass:AnnotatedSingleClass)");
-        assertNotNull(session.loadAll(PlainChildWithAbstractParentAndAnnotatedSuperclass.class).iterator().next());
+		session.save(new PlainChildWithAbstractParentAndAnnotatedSuperclass());
+		assertSameGraph(getDatabase(), "CREATE (:PlainChildWithAbstractParentAndAnnotatedSuperclass:AnnotatedSingleClass)");
+		assertNotNull(session.loadAll(PlainChildWithAbstractParentAndAnnotatedSuperclass.class).iterator().next());
 //        assertNotNull(session.loadAll(PlainAbstractWithAnnotatedParent.class).iterator().next());
-        assertNotNull(session.loadAll(AnnotatedSingleClass.class).iterator().next());
-    }
-
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void annotatedChildWithMultipleAnnotatedInterfaces() {
-        session.save(new AnnotatedChildWithMultipleAnnotatedInterfaces());
-
-        assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithMultipleAnnotatedInterfaces:AnnotatedInterface:Parent)");
-
-        assertNotNull(session.loadAll(AnnotatedChildWithMultipleAnnotatedInterfaces.class).iterator().next());
-        assertEquals(1, session.loadAll(AnnotatedInterface.class).size());
-        assertEquals(1, session.loadAll(AnnotatedNamedInterfaceParent.class).size());
-    }
-
-    @Test
-    public void plainSingleClass() {
-        session.save(new PlainSingleClass());
-
-        assertSameGraph(getDatabase(), "CREATE (:PlainSingleClass)");
-
-        assertNotNull(session.loadAll(PlainSingleClass.class).iterator().next());
-    }
-
-    @Test
-    public void plainChildOfTransientParent() {
-        session.save(new PlainChildOfTransientParent());
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
-            tx.success();
-        }
-    }
-
-    /**
-     * @see DATAGRAPH-577
-     */
-    @Test
-    public void plainChildOfTransientInterface() {
-        session.save(new PlainChildOfTransientInterface());
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
-            tx.success();
-        }
-    }
-
-    @Test
-    public void transientChildWithPlainConcreteParent() {
-        session.save(new TransientChildWithPlainConcreteParent());
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
-            tx.success();
-        }
-    }
-
-    @Test
-    public void transientSingleClass() {
-        session.save(new TransientSingleClass());
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
-            tx.success();
-        }
-    }
-
-    @Test
-    public void transientSingleClassWithId() {
-        session.save(new TransientSingleClassWithId());
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
-            tx.success();
-        }
-    }
-
-    @Test
-    public void plainClassWithTransientFields() {
+		assertNotNull(session.loadAll(AnnotatedSingleClass.class).iterator().next());
+	}
+
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void annotatedChildWithMultipleAnnotatedInterfaces() {
+		session.save(new AnnotatedChildWithMultipleAnnotatedInterfaces());
+
+		assertSameGraph(getDatabase(), "CREATE (:AnnotatedChildWithMultipleAnnotatedInterfaces:AnnotatedInterface:Parent)");
+
+		assertNotNull(session.loadAll(AnnotatedChildWithMultipleAnnotatedInterfaces.class).iterator().next());
+		assertEquals(1, session.loadAll(AnnotatedInterface.class).size());
+		assertEquals(1, session.loadAll(AnnotatedNamedInterfaceParent.class).size());
+	}
+
+	@Test
+	public void plainSingleClass() {
+		session.save(new PlainSingleClass());
+
+		assertSameGraph(getDatabase(), "CREATE (:PlainSingleClass)");
+
+		assertNotNull(session.loadAll(PlainSingleClass.class).iterator().next());
+	}
+
+	@Test
+	public void plainChildOfTransientParent() {
+		session.save(new PlainChildOfTransientParent());
+
+		try (Transaction tx = getDatabase().beginTx()) {
+			assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
+			tx.success();
+		}
+	}
+
+	/**
+	 * @see DATAGRAPH-577
+	 */
+	@Test
+	public void plainChildOfTransientInterface() {
+		session.save(new PlainChildOfTransientInterface());
+		try (Transaction tx = getDatabase().beginTx()) {
+			assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
+			tx.success();
+		}
+	}
+
+	@Test
+	public void transientChildWithPlainConcreteParent() {
+		session.save(new TransientChildWithPlainConcreteParent());
+
+		try (Transaction tx = getDatabase().beginTx()) {
+			assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
+			tx.success();
+		}
+	}
+
+	@Test
+	public void transientSingleClass() {
+		session.save(new TransientSingleClass());
+
+		try (Transaction tx = getDatabase().beginTx()) {
+			assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
+			tx.success();
+		}
+	}
+
+	@Test
+	public void transientSingleClassWithId() {
+		session.save(new TransientSingleClassWithId());
+
+		try (Transaction tx = getDatabase().beginTx()) {
+			assertFalse(GraphTestUtils.allNodes(getDatabase()).iterator().hasNext());
+			tx.success();
+		}
+	}
+
+	@Test
+	public void plainClassWithTransientFields() {
+
+		PlainClassWithTransientFields toSave = new PlainClassWithTransientFields();
+
+		toSave.setAnotherTransientField(new PlainSingleClass());
+		toSave.setTransientField(new PlainChildOfTransientParent());
+		toSave.setYetAnotherTransientField(new PlainSingleClass());
+
+		session.save(toSave);
+
+		assertSameGraph(getDatabase(), "CREATE (:PlainClassWithTransientFields)");
+
+		assertNotNull(session.loadAll(PlainClassWithTransientFields.class).iterator().next());
+	}
+
+	@Test
+	public void shouldNotBeAbleToLoadClassOfWrongType() {
+		session.save(new AnnotatedNamedSingleClass());
+		assertFalse(session.loadAll(PlainSingleClass.class).iterator().hasNext());
+	}
+
+	@Test
+	public void shouldSaveHierarchy() {
+		session.save(new Female("Daniela"));
+		session.save(new Male("Michal"));
+		session.save(new Bloke("Adam"));
 
-        PlainClassWithTransientFields toSave = new PlainClassWithTransientFields();
-
-        toSave.setAnotherTransientField(new PlainSingleClass());
-        toSave.setTransientField(new PlainChildOfTransientParent());
-        toSave.setYetAnotherTransientField(new PlainSingleClass());
-
-        session.save(toSave);
+		assertSameGraph(getDatabase(), "CREATE (:Female:Person {name:'Daniela'})," +
+				"(:Male:Person {name:'Michal'})," +
+				"(:Bloke:Male:Person {name:'Adam'})");
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (:PlainClassWithTransientFields)");
-
-        assertNotNull(session.loadAll(PlainClassWithTransientFields.class).iterator().next());
-    }
-
-    @Test
-    public void shouldNotBeAbleToLoadClassOfWrongType() {
-        session.save(new AnnotatedNamedSingleClass());
-        assertFalse(session.loadAll(PlainSingleClass.class).iterator().hasNext());
-    }
-
-    @Test
-    public void shouldSaveHierarchy() {
-        session.save(new Female("Daniela"));
-        session.save(new Male("Michal"));
-        session.save(new Bloke("Adam"));
+	@Test
+	public void shouldSaveHierarchy2() {
+		session.save(Arrays.asList(new Female("Daniela"), new Male("Michal"), new Bloke("Adam")));
 
-        assertSameGraph(getDatabase(), "CREATE (:Female:Person {name:'Daniela'})," +
-                "(:Male:Person {name:'Michal'})," +
-                "(:Bloke:Male:Person {name:'Adam'})");
-    }
+		assertSameGraph(getDatabase(), "CREATE (:Female:Person {name:'Daniela'})," +
+				"(:Male:Person {name:'Michal'})," +
+				"(:Bloke:Male:Person {name:'Adam'})");
+	}
 
-    @Test
-    public void shouldSaveHierarchy2() {
-        session.save(Arrays.asList(new Female("Daniela"), new Male("Michal"), new Bloke("Adam")));
+	@Test
+	public void shouldReadHierarchyAndRetrieveBySuperclass() {
 
-        assertSameGraph(getDatabase(), "CREATE (:Female:Person {name:'Daniela'})," +
-                "(:Male:Person {name:'Michal'})," +
-                "(:Bloke:Male:Person {name:'Adam'})");
-    }
+		Female daniela = new Female("Daniela");
+		Male michal = new Male("Michal");
+		Bloke adam = new Bloke("Adam");
 
-    @Test
-    public void shouldReadHierarchyAndRetrieveBySuperclass() {
+		session.save(Arrays.asList(daniela, michal, adam));
 
-        Female daniela = new Female("Daniela");
-        Male michal = new Male("Michal");
-        Bloke adam = new Bloke("Adam");
+		Collection<Entity> entities = session.loadAll(Entity.class);
 
-        session.save(Arrays.asList(daniela, michal, adam));
+		Collection<Person> people = session.loadAll(Person.class);
+		Collection<Male> males = session.loadAll(Male.class);
+		Collection<Female> females = session.loadAll(Female.class);
+		Collection<Bloke> blokes = session.loadAll(Bloke.class);
 
-        Collection<Entity> entities = session.loadAll(Entity.class);
+		assertTrue("Shouldn't be able to load by non-annotated, abstract classes", entities.isEmpty());
 
-        Collection<Person> people = session.loadAll(Person.class);
-        Collection<Male> males = session.loadAll(Male.class);
-        Collection<Female> females = session.loadAll(Female.class);
-        Collection<Bloke> blokes = session.loadAll(Bloke.class);
+		assertEquals(3, people.size());
+		assertEquals(people.size(), session.countEntitiesOfType(Person.class));
+		assertTrue(people.containsAll(Arrays.asList(daniela, michal, adam)));
 
-        assertTrue("Shouldn't be able to load by non-annotated, abstract classes", entities.isEmpty());
+		assertEquals(2, males.size());
+		assertTrue(males.containsAll(Arrays.asList(michal, adam)));
 
-        assertEquals(3, people.size());
-        assertEquals(people.size(), session.countEntitiesOfType(Person.class));
-        assertTrue(people.containsAll(Arrays.asList(daniela, michal, adam)));
+		assertEquals(1, females.size());
+		assertEquals(females.size(), session.countEntitiesOfType(Female.class));
+		assertTrue(females.contains(daniela));
 
-        assertEquals(2, males.size());
-        assertTrue(males.containsAll(Arrays.asList(michal, adam)));
+		assertEquals(1, blokes.size());
+		assertTrue(blokes.contains(adam));
+	}
 
-        assertEquals(1, females.size());
-        assertEquals(females.size(), session.countEntitiesOfType(Female.class));
-        assertTrue(females.contains(daniela));
+	@Test
+	public void shouldReadHierarchy2() {
 
-        assertEquals(1, blokes.size());
-        assertTrue(blokes.contains(adam));
+		getDatabase().execute("CREATE (:Female:Person:Entity {name:'Daniela'})," +
+				"(:Male:Person:Entity {name:'Michal'})," +
+				"(:Bloke:Male:Person:Entity {name:'Adam'})");
 
-    }
+		Female daniela = new Female("Daniela");
+		Male michal = new Male("Michal");
+		Bloke adam = new Bloke("Adam");
 
-    @Test
-    public void shouldReadHierarchy2() {
+		Collection<Entity> entities = session.loadAll(Entity.class);
+		Collection<Person> people = session.loadAll(Person.class);
+		Collection<Male> males = session.loadAll(Male.class);
+		Collection<Female> females = session.loadAll(Female.class);
+		Collection<Bloke> blokes = session.loadAll(Bloke.class);
 
-        getDatabase().execute("CREATE (:Female:Person:Entity {name:'Daniela'})," +
-                "(:Male:Person:Entity {name:'Michal'})," +
-                "(:Bloke:Male:Person:Entity {name:'Adam'})");
+		assertEquals(3, entities.size());
+		assertTrue(entities.containsAll(Arrays.asList(daniela, michal, adam)));
 
-        Female daniela = new Female("Daniela");
-        Male michal = new Male("Michal");
-        Bloke adam = new Bloke("Adam");
+		assertEquals(3, people.size());
+		assertTrue(people.containsAll(Arrays.asList(daniela, michal, adam)));
 
-        Collection<Entity> entities = session.loadAll(Entity.class);
-        Collection<Person> people = session.loadAll(Person.class);
-        Collection<Male> males = session.loadAll(Male.class);
-        Collection<Female> females = session.loadAll(Female.class);
-        Collection<Bloke> blokes = session.loadAll(Bloke.class);
+		assertEquals(2, males.size());
+		assertTrue(males.containsAll(Arrays.asList(michal, adam)));
 
-        assertEquals(3, entities.size());
-        assertTrue(entities.containsAll(Arrays.asList(daniela, michal, adam)));
+		assertEquals(1, females.size());
+		assertTrue(females.contains(daniela));
 
-        assertEquals(3, people.size());
-        assertTrue(people.containsAll(Arrays.asList(daniela, michal, adam)));
+		assertEquals(1, blokes.size());
+		assertTrue(blokes.contains(adam));
+	}
 
-        assertEquals(2, males.size());
-        assertTrue(males.containsAll(Arrays.asList(michal, adam)));
+	@Test
+	public void shouldReadHierarchy3() {
+		getDatabase().execute("CREATE (:Female:Person {name:'Daniela'})," +
+				"(:Male:Person {name:'Michal'})," +
+				"(:Bloke:Male:Person {name:'Adam'})");
 
-        assertEquals(1, females.size());
-        assertTrue(females.contains(daniela));
+		Female daniela = new Female("Daniela");
+		Male michal = new Male("Michal");
+		Bloke adam = new Bloke("Adam");
 
-        assertEquals(1, blokes.size());
-        assertTrue(blokes.contains(adam));
-    }
+		Collection<Person> people = session.loadAll(Person.class);
+		Collection<Male> males = session.loadAll(Male.class);
+		Collection<Female> females = session.loadAll(Female.class);
+		Collection<Bloke> blokes = session.loadAll(Bloke.class);
 
-    @Test
-    public void shouldReadHierarchy3() {
-        getDatabase().execute("CREATE (:Female:Person {name:'Daniela'})," +
-                "(:Male:Person {name:'Michal'})," +
-                "(:Bloke:Male:Person {name:'Adam'})");
+		assertEquals(3, people.size());
+		assertTrue(people.containsAll(Arrays.asList(daniela, michal, adam)));
 
-        Female daniela = new Female("Daniela");
-        Male michal = new Male("Michal");
-        Bloke adam = new Bloke("Adam");
-
-        Collection<Person> people = session.loadAll(Person.class);
-        Collection<Male> males = session.loadAll(Male.class);
-        Collection<Female> females = session.loadAll(Female.class);
-        Collection<Bloke> blokes = session.loadAll(Bloke.class);
-
-        assertEquals(3, people.size());
-        assertTrue(people.containsAll(Arrays.asList(daniela, michal, adam)));
-
-        assertEquals(2, males.size());
-        assertTrue(males.containsAll(Arrays.asList(michal, adam)));
-
-        assertEquals(1, females.size());
-        assertTrue(females.contains(daniela));
-
-        assertEquals(1, blokes.size());
-        assertTrue(blokes.contains(adam));
-    }
-
-    @Test
-    public void shouldReadHierarchy4() {
-        getDatabase().execute("CREATE (:Female {name:'Daniela'})," +
-                "(:Male {name:'Michal'})," +
-                "(:Bloke:Male {name:'Adam'})");
-
-        Female daniela = new Female("Daniela");
-        Male michal = new Male("Michal");
-        Bloke adam = new Bloke("Adam");
-
-        Collection<Male> males = session.loadAll(Male.class);
-        Collection<Female> females = session.loadAll(Female.class);
-        Collection<Bloke> blokes = session.loadAll(Bloke.class);
-
-        assertEquals(2, males.size());
-        assertTrue(males.containsAll(Arrays.asList(michal, adam)));
-
-        assertEquals(1, females.size());
-        assertTrue(females.contains(daniela));
-
-        assertEquals(1, blokes.size());
-        assertTrue(blokes.contains(adam));
-    }
-
-    @Test
-    // the logic of this test is debatable. the domain model and persisted schema are not the same.
-    public void shouldReadHierarchy5() {
-
-        getDatabase().execute("CREATE (:Female {name:'Daniela'})," +
-                "(:Male {name:'Michal'})," +
-                "(:Bloke {name:'Adam'})");
-
-        Female daniela = new Female("Daniela");
-        Male michal = new Male("Michal");
-        Bloke adam = new Bloke("Adam");
-
-        Collection<Male> males = session.loadAll(Male.class);
-        Collection<Female> females = session.loadAll(Female.class);
-        Collection<Bloke> blokes = session.loadAll(Bloke.class);
-
-        assertEquals(1, males.size());
-        assertTrue(males.containsAll(Arrays.asList(michal)));
-
-        assertEquals(1, females.size());
-        assertTrue(females.contains(daniela));
-
-        assertEquals(1, blokes.size());
-        assertTrue(blokes.contains(adam));
-    }
-
-    @Test
-    public void shouldNotReadHierarchy() {
-        getDatabase().execute("CREATE (:Person {name:'Daniela'})");
-        assertEquals(0, session.loadAll(Person.class).size());
-    }
-
-    @Test
-    public void shouldLeaveExistingLabelsAlone() {
-        getDatabase().execute("CREATE (:Female:Person:GoldMember {name:'Daniela'})");
-
-        session.save(session.loadAll(Female.class).iterator().next());
-
-        assertSameGraph(getDatabase(), "CREATE (:Female:Person:GoldMember {name:'Daniela'})");
-    }
-
-    //this should throw an exception, but for a different reason than it does now!
-    @Test
-    public void shouldFailWithConflictingHierarchies() {
-        getDatabase().execute("CREATE (:Female:Person {name:'Daniela'})");
-
-        SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.hierarchy.domain", "org.neo4j.ogm.domain.hierarchy.conflicting");
-        session = sessionFactory.openSession();
-
-        assertEquals(0, session.loadAll(Female.class).size());
-    }
-
-    /**
-     * @see DATAGRAPH-735
-     */
-    @Test
-    public void shouldLoadRelatedSuperclasses() {
-        getDatabase().execute("CREATE (f1:Female:Person {name:'f1'})," +
-                "(m1:Male:Person {name:'m1'})," +
-                "(c1:Female:Person {name:'c1'})," +
-                "(b1:Bloke:Male:Person {name:'b1'})," +
-                "(m1)-[:CHILD]->(c1)");
-
-        Male m1 = session.loadAll(Male.class).iterator().next();
-        assertNotNull(m1);
-        assertEquals("m1", m1.getName());
-        assertEquals("c1", m1.getChildren().iterator().next().getName());
-    }
+		assertEquals(2, males.size());
+		assertTrue(males.containsAll(Arrays.asList(michal, adam)));
+
+		assertEquals(1, females.size());
+		assertTrue(females.contains(daniela));
+
+		assertEquals(1, blokes.size());
+		assertTrue(blokes.contains(adam));
+	}
+
+	@Test
+	public void shouldReadHierarchy4() {
+		getDatabase().execute("CREATE (:Female {name:'Daniela'})," +
+				"(:Male {name:'Michal'})," +
+				"(:Bloke:Male {name:'Adam'})");
+
+		Female daniela = new Female("Daniela");
+		Male michal = new Male("Michal");
+		Bloke adam = new Bloke("Adam");
+
+		Collection<Male> males = session.loadAll(Male.class);
+		Collection<Female> females = session.loadAll(Female.class);
+		Collection<Bloke> blokes = session.loadAll(Bloke.class);
+
+		assertEquals(2, males.size());
+		assertTrue(males.containsAll(Arrays.asList(michal, adam)));
+
+		assertEquals(1, females.size());
+		assertTrue(females.contains(daniela));
+
+		assertEquals(1, blokes.size());
+		assertTrue(blokes.contains(adam));
+	}
+
+	@Test
+	// the logic of this test is debatable. the domain model and persisted schema are not the same.
+	public void shouldReadHierarchy5() {
+
+		getDatabase().execute("CREATE (:Female {name:'Daniela'})," +
+				"(:Male {name:'Michal'})," +
+				"(:Bloke {name:'Adam'})");
+
+		Female daniela = new Female("Daniela");
+		Male michal = new Male("Michal");
+		Bloke adam = new Bloke("Adam");
+
+		Collection<Male> males = session.loadAll(Male.class);
+		Collection<Female> females = session.loadAll(Female.class);
+		Collection<Bloke> blokes = session.loadAll(Bloke.class);
+
+		assertEquals(1, males.size());
+		assertTrue(males.containsAll(Arrays.asList(michal)));
+
+		assertEquals(1, females.size());
+		assertTrue(females.contains(daniela));
+
+		assertEquals(1, blokes.size());
+		assertTrue(blokes.contains(adam));
+	}
+
+	@Test
+	public void shouldNotReadHierarchy() {
+		getDatabase().execute("CREATE (:Person {name:'Daniela'})");
+		assertEquals(0, session.loadAll(Person.class).size());
+	}
+
+	@Test
+	public void shouldLeaveExistingLabelsAlone() {
+		getDatabase().execute("CREATE (:Female:Person:GoldMember {name:'Daniela'})");
+
+		session.save(session.loadAll(Female.class).iterator().next());
+
+		assertSameGraph(getDatabase(), "CREATE (:Female:Person:GoldMember {name:'Daniela'})");
+	}
+
+	//this should throw an exception, but for a different reason than it does now!
+	@Test
+	public void shouldFailWithConflictingHierarchies() {
+		getDatabase().execute("CREATE (:Female:Person {name:'Daniela'})");
+
+		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.hierarchy.domain", "org.neo4j.ogm.domain.hierarchy.conflicting");
+		session = sessionFactory.openSession();
+
+		assertEquals(0, session.loadAll(Female.class).size());
+	}
+
+	/**
+	 * @see DATAGRAPH-735
+	 */
+	@Test
+	public void shouldLoadRelatedSuperclasses() {
+		getDatabase().execute("CREATE (f1:Female:Person {name:'f1'})," +
+				"(m1:Male:Person {name:'m1'})," +
+				"(c1:Female:Person {name:'c1'})," +
+				"(b1:Bloke:Male:Person {name:'b1'})," +
+				"(m1)-[:CHILD]->(c1)");
+
+		Male m1 = session.loadAll(Male.class).iterator().next();
+		assertNotNull(m1);
+		assertEquals("m1", m1.getName());
+		assertEquals("c1", m1.getChildren().iterator().next().getName());
+	}
 }

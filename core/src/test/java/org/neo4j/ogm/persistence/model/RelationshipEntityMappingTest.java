@@ -33,7 +33,7 @@ import java.io.IOException;
  * @author Vince Bickers
  * @author Mark Angrish
  */
-public class RelationshipEntityMappingTest extends MultiDriverTestClass {
+public abstract class RelationshipEntityMappingTest  {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.cineasts.annotated", "org.neo4j.ogm.domain.canonical.hierarchies");
 
@@ -48,6 +48,8 @@ public class RelationshipEntityMappingTest extends MultiDriverTestClass {
 	private GraphDatabaseService getDatabase() {
 		return getGraphDatabaseService();
 	}
+
+	protected abstract GraphDatabaseService getGraphDatabaseService();
 
 	@Test
 	public void testThatAnnotatedRelationshipOnRelationshipEntityCreatesTheCorrectRelationshipTypeInTheGraph() {

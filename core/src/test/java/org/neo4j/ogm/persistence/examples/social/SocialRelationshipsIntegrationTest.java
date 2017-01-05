@@ -13,8 +13,8 @@
 
 package org.neo4j.ogm.persistence.examples.social;
 
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.ogm.testutil.GraphTestUtils.assertSameGraph;
+import static org.junit.Assert.*;
+import static org.neo4j.ogm.testutil.GraphTestUtils.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -25,260 +25,249 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.ogm.domain.social.Individual;
-import org.neo4j.ogm.domain.social.Mortal;
-import org.neo4j.ogm.domain.social.Person;
-import org.neo4j.ogm.domain.social.SocialUser;
-import org.neo4j.ogm.domain.social.User;
+import org.neo4j.ogm.domain.social.*;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author Luanne Misquitta
  */
-public class SocialRelationshipsIntegrationTest extends MultiDriverTestClass {
+public abstract class SocialRelationshipsIntegrationTest {
 
-    private Session session;
+	private Session session;
 
-    private static GraphDatabaseService getDatabase() {
-        return getGraphDatabaseService();
-    }
 
-    @Before
-    public void init() throws IOException {
-        SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.social");
-        session = sessionFactory.openSession();
-    }
+	@Before
+	public void init() throws IOException {
+		SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.social");
+		session = sessionFactory.openSession();
+	}
 
-    @After
-    public void clearDatabase() {
-        session.purgeDatabase();
-    }
+	@After
+	public void clearDatabase() {
+		session.purgeDatabase();
+	}
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void saveUndirectedSavesOutgoingRelationship() {
-        User userA = new User("A");
-        User userB = new User("B");
-        userA.getFriends().add(userB);
-        session.save(userA);
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void saveUndirectedSavesOutgoingRelationship() {
+		User userA = new User("A");
+		User userB = new User("B");
+		userA.getFriends().add(userB);
+		session.save(userA);
 
-        assertSameGraph(getDatabase(), "CREATE (a:User {name:'A'}) CREATE (b:User {name:'B'}) CREATE (a)-[:FRIEND]->(b)");
-    }
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:User {name:'A'}) CREATE (b:User {name:'B'}) CREATE (a)-[:FRIEND]->(b)");
+	}
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void saveUnmarkedSavesOutgoingRelationship() {
-        Individual individualA = new Individual();
-        individualA.setName("A");
-        Individual individualB = new Individual();
-        individualB.setName("B");
-        individualA.setFriends(Collections.singletonList(individualB));
-        session.save(individualA);
+	protected abstract GraphDatabaseService getGraphDatabaseService();
 
-        assertSameGraph(getDatabase(), "CREATE (a:Individual {name:'A', age: 0, code:0, bankBalance:0.0}) CREATE (b:Individual {name:'B', age:0, code:0, bankBalance:0.0}) CREATE (a)-[:FRIENDS]->(b)");
-    }
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void saveUnmarkedSavesOutgoingRelationship() {
+		Individual individualA = new Individual();
+		individualA.setName("A");
+		Individual individualB = new Individual();
+		individualB.setName("B");
+		individualA.setFriends(Collections.singletonList(individualB));
+		session.save(individualA);
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void saveOutgoingSavesOutgoingRelationship() {
-        Person personA = new Person("A");
-        Person personB = new Person("B");
-        personA.getPeopleILike().add(personB);
-        session.save(personA);
-        assertSameGraph(getDatabase(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) CREATE (a)-[:LIKES]->(b)");
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Individual {name:'A', age: 0, code:0, bankBalance:0.0}) CREATE (b:Individual {name:'B', age:0, code:0, bankBalance:0.0}) CREATE (a)-[:FRIENDS]->(b)");
+	}
 
-    }
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void saveOutgoingSavesOutgoingRelationship() {
+		Person personA = new Person("A");
+		Person personB = new Person("B");
+		personA.getPeopleILike().add(personB);
+		session.save(personA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) CREATE (a)-[:LIKES]->(b)");
+	}
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void saveIncomingSavesIncomingRelationship() {
-        Mortal mortalA = new Mortal("A");
-        Mortal mortalB = new Mortal("B");
-        mortalA.getKnownBy().add(mortalB);
-        session.save(mortalA);
-        assertSameGraph(getDatabase(), "CREATE (a:Mortal {name:'A'}) CREATE (b:Mortal {name:'B'}) CREATE (a)<-[:KNOWN_BY]-(b)");
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void saveIncomingSavesIncomingRelationship() {
+		Mortal mortalA = new Mortal("A");
+		Mortal mortalB = new Mortal("B");
+		mortalA.getKnownBy().add(mortalB);
+		session.save(mortalA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Mortal {name:'A'}) CREATE (b:Mortal {name:'B'}) CREATE (a)<-[:KNOWN_BY]-(b)");
+	}
 
-    }
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void saveOutgoingSavesOutgoingRelationshipInBothDirections() {
+		Person personA = new Person("A");
+		Person personB = new Person("B");
+		personA.getPeopleILike().add(personB);
+		personB.getPeopleILike().add(personA);
+		session.save(personA);
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void saveOutgoingSavesOutgoingRelationshipInBothDirections() {
-        Person personA = new Person("A");
-        Person personB = new Person("B");
-        personA.getPeopleILike().add(personB);
-        personB.getPeopleILike().add(personA);
-        session.save(personA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) " +
+				"CREATE (a)-[:LIKES]->(b) CREATE (b)-[:LIKES]->(a)");
+	}
 
-        assertSameGraph(getDatabase(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) " +
-                "CREATE (a)-[:LIKES]->(b) CREATE (b)-[:LIKES]->(a)");
-    }
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void saveOutgoingToExistingNodesSavesOutgoingRelationshipInBothDirections() {
+		Person personA = new Person("A");
+		Person personB = new Person("B");
+		session.save(personA);
+		session.save(personB);
+		personA.getPeopleILike().add(personB);
+		personB.getPeopleILike().add(personA);
+		session.save(personA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) " +
+				"CREATE (a)-[:LIKES]->(b) CREATE (b)-[:LIKES]->(a)");
+	}
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void saveOutgoingToExistingNodesSavesOutgoingRelationshipInBothDirections() {
-        Person personA = new Person("A");
-        Person personB = new Person("B");
-        session.save(personA);
-        session.save(personB);
-        personA.getPeopleILike().add(personB);
-        personB.getPeopleILike().add(personA);
-        session.save(personA);
-        assertSameGraph(getDatabase(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) " +
-                "CREATE (a)-[:LIKES]->(b) CREATE (b)-[:LIKES]->(a)");
-    }
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void updateOutgoingRelSavesOutgoingRelationshipInBothDirections() {
+		Person personA = new Person("A");
+		Person personB = new Person("B");
+		Person personC = new Person("C");
+		personA.getPeopleILike().add(personB);
+		personB.getPeopleILike().add(personA);
+		session.save(personA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) " +
+				"CREATE (a)-[:LIKES]->(b) CREATE (b)-[:LIKES]->(a)");
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void updateOutgoingRelSavesOutgoingRelationshipInBothDirections() {
-        Person personA = new Person("A");
-        Person personB = new Person("B");
-        Person personC = new Person("C");
-        personA.getPeopleILike().add(personB);
-        personB.getPeopleILike().add(personA);
-        session.save(personA);
-        assertSameGraph(getDatabase(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) " +
-                "CREATE (a)-[:LIKES]->(b) CREATE (b)-[:LIKES]->(a)");
+		personA.getPeopleILike().clear();
+		personA.getPeopleILike().add(personC);
+		personC.getPeopleILike().add(personA);
+		session.save(personA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) CREATE (c:Person {name:'C'}) " +
+				" CREATE (a)-[:LIKES]->(c) CREATE (c)-[:LIKES]->(a) CREATE (b)-[:LIKES]->(a)");
+	}
 
-        personA.getPeopleILike().clear();
-        personA.getPeopleILike().add(personC);
-        personC.getPeopleILike().add(personA);
-        session.save(personA);
-        assertSameGraph(getDatabase(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) CREATE (c:Person {name:'C'}) " +
-                " CREATE (a)-[:LIKES]->(c) CREATE (c)-[:LIKES]->(a) CREATE (b)-[:LIKES]->(a)");
-    }
+	/**
+	 * @see DATAGRAPH-594
+	 */
+	@Test
+	public void updateOutgoingRelInListSavesOutgoingRelationshipInBothDirections() {
+		Person personA = new Person("A");
+		Person personB = new Person("B");
+		Person personC = new Person("C");
+		Person personD = new Person("D");
+		personA.getPeopleILike().add(personB);
+		personA.getPeopleILike().add(personC);
+		personB.getPeopleILike().add(personA);
+		personD.getPeopleILike().add(personA);
 
-    /**
-     * @see DATAGRAPH-594
-     */
-    @Test
-    public void updateOutgoingRelInListSavesOutgoingRelationshipInBothDirections() {
-        Person personA = new Person("A");
-        Person personB = new Person("B");
-        Person personC = new Person("C");
-        Person personD = new Person("D");
-        personA.getPeopleILike().add(personB);
-        personA.getPeopleILike().add(personC);
-        personB.getPeopleILike().add(personA);
-        personD.getPeopleILike().add(personA);
+		session.save(personA);
+		session.save(personB);
+		session.save(personC);
+		session.save(personD);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) CREATE (c:Person {name:'C'}) CREATE (d:Person {name:'D'})" +
+				"CREATE (a)-[:LIKES]->(b) CREATE (a)-[:LIKES]->(c) CREATE (b)-[:LIKES]->(a) CREATE (d)-[:LIKES]->(a)");
+	}
 
-        session.save(personA);
-        session.save(personB);
-        session.save(personC);
-        session.save(personD);
-        assertSameGraph(getDatabase(), "CREATE (a:Person {name:'A'}) CREATE (b:Person {name:'B'}) CREATE (c:Person {name:'C'}) CREATE (d:Person {name:'D'})" +
-                "CREATE (a)-[:LIKES]->(b) CREATE (a)-[:LIKES]->(c) CREATE (b)-[:LIKES]->(a) CREATE (d)-[:LIKES]->(a)");
+	/**
+	 * @see DATAGRAPH-636, DATAGRAPH-665 (equals() on SocialUser includes every field)
+	 */
+	@Test
+	public void shouldManageRelationshipsToTheSameNodeType() {
+		SocialUser userA = new SocialUser("A");
+		SocialUser userB = new SocialUser("B");
+		SocialUser userC = new SocialUser("C");
+		SocialUser userD = new SocialUser("D");
+		SocialUser userE = new SocialUser("E");
+		SocialUser userF = new SocialUser("F");
+		SocialUser userG = new SocialUser("G");
 
-    }
+		Set<SocialUser> friends = new HashSet<>();
+		friends.add(userB);
+		friends.add(userE);
 
-    /**
-     * @see DATAGRAPH-636, DATAGRAPH-665 (equals() on SocialUser includes every field)
-     */
-    @Test
-    public void shouldManageRelationshipsToTheSameNodeType() {
-        SocialUser userA = new SocialUser("A");
-        SocialUser userB = new SocialUser("B");
-        SocialUser userC = new SocialUser("C");
-        SocialUser userD = new SocialUser("D");
-        SocialUser userE = new SocialUser("E");
-        SocialUser userF = new SocialUser("F");
-        SocialUser userG = new SocialUser("G");
+		Set<SocialUser> following = new HashSet<>();
+		following.add(userB);
+		following.add(userE);
 
-        Set<SocialUser> friends = new HashSet<>();
-        friends.add(userB);
-        friends.add(userE);
+		Set<SocialUser> followers = new HashSet<>();
+		followers.add(userB);
+		followers.add(userE);
 
-        Set<SocialUser> following = new HashSet<>();
-        following.add(userB);
-        following.add(userE);
+		userA.setFollowers(followers);
+		userA.setFriends(friends);
+		userA.setFollowing(following);
 
-        Set<SocialUser> followers = new HashSet<>();
-        followers.add(userB);
-        followers.add(userE);
+		session.save(userA);
 
-        userA.setFollowers(followers);
-        userA.setFriends(friends);
-        userA.setFollowing(following);
+		session.clear();
 
-        session.save(userA);
+		userA = session.load(SocialUser.class, userA.getId());
+		assertEquals(2, userA.getFriends().size());
+		assertEquals(2, userA.getFollowers().size());
+		assertEquals(2, userA.getFollowing().size());
+	}
 
-        session.clear();
+	/**
+	 * @see Issue #61
+	 */
+	@Test
+	public void shouldUseOptimizedQueryToSaveExistingRelations() {
+		SocialUser userA = new SocialUser("A");
+		SocialUser userB = new SocialUser("B");
+		SocialUser userE = new SocialUser("E");
+		session.save(userA);
+		session.save(userB);
+		session.save(userE);
 
-        userA = session.load(SocialUser.class, userA.getId());
-        assertEquals(2, userA.getFriends().size());
-        assertEquals(2, userA.getFollowers().size());
-        assertEquals(2, userA.getFollowing().size());
-    }
+		Set<SocialUser> friends = new HashSet<>();
+		friends.add(userB);
+		friends.add(userE);
 
-    /**
-     * @see Issue #61
-     */
-    @Test
-    public void shouldUseOptimizedQueryToSaveExistingRelations() {
-        SocialUser userA = new SocialUser("A");
-        SocialUser userB = new SocialUser("B");
-        SocialUser userE = new SocialUser("E");
-        session.save(userA);
-        session.save(userB);
-        session.save(userE);
+		Set<SocialUser> following = new HashSet<>();
+		following.add(userB);
+		following.add(userE);
 
-        Set<SocialUser> friends = new HashSet<>();
-        friends.add(userB);
-        friends.add(userE);
+		Set<SocialUser> followers = new HashSet<>();
+		followers.add(userB);
+		followers.add(userE);
 
-        Set<SocialUser> following = new HashSet<>();
-        following.add(userB);
-        following.add(userE);
+		userA.setFollowers(followers);
+		userA.setFriends(friends);
+		userA.setFollowing(following);
 
-        Set<SocialUser> followers = new HashSet<>();
-        followers.add(userB);
-        followers.add(userE);
+		session.save(userA);
 
-        userA.setFollowers(followers);
-        userA.setFriends(friends);
-        userA.setFollowing(following);
+		session.clear();
 
-        session.save(userA);
+		userA = session.load(SocialUser.class, userA.getId());
+		assertEquals(2, userA.getFriends().size());
+		assertEquals(2, userA.getFollowers().size());
+		assertEquals(2, userA.getFollowing().size());
+	}
 
-        session.clear();
+	/**
+	 * @see issue #112
+	 */
+	@Test
+	public void removeUndirectedRelationship() {
+		User userA = new User("A");
+		User userB = new User("B");
+		userA.getFriends().add(userB);
+		session.save(userA);
 
-        userA = session.load(SocialUser.class, userA.getId());
-        assertEquals(2, userA.getFriends().size());
-        assertEquals(2, userA.getFollowers().size());
-        assertEquals(2, userA.getFollowing().size());
-    }
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:User {name:'A'}) CREATE (b:User {name:'B'}) CREATE (a)-[:FRIEND]->(b)");
 
-    /**
-     * @see issue #112
-     */
-    @Test
-    public void removeUndirectedRelationship() {
-        User userA = new User("A");
-        User userB = new User("B");
-        userA.getFriends().add(userB);
-        session.save(userA);
-
-        assertSameGraph(getDatabase(), "CREATE (a:User {name:'A'}) CREATE (b:User {name:'B'}) CREATE (a)-[:FRIEND]->(b)");
-
-        userA.unfriend(userB);
-        session.save(userA);
-        assertSameGraph(getDatabase(), "CREATE (a:User {name:'A'}) CREATE (b:User {name:'B'})");
-
-    }
-
+		userA.unfriend(userB);
+		session.save(userA);
+		assertSameGraph(getGraphDatabaseService(), "CREATE (a:User {name:'A'}) CREATE (b:User {name:'B'})");
+	}
 }

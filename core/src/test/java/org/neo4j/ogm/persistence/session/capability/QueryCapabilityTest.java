@@ -45,7 +45,7 @@ import org.neo4j.ogm.testutil.TestUtils;
 /**
  * @author Luanne Misquitta
  */
-public class QueryCapabilityTest extends MultiDriverTestClass {
+public abstract class QueryCapabilityTest  {
 
     private Session session;
 

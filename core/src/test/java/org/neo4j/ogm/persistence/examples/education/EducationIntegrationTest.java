@@ -13,8 +13,6 @@
 
 package org.neo4j.ogm.persistence.examples.education;
 
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
-
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -23,101 +21,94 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.domain.education.Course;
 import org.neo4j.ogm.domain.education.School;
 import org.neo4j.ogm.domain.education.Student;
 import org.neo4j.ogm.domain.education.Teacher;
-import org.neo4j.ogm.driver.Driver;
-import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author Luanne Misquitta
  */
-public class EducationIntegrationTest extends MultiDriverTestClass {
+public abstract class EducationIntegrationTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.education").openSession();
-    }
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.education").openSession();
+	}
 
-    @Test
-    public void loadingCourseByPropertyShouldNotLoadOtherEntitiesWithSamePropertyValue() {
-        //create a course
-        Course course = new Course("CompSci");
-        //create a student with the same name as the course
-        Student student = new Student("CompSci");
-        //relate them so they're both in the mappingContext
-        course.setStudents(Collections.singletonList(student));
-        session.save(course);
+	@Test
+	public void loadingCourseByPropertyShouldNotLoadOtherEntitiesWithSamePropertyValue() {
+		//create a course
+		Course course = new Course("CompSci");
+		//create a student with the same name as the course
+		Student student = new Student("CompSci");
+		//relate them so they're both in the mappingContext
+		course.setStudents(Collections.singletonList(student));
+		session.save(course);
 
-        //fetch Courses by name
-        Collection<Course> courses = session.loadAll(Course.class, new Filter("name", "CompSci"));
-        assertEquals(1,courses.size());
-        assertEquals(course,courses.iterator().next());
-        assertEquals(1,courses.iterator().next().getStudents().size());
-    }
+		//fetch Courses by name
+		Collection<Course> courses = session.loadAll(Course.class, new Filter("name", "CompSci"));
+		assertEquals(1, courses.size());
+		assertEquals(course, courses.iterator().next());
+		assertEquals(1, courses.iterator().next().getStudents().size());
+	}
 
-    /**
-     * @see DATAGRAPH-595
-     */
-    @Test
-    public void loadingASchoolWithNegativeDepthShouldLoadAllConnectedEntities() {
-        //Create students, teachers, courses and a school
-        School hogwarts = new School("Hogwarts");
+	/**
+	 * @see DATAGRAPH-595
+	 */
+	@Test
+	public void loadingASchoolWithNegativeDepthShouldLoadAllConnectedEntities() {
+		//Create students, teachers, courses and a school
+		School hogwarts = new School("Hogwarts");
 
-        Student harry = new Student("Harry Potter");
-        Student ron = new Student("Ron Weasley");
-        Student hermione = new Student("Hermione Granger");
+		Student harry = new Student("Harry Potter");
+		Student ron = new Student("Ron Weasley");
+		Student hermione = new Student("Hermione Granger");
 
-        Course transfiguration = new Course("Transfiguration");
-        transfiguration.setStudents(Arrays.asList(harry, hermione, ron));
+		Course transfiguration = new Course("Transfiguration");
+		transfiguration.setStudents(Arrays.asList(harry, hermione, ron));
 
-        Course potions = new Course("Potions");
-        potions.setStudents(Arrays.asList(ron, hermione));
+		Course potions = new Course("Potions");
+		potions.setStudents(Arrays.asList(ron, hermione));
 
-        Course dark = new Course("Defence Against The Dark Arts");
-        dark.setStudents(Collections.singletonList(harry));
+		Course dark = new Course("Defence Against The Dark Arts");
+		dark.setStudents(Collections.singletonList(harry));
 
-        Teacher minerva = new Teacher("Minerva McGonagall");
-        minerva.setCourses(Collections.singletonList(transfiguration));
-        minerva.setSchool(hogwarts);
+		Teacher minerva = new Teacher("Minerva McGonagall");
+		minerva.setCourses(Collections.singletonList(transfiguration));
+		minerva.setSchool(hogwarts);
 
-        Teacher severus = new Teacher("Severus Snape");
-        severus.setCourses(Arrays.asList(potions, dark));
-        severus.setSchool(hogwarts);
+		Teacher severus = new Teacher("Severus Snape");
+		severus.setCourses(Arrays.asList(potions, dark));
+		severus.setSchool(hogwarts);
 
-        hogwarts.setTeachers(Arrays.asList(minerva, severus));
-        session.save(hogwarts);
+		hogwarts.setTeachers(Arrays.asList(minerva, severus));
+		session.save(hogwarts);
 
-        session.clear();
-        //Load the school with depth -1
-        hogwarts = session.load(School.class,hogwarts.getId(),-1);
-        assertEquals(2, hogwarts.getTeachers().size());
-        for(Teacher teacher : hogwarts.getTeachers()) {
-            if(teacher.getName().equals("Severus Snape")) {
-                assertEquals(2, teacher.getCourses().size());
-                for(Course course : teacher.getCourses()) {
-                    if(course.getName().equals("Potions")) {
-                        assertEquals(2, course.getStudents().size());
-                    }
-                    else {
-                        assertEquals(1, course.getStudents().size());
-                    }
-                }
-            }
-            else {
-                assertEquals(1, teacher.getCourses().size());
-                assertEquals(3, teacher.getCourses().get(0).getStudents().size());
-            }
-        }
-    }
+		session.clear();
+		//Load the school with depth -1
+		hogwarts = session.load(School.class, hogwarts.getId(), -1);
+		assertEquals(2, hogwarts.getTeachers().size());
+		for (Teacher teacher : hogwarts.getTeachers()) {
+			if (teacher.getName().equals("Severus Snape")) {
+				assertEquals(2, teacher.getCourses().size());
+				for (Course course : teacher.getCourses()) {
+					if (course.getName().equals("Potions")) {
+						assertEquals(2, course.getStudents().size());
+					} else {
+						assertEquals(1, course.getStudents().size());
+					}
+				}
+			} else {
+				assertEquals(1, teacher.getCourses().size());
+				assertEquals(3, teacher.getCourses().get(0).getStudents().size());
+			}
+		}
+	}
 }

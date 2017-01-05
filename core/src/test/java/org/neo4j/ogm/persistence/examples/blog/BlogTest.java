@@ -13,9 +13,7 @@
 
 package org.neo4j.ogm.persistence.examples.blog;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -27,110 +25,107 @@ import org.neo4j.ogm.domain.blog.Comment;
 import org.neo4j.ogm.domain.blog.Post;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author Vince Bickers
  */
-public class BlogTest extends MultiDriverTestClass {
+public abstract class BlogTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.blog").openSession();
-    }
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.blog").openSession();
+	}
 
-    @Test
-    public void shouldTraverseListOfBlogPosts() {
+	@Test
+	public void shouldTraverseListOfBlogPosts() {
 
-        Post p1 = new Post("first");
-        Post p2 = new Post("second");
-        Post p3 = new Post("third");
-        Post p4 = new Post("fourth");
+		Post p1 = new Post("first");
+		Post p2 = new Post("second");
+		Post p3 = new Post("third");
+		Post p4 = new Post("fourth");
 
-        p1.setNext(p2);
-        p2.setNext(p3);
-        p3.setNext(p4);
+		p1.setNext(p2);
+		p2.setNext(p3);
+		p3.setNext(p4);
 
-        assertEquals(p1, p2.getPrevious());
+		assertEquals(p1, p2.getPrevious());
 
-        assertEquals(p2, p1.getNext());
-        assertEquals(p2, p3.getPrevious());
+		assertEquals(p2, p1.getNext());
+		assertEquals(p2, p3.getPrevious());
 
-        assertEquals(p3, p2.getNext());
-        assertEquals(p3, p4.getPrevious());
+		assertEquals(p3, p2.getNext());
+		assertEquals(p3, p4.getPrevious());
 
-        assertEquals(p4, p3.getNext());
-        assertNull(p4.getNext());
+		assertEquals(p4, p3.getNext());
+		assertNull(p4.getNext());
 
+		session.save(p1);
 
-        session.save(p1);
+		session.clear();
 
-        session.clear();
+		Post f3 = session.load(Post.class, p3.getId(), -1);
+		Post f2 = f3.getPrevious();
+		Post f1 = f2.getPrevious();
+		Post f4 = f3.getNext();
 
-        Post f3 = session.load(Post.class, p3.getId(), -1);
-        Post f2 = f3.getPrevious();
-        Post f1 = f2.getPrevious();
-        Post f4 = f3.getNext();
+		assertNull(f1.getPrevious());
+		assertEquals(p1.getId(), f2.getPrevious().getId());
+		assertEquals(p2.getId(), f3.getPrevious().getId());
+		assertEquals(p3.getId(), f4.getPrevious().getId());
 
-        assertNull(f1.getPrevious());
-        assertEquals(p1.getId(), f2.getPrevious().getId());
-        assertEquals(p2.getId(), f3.getPrevious().getId());
-        assertEquals(p3.getId(), f4.getPrevious().getId());
-
-        assertEquals(p2.getId(), f1.getNext().getId());
-        assertEquals(p3.getId(), f2.getNext().getId());
-        assertEquals(p4.getId(), f3.getNext().getId());
-        assertNull(f4.getNext());
-
-    }
+		assertEquals(p2.getId(), f1.getNext().getId());
+		assertEquals(p3.getId(), f2.getNext().getId());
+		assertEquals(p4.getId(), f3.getNext().getId());
+		assertNull(f4.getNext());
+	}
 
 	/**
-     * @see Issue #99
-     */
-    @Test
-    public void shouldDeleteAuthoredRelationship() {
-        Author author = new Author();
-        Post post = new Post();
+	 * @see Issue #99
+	 */
+	@Test
+	public void shouldDeleteAuthoredRelationship() {
+		Author author = new Author();
+		Post post = new Post();
 
-        author.posts = new HashSet<>();
-        author.posts.add(post);
-        session.save(author);
-        session.clear();
+		author.posts = new HashSet<>();
+		author.posts.add(post);
+		session.save(author);
+		session.clear();
 
-        author = session.load(Author.class, author.id);
-        author.posts.clear();
-        session.save(author);
-        session.clear();
+		author = session.load(Author.class, author.id);
+		author.posts.clear();
+		session.save(author);
+		session.clear();
 
-        author = session.load(Author.class, author.id);
+		author = session.load(Author.class, author.id);
 
-        assertTrue(author.posts == null || author.posts.size() == 0);
-    }
+		assertTrue(author.posts == null || author.posts.size() == 0);
+	}
 
-    /**
-     * @see Issue #99
-     */
-    @Test
-    public void shouldDeleteCommentsRelationship() {
-        Author author = new Author();
-        Post post = new Post();
-        Comment comment = new Comment(post, author, "Try to delete me!");
+	/**
+	 * @see Issue #99
+	 */
+	@Test
+	public void shouldDeleteCommentsRelationship() {
+		Author author = new Author();
+		Post post = new Post();
+		Comment comment = new Comment(post, author, "Try to delete me!");
 
-        author.posts = new HashSet<>();
-        author.posts.add(post);
-        author.comments.add(comment);
-        session.save(author);
-        session.clear();
+		author.posts = new HashSet<>();
+		author.posts.add(post);
+		author.comments.add(comment);
+		session.save(author);
+		session.clear();
 
-        author = session.load(Author.class, author.id);
-        author.comments.clear();
-        session.save(author);
-        session.clear();
+		author = session.load(Author.class, author.id);
+		author.comments.clear();
+		session.save(author);
+		session.clear();
 
-        author = session.load(Author.class, author.id);
+		author = session.load(Author.class, author.id);
 
-        assertTrue(author.comments == null || author.comments.size() == 0);
-    }
+		assertTrue(author.comments == null || author.comments.size() == 0);
+	}
 }

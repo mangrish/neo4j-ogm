@@ -27,7 +27,7 @@ import java.util.UUID;
 /**
  * @author vince
  */
-public class LifecycleTest extends EventTestBaseClass {
+public abstract class LifecycleTest extends EventTestBaseClass {
 
     @Test
     public void shouldSaveObjectUpdatedByPreSaveEventHandler() {

@@ -13,18 +13,16 @@
 
 package org.neo4j.ogm.persistence.examples.linkedlist;
 
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.ogm.domain.linkedlist.Item;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.Transaction;
-
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Vince Bickers
@@ -38,69 +36,64 @@ import static org.junit.Assert.assertNull;
  * <pre>
  * <code>
  * class Item {
- *
  *      @{literal @}Relationship(type='NEXT', direction=Relationship.INCOMING)
  *      Item previous;
- *
  *      @{literal @}Relationship(type='NEXT', direction=Relationship.OUTGOING)
  *      Item next;
  * }
  * </code>
  * </pre>
  */
-public class BidirectionalMappingTest extends MultiDriverTestClass {
+public abstract class BidirectionalMappingTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.linkedlist").openSession();
-    }
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.linkedlist").openSession();
+	}
 
-    /**
-     * @see DATAGRAPH-636
-     */
-    @Test
-    public void shouldLoadDoublyLinkedList() {
+	/**
+	 * @see DATAGRAPH-636
+	 */
+	@Test
+	public void shouldLoadDoublyLinkedList() {
 
-        Item first = new Item();
-        Item second = new Item();
-        Item third = new Item();
+		Item first = new Item();
+		Item second = new Item();
+		Item third = new Item();
 
-        first.next = second;
-        second.next = third;
+		first.next = second;
+		second.next = third;
 
-        session.save(first);
+		session.save(first);
 
-        session.clear();
+		session.clear();
 
-        first = session.load(Item.class, first.getId(), -1);
+		first = session.load(Item.class, first.getId(), -1);
 
-        assertEquals(second.getId(), first.next.getId());
-        assertEquals(third.getId(), first.next.next.getId());
-        assertNull(first.next.next.next);
+		assertEquals(second.getId(), first.next.getId());
+		assertEquals(third.getId(), first.next.next.getId());
+		assertNull(first.next.next.next);
 
-        assertNull(first.previous);
-        assertEquals(first.getId(), first.next.previous.getId());
-        assertEquals(second.getId(), first.next.next.previous.getId());
+		assertNull(first.previous);
+		assertEquals(first.getId(), first.next.previous.getId());
+		assertEquals(second.getId(), first.next.next.previous.getId());
+	}
 
-    }
+	@Test
+	public void shouldHandleSelfReferencingObjectOnRollback() {
 
-    @Test
-    public void shouldHandleSelfReferencingObjectOnRollback() {
+		Item item = new Item();
+		item.next = item;
+		item.previous = item;
 
-        Item item = new Item();
-        item.next = item;
-        item.previous = item;
+		try (Transaction tx = session.beginTransaction()) {
 
-        try (Transaction tx = session.beginTransaction()) {
+			session.save(item);
 
-            session.save(item);
-
-            session.deleteAll(Item.class);
-
-        }
-    }
-
+			session.deleteAll(Item.class);
+		}
+	}
 }
 
