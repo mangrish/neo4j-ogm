@@ -11,37 +11,41 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.drivers.http;
+package org.neo4j.ogm.drivers.embedded;
 
 import org.junit.AfterClass;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.ogm.drivers.AbstractDriverTestSuite;
+import org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver;
 import org.neo4j.ogm.service.Components;
-import org.neo4j.ogm.testutil.TestServer;
 
 /**
  * @author vince
  */
-public class HttpDriverTest extends AbstractDriverTestSuite {
+public class EmbeddedDriverTest extends AbstractDriverTestSuite {
 
-    private static TestServer testServer;
+    private GraphDatabaseService graphDatabaseService;
 
     @BeforeClass
-    public static void configure() {
-        Components.configure("ogm-http.properties");
-        System.out.println("Http: " + Components.neo4jVersion());
-        testServer = new TestServer.Builder().build();
+    public static void configure() throws Exception {
+		Components.configure("embedded.driver.properties");
+		AbstractDriverTestSuite.deleteExistingEmbeddedDatabase();
+		System.out.println("Embedded: " + Components.neo4jVersion());
     }
 
-    @AfterClass
+
+	@AfterClass
     public static void reset() {
-        testServer.shutdown();
         Components.destroy();
     }
 
-    @Before
+    @Override
     public void setUpTest() {
+		graphDatabaseService = ((EmbeddedDriver) Components.driver()).getGraphDatabaseService();
+		Assert.assertTrue(graphDatabaseService instanceof GraphDatabaseFacade);
     }
 
     @Override

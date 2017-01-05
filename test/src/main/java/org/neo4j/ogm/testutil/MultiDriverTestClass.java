@@ -19,9 +19,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.ogm.driver.Driver;
-import org.neo4j.ogm.drivers.bolt.driver.BoltDriver;
-import org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver;
-import org.neo4j.ogm.drivers.http.driver.HttpDriver;
 import org.neo4j.ogm.service.Components;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
@@ -41,35 +38,35 @@ public class MultiDriverTestClass {
     @BeforeClass
     public static synchronized void setupMultiDriverTestEnvironment() {
 
-        Driver driver = Components.driver(); // this will load the driver
-
-        if (driver instanceof HttpDriver ) {
-            if (Components.neo4jVersion() < 2.2) {
-                testServer = new TestServer.Builder()
-                        .enableAuthentication(false)
-                        .enableBolt(false)
-                        .transactionTimeoutSeconds(30)
-                        .build();
-            } else {
-                testServer = new TestServer.Builder()
-                        .enableAuthentication(true)
-                        .enableBolt(false)
-                        .transactionTimeoutSeconds(30)
-                        .build();
-            }
-        }
-        else if (driver instanceof BoltDriver) {
-            testServer = new TestServer.Builder()
-                    .enableBolt(true)
-                    .transactionTimeoutSeconds(30)
-                    .build();
-        }
-        else {
-            graphStore = FileUtils.createTemporaryGraphStore();
-            impermanentDb = new TestGraphDatabaseFactory().newImpermanentDatabase(graphStore);
-			logger.info("Creating new impermanent database {}", impermanentDb);
-            Components.setDriver(new EmbeddedDriver(impermanentDb));
-        }
+//        Driver driver = Components.driver(); // this will load the driver
+//
+//        if (driver instanceof HttpDriver ) {
+//            if (Components.neo4jVersion() < 2.2) {
+//                testServer = new TestServer.Builder()
+//                        .enableAuthentication(false)
+//                        .enableBolt(false)
+//                        .transactionTimeoutSeconds(30)
+//                        .build();
+//            } else {
+//                testServer = new TestServer.Builder()
+//                        .enableAuthentication(true)
+//                        .enableBolt(false)
+//                        .transactionTimeoutSeconds(30)
+//                        .build();
+//            }
+//        }
+//        else if (driver instanceof BoltDriver) {
+//            testServer = new TestServer.Builder()
+//                    .enableBolt(true)
+//                    .transactionTimeoutSeconds(30)
+//                    .build();
+//        }
+//        else {
+//            graphStore = FileUtils.createTemporaryGraphStore();
+//            impermanentDb = new TestGraphDatabaseFactory().newImpermanentDatabase(graphStore);
+//			logger.info("Creating new impermanent database {}", impermanentDb);
+//            Components.setDriver(new EmbeddedDriver(impermanentDb));
+//        }
 
     }
 

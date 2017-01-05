@@ -14,12 +14,12 @@
 
 package org.neo4j.ogm.domain.convertible.parametrized;
 
-import static org.neo4j.driver.internal.util.Iterables.map;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import org.neo4j.ogm.typeconversion.AttributeConverter;
 
 /**
@@ -34,6 +34,7 @@ public class StringMapConverter implements AttributeConverter<Map<String, String
 
 	@Override
 	public Map<String, String> toEntityAttribute(List<String> value) {
-		return map("a","1","b","2","c","3");
+
+		return ImmutableMap.of("a","1","b","2","c","3");
 	}
 }
