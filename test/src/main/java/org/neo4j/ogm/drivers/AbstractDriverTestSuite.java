@@ -52,15 +52,6 @@ public abstract class AbstractDriverTestSuite {
     public abstract void setUpTest();
     public abstract void tearDownTest();
 
-	protected static void deleteExistingEmbeddedDatabase() {
-		try {
-			FileUtils.forceDelete(new File(new URI(Components.getConfiguration().driverConfiguration().getURI())));
-		} catch (IOException ioe) {
-			// ignore - nothing to delete
-		} catch (URISyntaxException use) {
-			throw new RuntimeException(use); // invalid file URI
-		}
-	}
 
     @Before
     public void init() {

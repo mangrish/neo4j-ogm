@@ -15,6 +15,12 @@ package org.neo4j.ogm.drivers.embedded;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -37,10 +43,20 @@ public class EmbeddedDriverTest extends AbstractDriverTestSuite {
 
     private GraphDatabaseService graphDatabaseService;
 
+	protected static void deleteExistingEmbeddedDatabase() {
+		try {
+			FileUtils.forceDelete(new File(new URI(Components.getConfiguration().driverConfiguration().getURI())));
+		} catch (IOException ioe) {
+			// ignore - nothing to delete
+		} catch (URISyntaxException use) {
+			throw new RuntimeException(use); // invalid file URI
+		}
+	}
+
     @BeforeClass
     public static void configure() throws Exception {
 		Components.configure("embedded.driver.properties");
-		AbstractDriverTestSuite.deleteExistingEmbeddedDatabase();
+		deleteExistingEmbeddedDatabase();
 		System.out.println("Embedded: " + Components.neo4jVersion());
     }
 
