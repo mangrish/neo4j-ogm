@@ -36,6 +36,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Michal Bachman
  */
+@Ignore("Nothing to test in this class")
 public abstract class TxHandlerIntegrationTest  {
 
     private static SessionFactory sessionFactory;

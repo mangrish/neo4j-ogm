@@ -36,7 +36,7 @@ public class BoltDriverTest extends AbstractDriverTestSuite {
 
 	@BeforeClass
 	public static void configure() {
-		Components.configure("ogm-bolt.properties");
+		Components.configure("ogm.properties");
 		System.out.println("Bolt: " + Components.neo4jVersion());
 		if (Components.neo4jVersion() >= 3.0) {
 			testServer = new TestServer.Builder().enableBolt(true).build();
