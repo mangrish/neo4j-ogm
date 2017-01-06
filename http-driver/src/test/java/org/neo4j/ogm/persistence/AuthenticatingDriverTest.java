@@ -22,7 +22,6 @@ import org.neo4j.ogm.drivers.http.driver.HttpDriver;
 import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 import org.neo4j.ogm.transaction.Transaction;
 
 import static org.junit.Assert.*;
@@ -33,7 +32,7 @@ import static org.junit.Assume.assumeTrue;
  * @author Luanne Misquitta
  */
 
-public class AuthenticatingDriverTest extends MultiDriverTestClass {
+public class AuthenticatingDriverTest  {
 
     private Session session;
 

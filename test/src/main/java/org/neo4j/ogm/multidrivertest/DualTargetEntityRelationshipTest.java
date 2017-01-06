@@ -21,7 +21,6 @@ import org.neo4j.ogm.domain.mappings.Event;
 import org.neo4j.ogm.domain.mappings.Tag;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 import java.io.IOException;
 import java.util.Collection;

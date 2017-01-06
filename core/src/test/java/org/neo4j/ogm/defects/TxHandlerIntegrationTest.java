@@ -25,7 +25,6 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.ogm.domain.bike.WheelWithUUID;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 import java.io.IOException;
 import java.util.UUID;

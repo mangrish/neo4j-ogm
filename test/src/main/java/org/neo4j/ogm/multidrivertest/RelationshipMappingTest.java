@@ -28,7 +28,6 @@ import org.neo4j.ogm.domain.policy.Policy;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.testutil.GraphTestUtils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 
 /**

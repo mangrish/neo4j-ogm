@@ -23,7 +23,6 @@ import org.neo4j.ogm.domain.pets.Kid;
 import org.neo4j.ogm.domain.pets.Mammal;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 import java.io.IOException;
 

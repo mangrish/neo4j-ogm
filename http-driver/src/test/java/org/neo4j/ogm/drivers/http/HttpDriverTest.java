@@ -11,10 +11,13 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.http;
+package org.neo4j.ogm.drivers.http;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -22,6 +25,7 @@ import org.junit.Test;
 import org.neo4j.ogm.config.Configuration;
 import org.neo4j.ogm.config.DriverConfiguration;
 import org.neo4j.ogm.drivers.AbstractDriverTestSuite;
+import org.neo4j.ogm.drivers.http.driver.HttpDriver;
 import org.neo4j.ogm.exception.ConnectionException;
 import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.session.Session;
@@ -68,5 +72,23 @@ public class HttpDriverTest extends AbstractDriverTestSuite {
     public void shouldLoadHttpDriverConfigFromPropertiesFile() {
         DriverConfiguration driverConfig = new DriverConfiguration(new Configuration("src/test/resources/http.driver.properties"));
         assertEquals("http://neo4j:password@localhost:7474", driverConfig.getURI());
+    }
+
+    @Test
+    public void shouldInitialiseWithCustomHttpClient() {
+
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal( 1 );
+        connectionManager.setDefaultMaxPerRoute( 1 );
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setConnectionManager(connectionManager)
+                .build();
+
+
+        Components.setDriver(new HttpDriver( httpClient ));
+
+        assertNotNull(Components.driver());
+
     }
 }

@@ -1,11 +1,11 @@
 package org.neo4j.ogm.drivers.bolt;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.ogm.driver.Driver;
 import org.neo4j.ogm.multidrivertest.*;
-import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.testutil.TestServer;
 
 /**
@@ -14,12 +14,26 @@ import org.neo4j.ogm.testutil.TestServer;
 @RunWith(Enclosed.class)
 public class EnclosedBoltTests {
 
-	Driver driver = Components.driver();
 
-	private static TestServer testServer = new TestServer.Builder()
-			.enableBolt(true)
-			.transactionTimeoutSeconds(30)
-			.build();
+	private static TestServer testServer;
+
+	@BeforeClass
+	public static void oneTimeSetup() {
+		testServer = new TestServer.Builder()
+				.enableBolt(true)
+				.transactionTimeoutSeconds(30)
+				.build();
+	}
+
+	@AfterClass
+	public static synchronized void tearDownMultiDriverTestEnvironment() {
+		if (testServer != null) {
+			if (testServer.isRunning(1000)) {
+				testServer.shutdown();
+			}
+			testServer = null;
+		}
+	}
 
 	public static class BoltAutoIndexManagerTest extends AutoIndexManagerTest {
 

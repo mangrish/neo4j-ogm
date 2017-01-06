@@ -24,7 +24,6 @@ import org.neo4j.ogm.domain.cineasts.annotated.Movie;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.testutil.GraphTestUtils;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 import java.io.IOException;
 

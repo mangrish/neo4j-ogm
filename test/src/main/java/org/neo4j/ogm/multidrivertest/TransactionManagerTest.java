@@ -16,9 +16,7 @@ package org.neo4j.ogm.multidrivertest;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.neo4j.ogm.exception.TransactionManagerException;
 import org.neo4j.ogm.service.Components;
 import org.neo4j.ogm.session.Session;
@@ -36,7 +34,6 @@ import org.neo4j.ogm.transaction.Transaction;
  * @author Michal Bachman
  * @author Vince Bickers
  */
-@RunWith(MockitoJUnitRunner.class)
 public abstract class TransactionManagerTest {
 
 	@Test

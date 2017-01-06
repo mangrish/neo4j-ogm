@@ -29,7 +29,6 @@ import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.session.event.Event;
 import org.neo4j.ogm.session.event.EventListener;
 import org.neo4j.ogm.session.event.PersistenceEvent;
-import org.neo4j.ogm.testutil.MultiDriverTestClass;
 
 /**
  * @author Mihai Raulea
