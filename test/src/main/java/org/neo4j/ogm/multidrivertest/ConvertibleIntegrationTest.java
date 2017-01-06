@@ -38,7 +38,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class ConvertibleIntegrationTest {
+public class ConvertibleIntegrationTest {
 
 	private static Session session;
 

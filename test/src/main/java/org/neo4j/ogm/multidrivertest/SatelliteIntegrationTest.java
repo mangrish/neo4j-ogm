@@ -20,7 +20,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.cypher.query.SortOrder;
@@ -35,18 +36,19 @@ import org.neo4j.ogm.transaction.Transaction;
 /**
  * @author Vince Bickers
  */
-public abstract class SatelliteIntegrationTest {
+public class SatelliteIntegrationTest {
 
-	private static Session session;
+	private Session session;
 
-	@BeforeClass
-	public static void init() throws IOException {
+	@Before
+	public void init() throws IOException {
 		session = new SessionFactory("org.neo4j.ogm.domain.satellites").openSession();
-		importSatellites();
+		session.query(TestUtils.readCQLFile("org/neo4j/ogm/cql/satellites.cql").toString(), Utils.map());
 	}
 
-	private static void importSatellites() {
-		session.query(TestUtils.readCQLFile("org/neo4j/ogm/cql/satellites.cql").toString(), Utils.map());
+	@After
+	public void tearDown() {
+		session.purgeDatabase();
 	}
 
 	@Test

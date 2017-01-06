@@ -35,7 +35,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class LoadCapabilityTest {
+public class LoadCapabilityTest {
 
 	private SessionFactory sessionFactory;
 	private Session session;

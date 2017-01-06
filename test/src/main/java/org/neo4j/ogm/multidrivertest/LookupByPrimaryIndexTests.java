@@ -14,7 +14,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Mark Angrish
  */
-public abstract class LookupByPrimaryIndexTests {
+public class LookupByPrimaryIndexTests {
 
 	@Test
 	public void loadUsesPrimaryIndexWhenPresent() {

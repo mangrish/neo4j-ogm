@@ -23,7 +23,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author vince
  */
-public abstract class DeleteCapabilityTest {
+public class DeleteCapabilityTest {
 
 	private Session session = new SessionFactory("org.neo4j.ogm.domain.music").openSession();
 

@@ -31,7 +31,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class IngredientsIntegrationTest {
+public class IngredientsIntegrationTest {
 
 	private static Session session;
 

@@ -29,7 +29,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Vince Bickers
  */
-public abstract class BlogTest {
+public class BlogTest {
 
 	private Session session;
 

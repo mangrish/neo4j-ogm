@@ -26,7 +26,7 @@ import org.neo4j.ogm.session.Utils;
 /**
  * @author vince
  */
-public abstract class DirtyObjectsTest {
+public class DirtyObjectsTest {
 
 	private Neo4jSession session;
 	private SessionFactory sessionFactory;

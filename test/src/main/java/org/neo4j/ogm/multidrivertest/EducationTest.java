@@ -28,7 +28,7 @@ import org.neo4j.ogm.testutil.StubDriver;
 /**
  * @author Vince Bickers
  */
-public abstract class EducationTest {
+public class EducationTest {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.education");
 	private static final Neo4jSession session = (Neo4jSession) sessionFactory.openSession();

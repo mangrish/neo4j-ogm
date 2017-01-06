@@ -31,7 +31,7 @@ import org.neo4j.ogm.session.SessionFactory;
  *
  * @author Vince Bickers
  */
-public abstract class RelationshipEntityPartialMappingTest {
+public class RelationshipEntityPartialMappingTest {
 
 	private Session session;
 

@@ -29,7 +29,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Luanne Misquitta
  * @see Issue 161
  */
-public abstract class DualTargetRelationshipsTest {
+public class DualTargetRelationshipsTest {
 
 	private Session session;
 

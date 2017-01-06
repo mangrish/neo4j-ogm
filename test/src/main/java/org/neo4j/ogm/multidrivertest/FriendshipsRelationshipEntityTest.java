@@ -31,7 +31,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Vince Bickers
  * @author Luanne Misquitta
  */
-public abstract class FriendshipsRelationshipEntityTest {
+public class FriendshipsRelationshipEntityTest {
 
 	private Session session;
 

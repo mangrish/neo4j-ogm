@@ -29,7 +29,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Luanne Misquitta
  * @see issue #145
  */
-public abstract class EnumsScannedTest {
+public class EnumsScannedTest {
 
 	private Session session;
 

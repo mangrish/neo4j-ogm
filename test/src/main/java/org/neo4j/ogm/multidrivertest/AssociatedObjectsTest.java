@@ -13,217 +13,210 @@
 
 package org.neo4j.ogm.multidrivertest;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.neo4j.ogm.domain.filesystem.Document;
 import org.neo4j.ogm.domain.filesystem.Folder;
 import org.neo4j.ogm.session.event.Event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author vince
  */
-public abstract class AssociatedObjectsTest extends EventTestBaseClass {
+public class AssociatedObjectsTest extends EventTestBaseClass {
 
-    @Test
-    public void shouldNotFireEventsOnAssociatedFolderThatHasNotChanged() {
+	@Test
+	public void shouldNotFireEventsOnAssociatedFolderThatHasNotChanged() {
 
-        // even though the document is updated,
-        // its associated folder has not changed,
-        // so no folder save events should fire
-        a.setName("newA");
-        session.save(a);
+		// even though the document is updated,
+		// its associated folder has not changed,
+		// so no folder save events should fire
+		a.setName("newA");
+		session.save(a);
 
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
 
-        assertEquals(2, eventListener.count());
-    }
+		assertEquals(2, eventListener.count());
+	}
 
-    @Test
-    public void shouldFireEventsForAllDirtyObjectsThatAreReachableFromTheRoot() {
+	@Test
+	public void shouldFireEventsForAllDirtyObjectsThatAreReachableFromTheRoot() {
 
-        // the documents b and c are connected to a via a shared folder,
-        // so events should fire for each of a,b and c
-        a.setName("newA");
-        b.setName("newB");
-        c.setName("newC");
-        session.save(a);
+		// the documents b and c are connected to a via a shared folder,
+		// so events should fire for each of a,b and c
+		a.setName("newA");
+		b.setName("newB");
+		c.setName("newC");
+		session.save(a);
 
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(b, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(b, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(c, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(c, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(b, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(b, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(c, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(c, Event.TYPE.POST_SAVE));
 
-        assertEquals(6, eventListener.count());
+		assertEquals(6, eventListener.count());
+	}
 
-    }
+	@Test
+	public void shouldFireEventsForAssociatedObjectsWhenDeletingParentObjectWithInconsistentDomainModel() {
 
-    @Test
-    public void shouldFireEventsForAssociatedObjectsWhenDeletingParentObjectWithInconsistentDomainModel() {
+		session.delete(a);  // a has a folder object reference
 
-        session.delete(a);  // a has a folder object reference
+		// note that we're not actually changing the folder object. It still
+		// has a reference to the deleted document a. This means the domain model
+		// will be internally inconsistent. Nevertheless, because the relationship between
+		// the folder and the document has been deleted in the graph, we must
+		// fire events for the folder.
 
-        // note that we're not actually changing the folder object. It still
-        // has a reference to the deleted document a. This means the domain model
-        // will be internally inconsistent. Nevertheless, because the relationship between
-        // the folder and the document has been deleted in the graph, we must
-        // fire events for the folder.
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_DELETE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_DELETE));
 
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_DELETE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_DELETE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		assertEquals(4, eventListener.count());
+	}
 
-        assertEquals(4, eventListener.count());
+	@Test
+	public void shouldFireEventsForAssociatedObjectsWhenDeletingParentObjectWithConsistentDomainModel() {
 
+		folder.getDocuments().remove(a);
+		session.delete(a);  // a has a folder object reference
 
-    }
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_DELETE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_DELETE));
 
-    @Test
-    public void shouldFireEventsForAssociatedObjectsWhenDeletingParentObjectWithConsistentDomainModel() {
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-        folder.getDocuments().remove(a);
-        session.delete(a);  // a has a folder object reference
+		assertEquals(4, eventListener.count());
+	}
 
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_DELETE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_DELETE));
+	@Test
+	public void shouldFireEventsWhenAddNewObjectInCollectionAndSaveCollection() {
 
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		// add a new document to an existing folder and save the document
+		Document z = new Document();
+		z.setFolder(folder);
+		folder.getDocuments().add(z);
 
-        assertEquals(4, eventListener.count());
+		session.save(folder);
 
-    }
+		assertTrue(eventListener.captured(z, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(z, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-    @Test
-    public void shouldFireEventsWhenAddNewObjectInCollectionAndSaveCollection() {
+		assertEquals(4, eventListener.count());
+	}
 
-        // add a new document to an existing folder and save the document
-        Document z = new Document();
-        z.setFolder(folder);
-        folder.getDocuments().add(z);
+	@Test
+	public void shouldFireEventsWhenAddNewObjectToCollectionAndSaveNewObject() {
 
-        session.save(folder);
+		// add a new document to an existing folder and save the document
+		Document z = new Document();
+		z.setFolder(folder);
+		folder.getDocuments().add(z);
 
-        assertTrue(eventListener.captured(z, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(z, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		session.save(z);
 
-        assertEquals(4, eventListener.count());
-    }
+		assertTrue(eventListener.captured(z, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(z, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-    @Test
-    public void shouldFireEventsWhenAddNewObjectToCollectionAndSaveNewObject() {
+		assertEquals(4, eventListener.count());
+	}
 
-        // add a new document to an existing folder and save the document
-        Document z = new Document();
-        z.setFolder(folder);
-        folder.getDocuments().add(z);
+	@Test
+	public void shouldFireEventsWhenAddExistingObjectToCollectionAndSaveExistingObject() {
 
-        session.save(z);
+		d.setFolder(folder);
+		folder.getDocuments().add(d);
 
-        assertTrue(eventListener.captured(z, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(z, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		session.save(d);
 
-        assertEquals(4, eventListener.count());
-    }
+		assertTrue(eventListener.captured(d, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(d, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-    @Test
-    public void shouldFireEventsWhenAddExistingObjectToCollectionAndSaveExistingObject() {
+		assertEquals(4, eventListener.count());
+	}
 
-        d.setFolder(folder);
-        folder.getDocuments().add(d);
+	@Test
+	public void shouldFireEventsWhenSetAssociatedObjectToNewAnonymousObject() {
 
-        session.save(d);
+		a.setFolder(new Folder());
+		folder.getDocuments().remove(a);
 
-        assertTrue(eventListener.captured(d, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(d, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		session.save(a);
 
-        assertEquals(4, eventListener.count());
+		// events for creation of new object
+		assertTrue(eventListener.captured(new Folder(), Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(new Folder(), Event.TYPE.POST_SAVE));
 
-    }
+		// events for update of a's folder relationship
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
 
-    @Test
-    public void shouldFireEventsWhenSetAssociatedObjectToNewAnonymousObject() {
+		// events for updates of folder's relationship to a
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-        a.setFolder(new Folder());
-        folder.getDocuments().remove(a);
+		assertEquals(6, eventListener.count());
+	}
 
-        session.save(a);
+	@Test
+	public void shouldFireEventsWhenAddExistingObjectToCollectionAndSaveCollection() {
 
-        // events for creation of new object
-        assertTrue(eventListener.captured(new Folder(), Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(new Folder(), Event.TYPE.POST_SAVE));
+		assertNull(d.getFolder());
 
-        // events for update of a's folder relationship
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
+		d.setFolder(folder);
+		folder.getDocuments().add(d);
 
-        // events for updates of folder's relationship to a
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		session.save(folder);
 
-        assertEquals(6, eventListener.count());
-    }
+		assertTrue(eventListener.captured(d, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(d, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
 
-    @Test
-    public void shouldFireEventsWhenAddExistingObjectToCollectionAndSaveCollection() {
+		assertEquals(4, eventListener.count());
+	}
 
-        assertNull(d.getFolder());
+	@Test
+	public void shouldFireEventsWhenItemDisassociatedFromContainerAndSaveContainer() {
 
-        d.setFolder(folder);
-        folder.getDocuments().add(d);
+		folder.getDocuments().remove(a);
+		a.setFolder(null);
 
-        session.save(folder);
+		session.save(folder);
 
-        assertTrue(eventListener.captured(d, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(d, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
 
-        assertEquals(4, eventListener.count());
-    }
+		assertEquals(4, eventListener.count());
+	}
 
-    @Test
-    public void shouldFireEventsWhenItemDisassociatedFromContainerAndSaveContainer() {
+	@Test
+	public void shouldFireEventsWhenItemDisassociatedFromContainerAndSaveItem() {
 
-        folder.getDocuments().remove(a);
-        a.setFolder(null);
+		folder.getDocuments().remove(a);
+		a.setFolder(null);
 
-        session.save(folder);
+		session.save(a);
 
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
 
-        assertEquals(4, eventListener.count());
-    }
-
-    @Test
-    public void shouldFireEventsWhenItemDisassociatedFromContainerAndSaveItem() {
-
-        folder.getDocuments().remove(a);
-        a.setFolder(null);
-
-        session.save(a);
-
-        assertTrue(eventListener.captured(folder, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(folder, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(a, Event.TYPE.POST_SAVE));
-
-        assertEquals(4, eventListener.count());
-    }
+		assertEquals(4, eventListener.count());
+	}
 }

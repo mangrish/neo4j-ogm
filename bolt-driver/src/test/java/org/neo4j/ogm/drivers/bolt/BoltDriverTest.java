@@ -13,6 +13,7 @@
 
 package org.neo4j.ogm.drivers.bolt;
 
+import static org.junit.Assert.fail;
 import static org.junit.Assume.*;
 
 import org.junit.AfterClass;
@@ -36,11 +37,12 @@ public class BoltDriverTest extends AbstractDriverTestSuite {
 
 	@BeforeClass
 	public static void configure() {
-		Components.configure("ogm.properties");
 		System.out.println("Bolt: " + Components.neo4jVersion());
-		if (Components.neo4jVersion() >= 3.0) {
-			testServer = new TestServer.Builder().enableBolt(true).build();
+		if (Components.neo4jVersion() < 3.0) {
+			fail("Bolt can only run with Neo4j 3.0+");
 		}
+		testServer = new TestServer.Builder().enableBolt(true).build();
+
 	}
 
 	@AfterClass

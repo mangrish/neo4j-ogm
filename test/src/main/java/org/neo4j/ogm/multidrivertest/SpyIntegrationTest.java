@@ -27,7 +27,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class SpyIntegrationTest {
+public class SpyIntegrationTest {
 
 	private Session session;
 

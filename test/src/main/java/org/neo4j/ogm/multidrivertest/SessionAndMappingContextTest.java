@@ -20,7 +20,7 @@ import org.neo4j.ogm.transaction.Transaction;
  * @author Mihai Raulea
  * @see ISSUE-86
  */
-public abstract class SessionAndMappingContextTest {
+public class SessionAndMappingContextTest {
 
 	// i need a Neo4jSession because the session interface does not define the context() method
 	private Neo4jSession session;

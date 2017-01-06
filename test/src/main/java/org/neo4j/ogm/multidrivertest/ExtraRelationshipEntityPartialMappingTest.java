@@ -13,6 +13,8 @@
 
 package org.neo4j.ogm.multidrivertest;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -21,8 +23,6 @@ import org.neo4j.ogm.domain.cineasts.minimum.Movie;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.testutil.GraphTestUtils;
-
-import java.io.IOException;
 
 /**
  * The purpose of these tests is to describe the behaviour of the
@@ -49,7 +49,6 @@ public abstract class ExtraRelationshipEntityPartialMappingTest {
 
 		Actor keanu = new Actor("Keanu Reeves");
 		Movie matrix = new Movie("The Matrix");
-
 
 		// note: this does not establish a role relationsip on the matrix
 		keanu.addRole("Neo", matrix);

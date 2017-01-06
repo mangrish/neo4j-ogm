@@ -11,7 +11,7 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.multidrivertest;
+package org.neo4j.ogm.multidrivertest.relationships.ab;
 
 import static org.junit.Assert.*;
 
@@ -21,25 +21,27 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.multidrivertest.relationships.RelationshipTrait;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
 /**
  * @author Vince Bickers
- * @author Luanne Misquitta
  */
-public abstract class ExtraABTest {
+public class ABTest extends RelationshipTrait {
 
-	private static SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.relationships.transitive.ab");
+	private static SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.multidrivertest.relationships.ab");
+
 	private Session session;
 	private A a;
 	private B b;
-	private R r;
 
 	@Before
 	public void init() throws IOException {
 		session = sessionFactory.openSession();
+		session.purgeDatabase();
 		setUpEntityModel();
 	}
 
@@ -49,16 +51,10 @@ public abstract class ExtraABTest {
 	}
 
 	private void setUpEntityModel() {
-
 		a = new A();
 		b = new B();
-		r = new R();
-
-		r.a = a;
-		r.b = b;
-
-		a.r = r;
-		b.r = r;
+		a.b = b;
+		b.a = a;
 	}
 
 	@Test
@@ -67,8 +63,7 @@ public abstract class ExtraABTest {
 		session.save(b);
 
 		a = session.load(A.class, a.id);
-
-		assertEquals(b, a.r.b);
+		assertEquals(b, a.b);
 	}
 
 	@Test
@@ -77,8 +72,7 @@ public abstract class ExtraABTest {
 		session.save(a);
 
 		b = session.load(B.class, b.id);
-
-		assertEquals(a, b.r.a);
+		assertEquals(a, b.a);
 	}
 
 	@Test
@@ -86,125 +80,41 @@ public abstract class ExtraABTest {
 
 		session.save(a);
 
-		// given that we remove the relationship
-
-		b.r = null;
-		a.r = null;
-
+		// given that we remove relationship from b's side
+		b.a = null;
 		session.save(b);
 
 		// when we reload a
 		a = session.load(A.class, a.id);
 
 		// expect the relationship to have gone.
-		assertNull(a.r);
-	}
-
-	/**
-	 * @see DATAGRAPH-714
-	 */
-	@Test
-	public void shouldBeAbleToUpdateRBySavingA() {
-		A a1 = new A();
-		B b3 = new B();
-		R r3 = new R();
-		r3.a = a1;
-		r3.b = b3;
-		r3.number = 1;
-		a1.r = r3;
-		b3.r = r3;
-
-		session.save(a1);
-		r3.number = 2;
-		session.save(a1);
-
-		session.clear();
-		b3 = session.load(B.class, b3.id);
-		assertEquals(2, b3.r.number);
-	}
-
-	/**
-	 * @see DATAGRAPH-714
-	 */
-	@Test
-	public void shouldBeAbleToUpdateRBySavingB() {
-		A a1 = new A();
-		B b3 = new B();
-		R r3 = new R();
-		r3.a = a1;
-		r3.b = b3;
-		r3.number = 1;
-		a1.r = r3;
-		b3.r = r3;
-
-		session.save(a1);
-		r3.number = 2;
-		session.save(b3);
-
-		session.clear();
-		b3 = session.load(B.class, b3.id);
-		assertEquals(2, b3.r.number);
-	}
-
-	/**
-	 * @see DATAGRAPH-714
-	 */
-	@Test
-	public void shouldBeAbleToUpdateRBySavingR() {
-		A a1 = new A();
-		B b3 = new B();
-		R r3 = new R();
-		r3.a = a1;
-		r3.b = b3;
-		r3.number = 1;
-		a1.r = r3;
-		b3.r = r3;
-
-		session.save(a1);
-		r3.number = 2;
-		session.save(r3);
-
-		session.clear();
-		b3 = session.load(B.class, b3.id);
-		assertEquals(2, b3.r.number);
+		assertNull(a.b);
 	}
 
 	@NodeEntity(label = "A")
 	public static class A extends E {
 
 		@Relationship(type = "EDGE", direction = Relationship.OUTGOING)
-		R r;
+		B b;
+
+		public A() {
+		}
 	}
 
 	@NodeEntity(label = "B")
 	public static class B extends E {
 
 		@Relationship(type = "EDGE", direction = Relationship.INCOMING)
-		R r;
-	}
-
-	@RelationshipEntity(type = "EDGE")
-	public static class R {
-
-		Long id;
-
-		@StartNode
 		A a;
-		@EndNode
-		B b;
 
-		int number;
-
-		@Override
-		public String toString() {
-			return this.getClass().getSimpleName() + ":" + a.id + "->" + b.id;
+		public B() {
 		}
 	}
 
 	/**
 	 * Can be used as the basic class at the root of any entity for these tests,
-	 * provides the mandatory id field, a unique ref, a simple to-string method
-	 * and equals/hashcode implementation.
+	 * provides the mandatory id field, a simple to-string method
+	 * and equals/hashcode.
 	 * <p/>
 	 * Note that without an equals/hashcode implementation, reloading
 	 * an object which already has a collection of items in it

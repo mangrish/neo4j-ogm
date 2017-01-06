@@ -37,7 +37,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class SaveCapabilityTest {
+public class SaveCapabilityTest {
 
 	private Session session;
 	private Artist aerosmith;

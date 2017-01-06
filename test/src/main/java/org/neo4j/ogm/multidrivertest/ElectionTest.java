@@ -35,7 +35,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author vince
  * @See DATAGRAPH-689
  */
-public abstract class ElectionTest {
+public class ElectionTest {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.election");
 

@@ -40,7 +40,7 @@ import org.neo4j.ogm.testutil.TestUtils;
  * @author Adam George
  * @author Mark Angrish
  */
-public abstract class CineastsIntegrationTest {
+public class CineastsIntegrationTest {
 
 	private static Session session;
 

@@ -31,7 +31,7 @@ import org.neo4j.ogm.session.Utils;
 /**
  * @author Luanne Misquitta
  */
-public abstract class TreeIntegrationTest {
+public class TreeIntegrationTest {
 
 	private Session session;
 

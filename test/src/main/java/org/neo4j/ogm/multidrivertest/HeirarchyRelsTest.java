@@ -13,7 +13,7 @@
 
 package org.neo4j.ogm.multidrivertest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ import org.neo4j.ogm.transaction.Transaction;
 /**
  * @author Luanne Misquitta
  */
-public abstract class HeirarchyRelsTest  {
+public class HeirarchyRelsTest {
 
 	private Session session;
 

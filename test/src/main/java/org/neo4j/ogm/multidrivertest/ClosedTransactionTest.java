@@ -30,7 +30,7 @@ import org.neo4j.ogm.transaction.Transaction;
  *
  * @author vince
  */
-public abstract class ClosedTransactionTest {
+public class ClosedTransactionTest {
 
 
 	private final SessionFactory sessionFactory = new SessionFactory("");

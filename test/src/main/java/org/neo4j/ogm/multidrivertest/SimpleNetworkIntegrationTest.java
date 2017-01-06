@@ -30,7 +30,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author vince
  */
-public abstract class SimpleNetworkIntegrationTest {
+public class SimpleNetworkIntegrationTest {
 
 	private Session session;
 

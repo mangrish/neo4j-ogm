@@ -397,7 +397,7 @@ public abstract class ClassHierarchiesIntegrationTest {
 	@Test
 	public void plainChildWithAnnotatedSuperInterface() {
 		/*
-        PlainChildWithAnnotatedSuperInterface->PlainInterfaceChildWithAnnotatedParentInterface->AnnotatedInterface
+		PlainChildWithAnnotatedSuperInterface->PlainInterfaceChildWithAnnotatedParentInterface->AnnotatedInterface
          */
 		session.save(new PlainChildWithAnnotatedSuperInterface());
 

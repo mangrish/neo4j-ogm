@@ -13,83 +13,78 @@
 
 package org.neo4j.ogm.multidrivertest;
 
-import org.junit.Test;
-import org.neo4j.ogm.domain.cineasts.annotated.Knows;
-import org.neo4j.ogm.session.event.Event;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.neo4j.ogm.domain.cineasts.annotated.Knows;
+import org.neo4j.ogm.session.event.Event;
 
 /**
  * @author vince
  */
-public abstract class RelationshipEntityTest extends EventTestBaseClass {
+public class RelationshipEntityTest extends EventTestBaseClass {
 
 
-    @Test
-    public void shouldNotFireEventsIfObjectHasNotChanged() {
+	@Test
+	public void shouldNotFireEventsIfObjectHasNotChanged() {
 
-        session.save(folder);
-        assertEquals(0, eventListener.count());
-    }
+		session.save(folder);
+		assertEquals(0, eventListener.count());
+	}
 
-    @Test
-    public void shouldFireEventsWhenUpdatingRelationshipEntity() {
+	@Test
+	public void shouldFireEventsWhenUpdatingRelationshipEntity() {
 
-        Random r = new Random();
-        knowsJL.setSince((new Date((long) (1293861599 + r.nextDouble() * 60 * 60 * 24 * 365))));
+		Random r = new Random();
+		knowsJL.setSince((new Date((long) (1293861599 + r.nextDouble() * 60 * 60 * 24 * 365))));
 
-        session.save(knowsJL);
+		session.save(knowsJL);
 
-        assertTrue(eventListener.captured(knowsJL, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(knowsJL, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(knowsJL, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(knowsJL, Event.TYPE.POST_SAVE));
 
-        assertEquals(2, eventListener.count());
+		assertEquals(2, eventListener.count());
+	}
 
+	@Test
+	public void shouldFireEventsWhenDeletingRelationshipEntity() {
 
-    }
+		session.delete(knowsJL);
 
-    @Test
-    public void shouldFireEventsWhenDeletingRelationshipEntity() {
+		assertTrue(eventListener.captured(knowsJL, Event.TYPE.PRE_DELETE));
+		assertTrue(eventListener.captured(knowsJL, Event.TYPE.POST_DELETE));
 
-        session.delete(knowsJL);
+		assertTrue(eventListener.captured(jim, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(jim, Event.TYPE.POST_SAVE));
 
-        assertTrue(eventListener.captured(knowsJL, Event.TYPE.PRE_DELETE));
-        assertTrue(eventListener.captured(knowsJL, Event.TYPE.POST_DELETE));
+		assertTrue(eventListener.captured(lee, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(lee, Event.TYPE.POST_SAVE));
 
-        assertTrue(eventListener.captured(jim, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(jim, Event.TYPE.POST_SAVE));
+		assertEquals(6, eventListener.count());
+	}
 
-        assertTrue(eventListener.captured(lee, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(lee, Event.TYPE.POST_SAVE));
+	@Test
+	public void shouldFireEventsWhenCreatingRelationshipEntity() {
 
-        assertEquals(6, eventListener.count());
+		Knows knowsBS = new Knows();
 
-    }
+		knowsBS.setFirstActor(bruce);
+		knowsBS.setSecondActor(stan);
 
-    @Test
-    public void shouldFireEventsWhenCreatingRelationshipEntity() {
+		bruce.getKnows().add(knowsBS);
 
-        Knows knowsBS = new Knows();
+		session.save(bruce);
 
-        knowsBS.setFirstActor(bruce);
-        knowsBS.setSecondActor(stan);
+		assertTrue(eventListener.captured(knowsBS, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(knowsBS, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(bruce, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(bruce, Event.TYPE.POST_SAVE));
+		assertTrue(eventListener.captured(stan, Event.TYPE.PRE_SAVE));
+		assertTrue(eventListener.captured(stan, Event.TYPE.POST_SAVE));
 
-        bruce.getKnows().add(knowsBS);
-
-        session.save(bruce);
-
-        assertTrue(eventListener.captured(knowsBS, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(knowsBS, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(bruce, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(bruce, Event.TYPE.POST_SAVE));
-        assertTrue(eventListener.captured(stan, Event.TYPE.PRE_SAVE));
-        assertTrue(eventListener.captured(stan, Event.TYPE.POST_SAVE));
-
-        assertEquals(6, eventListener.count());
-    }
-
+		assertEquals(6, eventListener.count());
+	}
 }

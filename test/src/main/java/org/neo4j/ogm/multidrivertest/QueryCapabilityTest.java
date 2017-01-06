@@ -13,18 +13,10 @@
 
 package org.neo4j.ogm.multidrivertest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,194 +36,191 @@ import org.neo4j.ogm.testutil.TestUtils;
 /**
  * @author Luanne Misquitta
  */
-public abstract class QueryCapabilityTest  {
+public class QueryCapabilityTest {
 
-    private Session session;
+	private Session session;
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.cineasts.annotated").openSession();
-        session.purgeDatabase();
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.cineasts.annotated").openSession();
+		session.purgeDatabase();
 		session.clear();
-        importCineasts();
-    }
+		importCineasts();
+	}
 
-    private void importCineasts() {
-        session.query(TestUtils.readCQLFile("org/neo4j/ogm/cql/cineasts.cql").toString(), Utils.map());
-    }
+	private void importCineasts() {
+		session.query(TestUtils.readCQLFile("org/neo4j/ogm/cql/cineasts.cql").toString(), Utils.map());
+	}
 
-    @After
-    public void clearDatabase() {
-        session.purgeDatabase();
-    }
+	@After
+	public void clearDatabase() {
+		session.purgeDatabase();
+	}
 
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test
-    public void shouldQueryForArbitraryDataUsingBespokeParameterisedCypherQuery() {
-        session.save(new Actor("Helen Mirren"));
-        Actor alec = new Actor("Alec Baldwin");
-        session.save(alec);
-        session.save(new Actor("Matt Damon"));
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test
+	public void shouldQueryForArbitraryDataUsingBespokeParameterisedCypherQuery() {
+		session.save(new Actor("Helen Mirren"));
+		Actor alec = new Actor("Alec Baldwin");
+		session.save(alec);
+		session.save(new Actor("Matt Damon"));
 
-        Iterable<Map<String, Object>> resultsIterable = session.query("MATCH (a:Actor) WHERE ID(a)={param} RETURN a.name as name",
-                Collections.<String, Object>singletonMap("param", alec.getId())); //make sure the change is backward compatible
-        assertNotNull("Results are empty", resultsIterable);
-        Map<String, Object> row = resultsIterable.iterator().next();
-        assertEquals("Alec Baldwin", row.get("name"));
+		Iterable<Map<String, Object>> resultsIterable = session.query("MATCH (a:Actor) WHERE ID(a)={param} RETURN a.name as name",
+				Collections.<String, Object>singletonMap("param", alec.getId())); //make sure the change is backward compatible
+		assertNotNull("Results are empty", resultsIterable);
+		Map<String, Object> row = resultsIterable.iterator().next();
+		assertEquals("Alec Baldwin", row.get("name"));
 
-        Result results = session.query("MATCH (a:Actor) WHERE ID(a)={param} RETURN a.name as name",
-                Collections.<String, Object>singletonMap("param", alec.getId()));
-        assertNotNull("Results are empty", results);
-        assertEquals("Alec Baldwin", results.iterator().next().get("name"));
-    }
-
-
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test(expected = RuntimeException.class)
-    public void readOnlyQueryMustBeReadOnly() {
-        session.save(new Actor("Jeff"));
-        session.query("MATCH (a:Actor) SET a.age={age}", MapUtil.map("age", 5), true);
-    }
+		Result results = session.query("MATCH (a:Actor) WHERE ID(a)={param} RETURN a.name as name",
+				Collections.<String, Object>singletonMap("param", alec.getId()));
+		assertNotNull("Results are empty", results);
+		assertEquals("Alec Baldwin", results.iterator().next().get("name"));
+	}
 
 
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test
-    public void modifyingQueryShouldReturnStatistics() {
-        session.save(new Actor("Jeff"));
-        session.save(new Actor("John"));
-        session.save(new Actor("Colin"));
-        Result result = session.query("MATCH (a:Actor) SET a.age={age}", MapUtil.map("age", 5), false);
-        assertNotNull(result);
-        assertNotNull(result.queryStatistics());
-        assertEquals(3, result.queryStatistics().getPropertiesSet());
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test(expected = RuntimeException.class)
+	public void readOnlyQueryMustBeReadOnly() {
+		session.save(new Actor("Jeff"));
+		session.query("MATCH (a:Actor) SET a.age={age}", MapUtil.map("age", 5), true);
+	}
 
 
-        result = session.query("MATCH (a:Actor) SET a.age={age}", MapUtil.map("age", 5));
-        assertNotNull(result);
-        assertNotNull(result.queryStatistics());
-        assertEquals(3, result.queryStatistics().getPropertiesSet());
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test
+	public void modifyingQueryShouldReturnStatistics() {
+		session.save(new Actor("Jeff"));
+		session.save(new Actor("John"));
+		session.save(new Actor("Colin"));
+		Result result = session.query("MATCH (a:Actor) SET a.age={age}", MapUtil.map("age", 5), false);
+		assertNotNull(result);
+		assertNotNull(result.queryStatistics());
+		assertEquals(3, result.queryStatistics().getPropertiesSet());
 
-    }
+		result = session.query("MATCH (a:Actor) SET a.age={age}", MapUtil.map("age", 5));
+		assertNotNull(result);
+		assertNotNull(result.queryStatistics());
+		assertEquals(3, result.queryStatistics().getPropertiesSet());
+	}
 
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test
-    public void modifyingQueryShouldReturnResultsWithStatistics() {
-        session.save(new Actor("Jeff"));
-        session.save(new Actor("John"));
-        session.save(new Actor("Colin"));
-        Result result = session.query("MATCH (a:Actor) SET a.age={age} RETURN a.name", MapUtil.map("age", 5), false);
-        assertNotNull(result);
-        assertNotNull(result.queryStatistics());
-        assertEquals(3, result.queryStatistics().getPropertiesSet());
-        List<String> names = new ArrayList<>();
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test
+	public void modifyingQueryShouldReturnResultsWithStatistics() {
+		session.save(new Actor("Jeff"));
+		session.save(new Actor("John"));
+		session.save(new Actor("Colin"));
+		Result result = session.query("MATCH (a:Actor) SET a.age={age} RETURN a.name", MapUtil.map("age", 5), false);
+		assertNotNull(result);
+		assertNotNull(result.queryStatistics());
+		assertEquals(3, result.queryStatistics().getPropertiesSet());
+		List<String> names = new ArrayList<>();
 
-        Iterator<Map<String, Object>> namesIterator = result.queryResults().iterator();
-        while (namesIterator.hasNext()) {
-            names.add((String) namesIterator.next().get("a.name"));
-        }
+		Iterator<Map<String, Object>> namesIterator = result.queryResults().iterator();
+		while (namesIterator.hasNext()) {
+			names.add((String) namesIterator.next().get("a.name"));
+		}
 
-        assertEquals(3, names.size());
-        assertTrue(names.contains("Jeff"));
-        assertTrue(names.contains("John"));
-        assertTrue(names.contains("Colin"));
+		assertEquals(3, names.size());
+		assertTrue(names.contains("Jeff"));
+		assertTrue(names.contains("John"));
+		assertTrue(names.contains("Colin"));
 
-        result = session.query("MATCH (a:Actor) SET a.age={age} RETURN a.name, a.age", MapUtil.map("age", 5));
-        assertNotNull(result);
-        assertNotNull(result.queryStatistics());
-        assertEquals(3, result.queryStatistics().getPropertiesSet());
-        names = new ArrayList<>();
+		result = session.query("MATCH (a:Actor) SET a.age={age} RETURN a.name, a.age", MapUtil.map("age", 5));
+		assertNotNull(result);
+		assertNotNull(result.queryStatistics());
+		assertEquals(3, result.queryStatistics().getPropertiesSet());
+		names = new ArrayList<>();
 
-        namesIterator = result.queryResults().iterator();
-        while (namesIterator.hasNext()) {
-            Map<String, Object> row = namesIterator.next();
-            names.add((String) row.get("a.name"));
-            assertEquals(5l, ((Number)row.get("a.age")).longValue());
-        }
+		namesIterator = result.queryResults().iterator();
+		while (namesIterator.hasNext()) {
+			Map<String, Object> row = namesIterator.next();
+			names.add((String) row.get("a.name"));
+			assertEquals(5l, ((Number) row.get("a.age")).longValue());
+		}
 
-        assertEquals(3, names.size());
-        assertTrue(names.contains("Jeff"));
-        assertTrue(names.contains("John"));
-        assertTrue(names.contains("Colin"));
-    }
+		assertEquals(3, names.size());
+		assertTrue(names.contains("Jeff"));
+		assertTrue(names.contains("John"));
+		assertTrue(names.contains("Colin"));
+	}
 
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test
-    public void readOnlyQueryShouldNotReturnStatistics() {
-        session.save(new Actor("Jeff"));
-        session.save(new Actor("John"));
-        session.save(new Actor("Colin"));
-        Result result = session.query("MATCH (a:Actor) RETURN a.name", Collections.EMPTY_MAP, true);
-        assertNotNull(result);
-        assertNull(result.queryStatistics());
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test
+	public void readOnlyQueryShouldNotReturnStatistics() {
+		session.save(new Actor("Jeff"));
+		session.save(new Actor("John"));
+		session.save(new Actor("Colin"));
+		Result result = session.query("MATCH (a:Actor) RETURN a.name", Collections.EMPTY_MAP, true);
+		assertNotNull(result);
+		assertNull(result.queryStatistics());
 
-        List<String> names = new ArrayList<>();
+		List<String> names = new ArrayList<>();
 
-        Iterator<Map<String, Object>> namesIterator = result.queryResults().iterator();
-        while (namesIterator.hasNext()) {
-            names.add((String) namesIterator.next().get("a.name"));
-        }
+		Iterator<Map<String, Object>> namesIterator = result.queryResults().iterator();
+		while (namesIterator.hasNext()) {
+			names.add((String) namesIterator.next().get("a.name"));
+		}
 
-        assertEquals(3, names.size());
-        assertTrue(names.contains("Jeff"));
-        assertTrue(names.contains("John"));
-        assertTrue(names.contains("Colin"));
+		assertEquals(3, names.size());
+		assertTrue(names.contains("Jeff"));
+		assertTrue(names.contains("John"));
+		assertTrue(names.contains("Colin"));
+	}
 
-    }
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test
+	public void modifyingQueryShouldBePermittedWhenQueryingForObject() {
+		session.save(new Actor("Jeff"));
+		session.save(new Actor("John"));
+		session.save(new Actor("Colin"));
+		Actor jeff = session.queryForObject(Actor.class, "MATCH (a:Actor {name:{name}}) set a.age={age} return a", MapUtil.map("name", "Jeff", "age", 40));
+		assertNotNull(jeff);
+		assertEquals("Jeff", jeff.getName());
+	}
 
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test
-    public void modifyingQueryShouldBePermittedWhenQueryingForObject() {
-        session.save(new Actor("Jeff"));
-        session.save(new Actor("John"));
-        session.save(new Actor("Colin"));
-        Actor jeff = session.queryForObject(Actor.class, "MATCH (a:Actor {name:{name}}) set a.age={age} return a", MapUtil.map("name", "Jeff", "age", 40));
-        assertNotNull(jeff);
-        assertEquals("Jeff", jeff.getName());
-    }
+	/**
+	 * @see DATAGRAPH-697
+	 */
+	@Test
+	public void modifyingQueryShouldBePermittedWhenQueryingForObjects() {
+		session.save(new Actor("Jeff"));
+		session.save(new Actor("John"));
+		session.save(new Actor("Colin"));
+		Iterable<Actor> actors = session.query(Actor.class, "MATCH (a:Actor) set a.age={age} return a", MapUtil.map("age", 40));
+		assertNotNull(actors);
 
-    /**
-     * @see DATAGRAPH-697
-     */
-    @Test
-    public void modifyingQueryShouldBePermittedWhenQueryingForObjects() {
-        session.save(new Actor("Jeff"));
-        session.save(new Actor("John"));
-        session.save(new Actor("Colin"));
-        Iterable<Actor> actors = session.query(Actor.class, "MATCH (a:Actor) set a.age={age} return a", MapUtil.map("age", 40));
-        assertNotNull(actors);
+		List<String> names = new ArrayList<>();
 
-        List<String> names = new ArrayList<>();
+		Iterator<Actor> actorIterator = actors.iterator();
+		while (actorIterator.hasNext()) {
+			names.add(actorIterator.next().getName());
+		}
 
-        Iterator<Actor> actorIterator = actors.iterator();
-        while (actorIterator.hasNext()) {
-            names.add(actorIterator.next().getName());
-        }
+		assertEquals(3, names.size());
+		assertTrue(names.contains("Jeff"));
+		assertTrue(names.contains("John"));
+		assertTrue(names.contains("Colin"));
+	}
 
-        assertEquals(3, names.size());
-        assertTrue(names.contains("Jeff"));
-        assertTrue(names.contains("John"));
-        assertTrue(names.contains("Colin"));
-    }
-
-    @Test
-    public void shouldBeAbleToHandleNullValuesInQueryResults() {
-        session.save(new Actor("Jeff"));
-        Iterable<Map<String,Object>> results = session.query("MATCH (a:Actor) return a.nonExistent as nonExistent", Collections.EMPTY_MAP);
-        Map<String,Object> result = results.iterator().next();
-        assertNull(result.get("nonExistent"));
-    }
+	@Test
+	public void shouldBeAbleToHandleNullValuesInQueryResults() {
+		session.save(new Actor("Jeff"));
+		Iterable<Map<String, Object>> results = session.query("MATCH (a:Actor) return a.nonExistent as nonExistent", Collections.EMPTY_MAP);
+		Map<String, Object> result = results.iterator().next();
+		assertNull(result.get("nonExistent"));
+	}
 
 	/**
 	 * @see DATAGRAPH-700
@@ -430,7 +419,7 @@ public abstract class QueryCapabilityTest  {
 		assertNotNull(user);
 		assertEquals("Vince", user.getName());
 
-		List<Rating> ratings = (List)result.get("r");
+		List<Rating> ratings = (List) result.get("r");
 		if (ratings.size() == 1) { //because the list of ratings with size 2= friends,rated relationships
 			Rating rating = ratings.get(0);
 			assertNotNull(rating);
@@ -453,7 +442,7 @@ public abstract class QueryCapabilityTest  {
 		assertNotNull(user);
 		assertEquals("Vince", user.getName());
 
-		ratings = (List)result.get("r");
+		ratings = (List) result.get("r");
 		if (ratings.size() == 1) { //because the list of ratings with size 2= friends,rated relationships
 			Rating rating = ratings.get(0);
 			assertNotNull(rating);
@@ -464,7 +453,6 @@ public abstract class QueryCapabilityTest  {
 		}
 		assertTrue(ratedRelationshipFound);
 		assertNull(user.getFriends());
-
 	}
 
 	/**
@@ -477,7 +465,7 @@ public abstract class QueryCapabilityTest  {
 		Map<String, Object> result = results.next();
 		assertNotNull(result);
 		boolean foundMichal = false;
-        /*
+		/*
             Expect 3 rows:
              one with (vince)-[:FRIENDS]-(michal)
              one with (vince)-[:RATED]-(top gear)
@@ -498,7 +486,6 @@ public abstract class QueryCapabilityTest  {
 		foundMichal = checkForMichal(result, foundMichal);
 
 		assertTrue(foundMichal);
-
 	}
 
 	/**
@@ -510,7 +497,7 @@ public abstract class QueryCapabilityTest  {
 		assertNotNull(results);
 		Map<String, Object> result = results.next();
 		assertNotNull(result);
-		assertEquals("Michal", ((User)result.get("user")).getName());
+		assertEquals("Michal", ((User) result.get("user")).getName());
 
 		List<Rating> ratings = (List) result.get("collect(r)");
 		assertEquals(2, ratings.size());
@@ -521,10 +508,9 @@ public abstract class QueryCapabilityTest  {
 		List<Movie> movies = (List) result.get("movies");
 		assertEquals(2, movies.size());
 		for (Movie movie : movies) {
-			if (movie.getRatings().iterator().next().getStars()==3) {
+			if (movie.getRatings().iterator().next().getStars() == 3) {
 				assertEquals("Top Gear", movie.getTitle());
-			}
-			else {
+			} else {
 				assertEquals("Pulp Fiction", movie.getTitle());
 				assertEquals(5, movie.getRatings().iterator().next().getStars());
 			}
@@ -549,7 +535,7 @@ public abstract class QueryCapabilityTest  {
 
 		for (Object o : nodes) {
 			if (o instanceof User) {
-				User user = (User)o;
+				User user = (User) o;
 				assertEquals("Vince", user.getName());
 				assertEquals(1, user.getRatings().size());
 				Movie movie = user.getRatings().iterator().next().getMovie();
@@ -558,7 +544,6 @@ public abstract class QueryCapabilityTest  {
 				Rating rating = movie.getRatings().iterator().next();
 				assertNotNull(rating);
 				assertEquals(4, rating.getStars());
-
 			}
 		}
 	}
@@ -572,8 +557,7 @@ public abstract class QueryCapabilityTest  {
 		assertNotNull(results);
 		Map<String, Object> result = results.next();
 		assertNotNull(result);
-		assertEquals(2, ((String[])result.get("arr")).length);
-
+		assertEquals(2, ((String[]) result.get("arr")).length);
 	}
 
 	/**
@@ -585,14 +569,12 @@ public abstract class QueryCapabilityTest  {
 		assertNotNull(results);
 		Map<String, Object> result = results.next();
 		assertNotNull(result);
-		assertEquals(2, ((String[])result.get("arr")).length);
-		Object[] mixed = (Object[])result.get("mixed");
+		assertEquals(2, ((String[]) result.get("arr")).length);
+		Object[] mixed = (Object[]) result.get("mixed");
 		assertEquals(3, mixed.length);
-		assertEquals(1L, ((Number)mixed[0]).longValue());
+		assertEquals(1L, ((Number) mixed[0]).longValue());
 		assertEquals("two", mixed[1]);
 		assertEquals(true, mixed[2]);
-
-
 	}
 
 	/**
@@ -600,7 +582,7 @@ public abstract class QueryCapabilityTest  {
 	 */
 	@Test
 	public void modifyingQueryShouldBeAbleToMapEntitiesAndReturnStatistics() {
-		Result result = session.query("MATCH (u:User {name:{name}})-[:RATED]->(m) WITH u,m SET u.age={age} RETURN u as user, m as movie", MapUtil.map("name", "Vince","age",20));
+		Result result = session.query("MATCH (u:User {name:{name}})-[:RATED]->(m) WITH u,m SET u.age={age} RETURN u as user, m as movie", MapUtil.map("name", "Vince", "age", 20));
 		Iterator<Map<String, Object>> results = result.queryResults().iterator();
 		assertNotNull(results);
 		Map<String, Object> row = results.next();
@@ -639,7 +621,7 @@ public abstract class QueryCapabilityTest  {
 	 */
 	@Test
 	public void shouldLoadNodesWithUnmappedOrNoLabels() {
-		int movieCount=0,userCount=0, unmappedCount=0, noLabelCount=0;
+		int movieCount = 0, userCount = 0, unmappedCount = 0, noLabelCount = 0;
 
 		session.query("CREATE (unknown), (m:Unmapped), (n:Movie), (n)-[:UNKNOWN]->(m)", Collections.EMPTY_MAP);
 
@@ -648,23 +630,19 @@ public abstract class QueryCapabilityTest  {
 
 		Iterator<Map<String, Object>> resultIterator = result.iterator();
 		while (resultIterator.hasNext()) {
-			Map<String,Object> row = resultIterator.next();
+			Map<String, Object> row = resultIterator.next();
 			Object n = row.get("n");
 			if (n instanceof User) {
 				userCount++;
-			}
-			else if (n instanceof Movie) {
+			} else if (n instanceof Movie) {
 				movieCount++;
-			}
-			else if (n instanceof NodeModel) {
+			} else if (n instanceof NodeModel) {
 				if (((NodeModel) n).getLabels().length == 0) {
 					noLabelCount++;
-				}
-				else if (((NodeModel) n).getLabels()[0].equals("Unmapped")) {
+				} else if (((NodeModel) n).getLabels()[0].equals("Unmapped")) {
 					unmappedCount++;
 				}
 			}
-
 		}
 		assertEquals(1, unmappedCount);
 		assertEquals(1, noLabelCount);
@@ -677,23 +655,23 @@ public abstract class QueryCapabilityTest  {
 	 */
 	@Test
 	public void shouldMapCypherCollectionsToArrays() {
-		Iterator<Map<String,Object>> iterator = session.query("MATCH (n:User) return collect(n.name) as names", Collections.EMPTY_MAP).iterator();
+		Iterator<Map<String, Object>> iterator = session.query("MATCH (n:User) return collect(n.name) as names", Collections.EMPTY_MAP).iterator();
 		assertTrue(iterator.hasNext());
-		Map<String,Object> row = iterator.next();
+		Map<String, Object> row = iterator.next();
 		assertTrue(row.get("names").getClass().isArray());
-		assertEquals(4, ((String[])row.get("names")).length);
+		assertEquals(4, ((String[]) row.get("names")).length);
 
 		iterator = session.query("MATCH (n:User {name:'Michal'}) return collect(n.name) as names", Collections.EMPTY_MAP).iterator();
 		assertTrue(iterator.hasNext());
 		row = iterator.next();
 		assertTrue(row.get("names").getClass().isArray());
-		assertEquals(1, ((String[])row.get("names")).length);
+		assertEquals(1, ((String[]) row.get("names")).length);
 
 		iterator = session.query("MATCH (n:User {name:'Does Not Exist'}) return collect(n.name) as names", Collections.EMPTY_MAP).iterator();
 		assertTrue(iterator.hasNext());
 		row = iterator.next();
 		assertTrue(row.get("names").getClass().isArray());
-		assertEquals(0, ((Object[])row.get("names")).length);
+		assertEquals(0, ((Object[]) row.get("names")).length);
 	}
 
 	private boolean checkForMichal(Map<String, Object> result, boolean foundMichal) {
@@ -704,9 +682,7 @@ public abstract class QueryCapabilityTest  {
 				assertEquals("Vince", u.getFriends().iterator().next().getName());
 				foundMichal = true;
 			}
-
 		}
 		return foundMichal;
 	}
-
 }

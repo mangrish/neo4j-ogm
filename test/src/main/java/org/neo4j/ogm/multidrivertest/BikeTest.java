@@ -27,7 +27,7 @@ import org.neo4j.ogm.testutil.StubDriver;
 /**
  * @author Vince Bickers
  */
-public abstract class BikeTest {
+public class BikeTest {
 
 
 	@Test

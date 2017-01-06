@@ -11,7 +11,7 @@
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
 
-package org.neo4j.ogm.multidrivertest;
+package org.neo4j.ogm.multidrivertest.relationships;
 
 import static org.junit.Assert.*;
 
@@ -31,9 +31,9 @@ import org.neo4j.ogm.session.Utils;
  * @author Vince Bickers
  * @author Luanne Misquitta
  */
-public abstract class ExtraRelationshipEntityTest {
+public class ExtraRelationshipEntityTest {
 
-	private final Session session = new SessionFactory("org.neo4j.ogm.persistence.relationships").openSession();
+	private final Session session = new SessionFactory("org.neo4j.ogm.multidrivertest.relationships").openSession();
 	private U u;
 	private M m;
 	private R r1;

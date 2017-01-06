@@ -33,7 +33,7 @@ import org.neo4j.ogm.transaction.Transaction;
 /**
  * @author Luanne Misquitta
  */
-public abstract class TransactionTest {
+public class TransactionTest {
 
 	private Session session;
 

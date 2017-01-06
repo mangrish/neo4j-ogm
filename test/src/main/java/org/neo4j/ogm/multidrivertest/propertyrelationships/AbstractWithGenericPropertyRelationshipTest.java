@@ -1,4 +1,4 @@
-package org.neo4j.ogm.multidrivertest;
+package org.neo4j.ogm.multidrivertest.propertyrelationships;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -24,9 +24,9 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Vince Bickers
  */
 
-public abstract class AbstractWithGenericPropertyRelationshipTest {
+public class AbstractWithGenericPropertyRelationshipTest {
 
-	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.model", "org.neo4j.ogm.persistence.examples.stage");
+	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.multidrivertest.propertyrelationships", "org.neo4j.ogm.domain.stage");
 
 	private Session session;
 

@@ -44,7 +44,7 @@ import org.neo4j.ogm.transaction.Transaction;
  * </code>
  * </pre>
  */
-public abstract class BidirectionalMappingTest {
+public class BidirectionalMappingTest {
 
 	private Session session;
 

@@ -33,7 +33,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Michal Bachman
  * @author Vince Bickers
  */
-public abstract class EndToEndTest {
+public class EndToEndTest {
 
 	private static Session session;
 

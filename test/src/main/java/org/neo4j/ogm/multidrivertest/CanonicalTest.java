@@ -29,7 +29,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class CanonicalTest {
+public class CanonicalTest {
 
 	private Session session;
 

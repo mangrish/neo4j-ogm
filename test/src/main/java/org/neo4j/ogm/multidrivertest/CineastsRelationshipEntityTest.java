@@ -36,7 +36,7 @@ import org.neo4j.ogm.testutil.TestUtils;
  * @author Luanne Misquitta
  * @author Mark Angrish
  */
-public abstract class CineastsRelationshipEntityTest {
+public class CineastsRelationshipEntityTest {
 
 	private Session session;
 

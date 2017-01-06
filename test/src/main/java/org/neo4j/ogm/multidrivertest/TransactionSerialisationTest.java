@@ -29,7 +29,7 @@ import org.neo4j.ogm.transaction.Transaction;
  * @author vince
  * @see Issue #130
  */
-public abstract class TransactionSerialisationTest {
+public class TransactionSerialisationTest {
 
 	@Test
 	public void shouldBeAbleToRunMultiThreadedLongRunningQueriesWithoutLosingConnectionResources() throws InterruptedException {

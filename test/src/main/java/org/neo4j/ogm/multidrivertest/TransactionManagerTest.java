@@ -34,7 +34,7 @@ import org.neo4j.ogm.transaction.Transaction;
  * @author Michal Bachman
  * @author Vince Bickers
  */
-public abstract class TransactionManagerTest {
+public class TransactionManagerTest {
 
 	@Test
 	public void shouldBeAbleToCreateManagedTransaction() {

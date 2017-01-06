@@ -28,7 +28,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class GraphIdCapabilityTest {
+public class GraphIdCapabilityTest {
 
 	private Session session;
 	private Long pleaseId;

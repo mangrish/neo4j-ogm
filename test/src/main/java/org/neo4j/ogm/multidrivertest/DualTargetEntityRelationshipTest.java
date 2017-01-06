@@ -13,6 +13,14 @@
 
 package org.neo4j.ogm.multidrivertest;
 
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.ogm.cypher.Filter;
@@ -22,97 +30,90 @@ import org.neo4j.ogm.domain.mappings.Tag;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
  * @author Nils Dr\u00F6ge
  * @author Luanne Misquitta
  */
-public abstract class DualTargetEntityRelationshipTest  {
-    private Session session;
+public class DualTargetEntityRelationshipTest {
 
-    @Before
-    public void init() throws IOException {
-        session = new SessionFactory("org.neo4j.ogm.domain.mappings").openSession();
-    }
+	private Session session;
 
-    /**
-     * @see DATAGRAPH-636
-     */
-    @Test
-    public void mappingShouldConsiderClasses() {
+	@Before
+	public void init() throws IOException {
+		session = new SessionFactory("org.neo4j.ogm.domain.mappings").openSession();
+	}
 
-        Category category = new Category("cat1");
+	/**
+	 * @see DATAGRAPH-636
+	 */
+	@Test
+	public void mappingShouldConsiderClasses() {
 
-        Tag tag1 = new Tag("tag1");
-        Set<Tag> tags = new HashSet<>();
-        tags.add(tag1);
+		Category category = new Category("cat1");
 
-        Event event = new Event("title");
-        event.setCategory(category);
-        event.setTags(tags);
+		Tag tag1 = new Tag("tag1");
+		Set<Tag> tags = new HashSet<>();
+		tags.add(tag1);
 
-        session.save(event);
+		Event event = new Event("title");
+		event.setCategory(category);
+		event.setTags(tags);
 
-        assertNotNull(event.getNodeId());
-        assertNotNull(event.getCategory().getNodeId());
-        assertNotNull(event.getTags().iterator().next().getNodeId());
+		session.save(event);
 
-        session.clear();
-        event = session.load(Event.class, event.getNodeId(), 1);
+		assertNotNull(event.getNodeId());
+		assertNotNull(event.getCategory().getNodeId());
+		assertNotNull(event.getTags().iterator().next().getNodeId());
 
-        assertNotNull(event);
-        assertEquals(category, event.getCategory());
-        assertEquals(tag1, event.getTags().iterator().next());
-    }
+		session.clear();
+		event = session.load(Event.class, event.getNodeId(), 1);
 
-    /**
-     * @see DATAGRAPH-690
-     */
-    @Test
-    public void shouldKeepAllRelations() {
+		assertNotNull(event);
+		assertEquals(category, event.getCategory());
+		assertEquals(tag1, event.getTags().iterator().next());
+	}
 
-        Category category = new Category("cat1");
+	/**
+	 * @see DATAGRAPH-690
+	 */
+	@Test
+	public void shouldKeepAllRelations() {
 
-        Tag tag1 = new Tag("tag1");
-        Set<Tag> tags = new HashSet<>();
-        tags.add(tag1);
+		Category category = new Category("cat1");
 
-        Event event = new Event("title");
-        event.setCategory(category);
-        event.setTags(tags);
+		Tag tag1 = new Tag("tag1");
+		Set<Tag> tags = new HashSet<>();
+		tags.add(tag1);
 
-        session.save(event);
+		Event event = new Event("title");
+		event.setCategory(category);
+		event.setTags(tags);
 
-        assertNotNull(event.getNodeId());
-        assertNotNull(category.getNodeId());
-        assertNotNull(tag1.getNodeId());
+		session.save(event);
 
-        session.clear();
+		assertNotNull(event.getNodeId());
+		assertNotNull(category.getNodeId());
+		assertNotNull(tag1.getNodeId());
 
-        Collection<Tag> tagsFound = session.loadAll(Tag.class, new Filter("name", "tag1"));
-        assertEquals(1, tagsFound.size());
-        event.setTags(new HashSet<>(tagsFound));
+		session.clear();
 
-        Collection<Category> categoriesFound = session.loadAll(Category.class, new Filter("name", "cat1"));
-        assertEquals(1, categoriesFound.size());
-        event.setCategory(categoriesFound.iterator().next());
+		Collection<Tag> tagsFound = session.loadAll(Tag.class, new Filter("name", "tag1"));
+		assertEquals(1, tagsFound.size());
+		event.setTags(new HashSet<>(tagsFound));
 
-        assertEquals(tag1, event.getTags().iterator().next());
-        assertEquals(category, event.getCategory());
-        session.save(event);
+		Collection<Category> categoriesFound = session.loadAll(Category.class, new Filter("name", "cat1"));
+		assertEquals(1, categoriesFound.size());
+		event.setCategory(categoriesFound.iterator().next());
 
-        session.clear();
-        Event eventFound = session.load(Event.class, event.getNodeId(), 1);
+		assertEquals(tag1, event.getTags().iterator().next());
+		assertEquals(category, event.getCategory());
+		session.save(event);
 
-        assertNotNull(eventFound.getNodeId());
-        assertEquals(category, eventFound.getCategory());
-        assertEquals(tag1, eventFound.getTags().iterator().next());
-    }
+		session.clear();
+		Event eventFound = session.load(Event.class, event.getNodeId(), 1);
+
+		assertNotNull(eventFound.getNodeId());
+		assertEquals(category, eventFound.getCategory());
+		assertEquals(tag1, eventFound.getTags().iterator().next());
+	}
 }

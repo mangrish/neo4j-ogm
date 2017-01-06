@@ -34,7 +34,7 @@ import org.neo4j.ogm.testutil.GraphTestUtils;
  * @author Mark Angrish
  * @author Luanne Misquitta
  */
-public abstract class RelationshipMappingTest  {
+public abstract class RelationshipMappingTest {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.policy", "org.neo4j.ogm.domain.election");
 

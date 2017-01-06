@@ -34,7 +34,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class SocialIntegrationTest {
+public class SocialIntegrationTest {
 
 	private Session session;
 

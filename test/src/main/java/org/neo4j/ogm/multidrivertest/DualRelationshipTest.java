@@ -37,7 +37,7 @@ import org.neo4j.ogm.session.Utils;
  * @author Luanne Misquitta
  * @see Issue 144
  */
-public abstract class DualRelationshipTest {
+public class DualRelationshipTest {
 
 	private Session session;
 

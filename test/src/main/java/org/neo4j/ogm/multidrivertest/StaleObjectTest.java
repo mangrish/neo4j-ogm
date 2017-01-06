@@ -47,7 +47,7 @@ import org.neo4j.ogm.session.SessionFactory;
  *
  * @author Vince Bickers
  */
-public abstract class StaleObjectTest {
+public class StaleObjectTest {
 
 	private Folder f;
 	private Document a;

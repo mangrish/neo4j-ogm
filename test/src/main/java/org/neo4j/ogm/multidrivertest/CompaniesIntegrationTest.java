@@ -33,7 +33,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Luanne Misquitta
  * @author Vince Bickers
  */
-public abstract class CompaniesIntegrationTest {
+public class CompaniesIntegrationTest {
 
 	private static Session session;
 

@@ -24,7 +24,7 @@ import org.neo4j.ogm.transaction.Transaction;
 /**
  * @author Luanne Misquitta
  */
-public abstract class FriendsInLongTransactionTest {
+public class FriendsInLongTransactionTest {
 
 	Session session = new SessionFactory("org.neo4j.ogm.domain.friendships").openSession();
 

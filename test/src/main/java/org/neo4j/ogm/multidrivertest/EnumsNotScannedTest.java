@@ -31,7 +31,7 @@ import org.neo4j.ogm.session.SessionFactory;
  * @author Luanne Misquitta
  * @see issue #145
  */
-public abstract class EnumsNotScannedTest {
+public class EnumsNotScannedTest {
 
 	private Session session;
 

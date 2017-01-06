@@ -30,7 +30,7 @@ import org.neo4j.ogm.session.Utils;
  * @author vince
  * @author Luanne Misquitta
  */
-public abstract class ParameterizedConversionTest {
+public class ParameterizedConversionTest {
 
 	private Session session;
 

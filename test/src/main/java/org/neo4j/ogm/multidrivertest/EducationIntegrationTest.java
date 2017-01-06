@@ -33,7 +33,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class EducationIntegrationTest {
+public class EducationIntegrationTest {
 
 	private Session session;
 

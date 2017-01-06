@@ -26,7 +26,7 @@ import org.neo4j.ogm.testutil.StubDriver;
  * @author Luanne Misquitta
  * @author Mark Angrish
  */
-public abstract class UserTest {
+public class UserTest {
 
 	@Test
 	public void testDeserialiseUserWithArrayOfEnums() {

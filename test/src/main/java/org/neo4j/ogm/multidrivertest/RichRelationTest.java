@@ -29,7 +29,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Nils Dr\u00F6ge
  */
-public abstract class RichRelationTest {
+public class RichRelationTest {
 
 	private Session session;
 

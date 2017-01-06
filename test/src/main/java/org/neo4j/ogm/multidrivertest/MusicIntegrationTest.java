@@ -35,7 +35,7 @@ import org.neo4j.ogm.session.Utils;
 /**
  * @author Luanne Misquitta
  */
-public abstract class MusicIntegrationTest {
+public class MusicIntegrationTest {
 
 	private static Session session;
 

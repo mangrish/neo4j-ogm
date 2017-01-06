@@ -10,7 +10,7 @@
  * code for these subcomponents is subject to the terms and
  *  conditions of the subcomponent's license, as noted in the LICENSE file.
  */
-package org.neo4j.ogm.multidrivertest;
+package org.neo4j.ogm.multidrivertest.identity;
 
 import static org.junit.Assert.*;
 
@@ -32,9 +32,9 @@ import org.neo4j.ogm.session.SessionFactory;
  *
  * @author vince
  */
-public abstract class IdentityTest {
+public class IdentityTest {
 
-	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.persistence.identity");
+	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.multidrivertest.identity");
 
 	private Session session;
 

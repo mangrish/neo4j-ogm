@@ -31,7 +31,7 @@ import org.neo4j.ogm.session.SessionFactory;
 /**
  * @author Luanne Misquitta
  */
-public abstract class NumericConversionTest {
+public class NumericConversionTest {
 
 	private Session session;
 

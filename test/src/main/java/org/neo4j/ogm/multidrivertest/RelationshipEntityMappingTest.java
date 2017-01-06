@@ -13,6 +13,8 @@
 
 package org.neo4j.ogm.multidrivertest;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -25,14 +27,12 @@ import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.testutil.GraphTestUtils;
 
-import java.io.IOException;
-
 
 /**
  * @author Vince Bickers
  * @author Mark Angrish
  */
-public abstract class RelationshipEntityMappingTest  {
+public abstract class RelationshipEntityMappingTest {
 
 	private static final SessionFactory sessionFactory = new SessionFactory("org.neo4j.ogm.domain.cineasts.annotated", "org.neo4j.ogm.domain.canonical.hierarchies");
 

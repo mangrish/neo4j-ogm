@@ -84,7 +84,6 @@ public abstract class EntityGraphMapperTest {
 	}
 
 
-
 	@Test(expected = NullPointerException.class)
 	public void shouldThrowExceptionOnAttemptToMapNullObjectToCypherQuery() {
 		this.mapper.map(null);
